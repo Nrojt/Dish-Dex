@@ -24,6 +24,7 @@ import java.util.List;
 
 public class ScrapeFromUrlActivity extends AppCompatActivity {
     private TextView recipeTextOnScreen;
+    private TextView ingredientTextOnScreen;
     private TextInputEditText websiteTextInput;
     private Button getUrlButton;
 
@@ -35,6 +36,7 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
         recipeTextOnScreen = findViewById(R.id.recipeTextOnScreen);
         websiteTextInput = findViewById(R.id.websiteTextInput);
         getUrlButton = findViewById(R.id.getUrlButton);
+        ingredientTextOnScreen = findViewById(R.id.ingredientTextOnScreen);
 
 
         getUrlButton.setOnClickListener(new View.OnClickListener() {
@@ -65,18 +67,37 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             if(isNetworkAvailable()) {
                 Document document = getDocument(url);
-                Elements recipeElements;
-                Elements ingredientElements;
+                Elements recipeElements = null;
+                Elements ingredientElements = null;
+
+                //checking the url to see what classes need to be scraped, don't think this can be done in a switch
                 if (url.contains("ah.nl/allerhande/recept")) {
                     recipeElements = document.getElementsByClass("recipe-steps_step__FYhB8");
                     ingredientElements = document.getElementsByClass("recipe-ingredients_ingredientsList__thXVo");
-                    recipeTextList = recipeElements.eachText();
-                    ingredientTextList = ingredientElements.eachText();
-                } else {
-                    recipeTextList.add("This site is unsupported");
+                } else if(url.contains("allrecipes.com/recipe")){
+                    recipeElements = document.getElementsByClass("comp recipe__steps-content mntl-sc-page mntl-block");
+                    ingredientElements = document.getElementsByClass("comp mntl-structured-ingredients");
+                } else if(url.contains("www.jumbo.com/recepten")){
+                    recipeElements = document.getElementsByClass("preparation-container");
+                    ingredientElements = document.getElementsByClass("ingredients-container");
                 }
+                else {
+                    recipeTextList.add("This site is unsupported");
+                    ingredientTextList.add("This site is unsupported");
+                }
+
+                for(int i = 0; i < recipeElements.size(); i++){
+                    recipeTextList.add(recipeElements.eachText().get(i));
+                    recipeTextList.add("\n\n");
+                }
+                for(int i = 0; i < ingredientElements.size(); i++){
+                    ingredientTextList.add(ingredientElements.eachText().get(i));
+                    ingredientTextList.add("\n\n");
+                }
+
             } else{
                 recipeTextList.add("Device not connected to the internet");
+                ingredientTextList.add("Device not connected to the internet");
             }
 
             return null;
@@ -86,11 +107,15 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
             StringBuilder recipeText = new StringBuilder();
+            StringBuilder ingredientText = new StringBuilder();
             for(int i = 0; i < recipeTextList.size(); i++){
                 recipeText.append(recipeTextList.get(i));
-                recipeText.append("\n");
+            }
+            for(int i = 0; i < ingredientTextList.size(); i++){
+                ingredientText.append(ingredientTextList.get(i));
             }
             recipeTextOnScreen.setText(recipeText);
+            ingredientTextOnScreen.setText(ingredientText);
 
         }
 
@@ -109,6 +134,7 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
         return document;
     }
 
+    //Checking if the user is connected to the internet
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
