@@ -16,6 +16,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -26,6 +27,8 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
     private TextView recipeTextOnScreen;
     private TextView ingredientTextOnScreen;
     private TextInputEditText websiteTextInput;
+    private TextView cookingTimeTextOnScreen;
+    private TextView servingsTextOnScreen;
     private Button getUrlButton;
 
     @Override
@@ -37,6 +40,8 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
         websiteTextInput = findViewById(R.id.websiteTextInput);
         getUrlButton = findViewById(R.id.getUrlButton);
         ingredientTextOnScreen = findViewById(R.id.ingredientTextOnScreen);
+        cookingTimeTextOnScreen = findViewById(R.id.cookingTimeTextOnScreen);
+        servingsTextOnScreen = findViewById(R.id.servingsTextOnScreen);
 
 
         getUrlButton.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +57,8 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
     }
     private class Webscraper extends AsyncTask<Void, Void, Void> {
         String url;
+        String servings = "Servings unknown";
+        String cookingTime = "Cooking time unknown";
         List<String> recipeTextList = new ArrayList<>();
         List<String> ingredientTextList = new ArrayList<>();
 
@@ -69,11 +76,15 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
                 Document document = getDocument(url);
                 Elements recipeElements = null;
                 Elements ingredientElements = null;
+                Elements servingsElements = null;
+                Element cookingTimeElements = null;
 
                 //checking the url to see what classes need to be scraped, don't think this can be done in a switch
                 if (url.contains("ah.nl/allerhande/recept")) {
                     recipeElements = document.getElementsByClass("recipe-steps_step__FYhB8");
                     ingredientElements = document.getElementsByClass("recipe-ingredients_ingredientsList__thXVo");
+                    servingsElements = document.getElementsByClass("recipe-ingredients_servings__f8HXF");
+                    cookingTimeElements = document.getElementsByClass("recipe-header-time_timeLine__nn84w").get(0);
                 } else if(url.contains("allrecipes.com/recipe")){
                     recipeElements = document.getElementsByClass("comp recipe__steps-content mntl-sc-page mntl-block");
                     ingredientElements = document.getElementsByClass("comp mntl-structured-ingredients");
@@ -86,14 +97,17 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
                     ingredientTextList.add("This site is unsupported");
                 }
 
-                for(int i = 0; i < recipeElements.size(); i++){
+                for(int i = 0; i < (recipeElements != null ? recipeElements.size() : 0); i++){
                     recipeTextList.add(recipeElements.eachText().get(i));
                     recipeTextList.add("\n\n");
                 }
-                for(int i = 0; i < ingredientElements.size(); i++){
+                for(int i = 0; i < (ingredientElements != null ? ingredientElements.size() : 0); i++){
                     ingredientTextList.add(ingredientElements.eachText().get(i));
                     ingredientTextList.add("\n\n");
                 }
+
+                servings = (servingsElements != null) ? servingsElements.eachText().get(0) : null;
+                cookingTime = cookingTimeElements != null ? cookingTimeElements.text() : null;
 
             } else{
                 recipeTextList.add("Device not connected to the internet");
@@ -116,6 +130,8 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
             }
             recipeTextOnScreen.setText(recipeText);
             ingredientTextOnScreen.setText(ingredientText);
+            servingsTextOnScreen.setText(servings);
+            cookingTimeTextOnScreen.setText(cookingTime);
 
         }
 
