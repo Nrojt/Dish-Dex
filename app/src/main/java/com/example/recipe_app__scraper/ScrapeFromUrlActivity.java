@@ -29,6 +29,7 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
     private TextInputEditText websiteTextInput;
     private TextView cookingTimeTextOnScreen;
     private TextView servingsTextOnScreen;
+    private TextView recipeTitleTextOnScreen;
     private Button getUrlButton;
 
     @Override
@@ -42,6 +43,7 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
         ingredientTextOnScreen = findViewById(R.id.ingredientTextOnScreen);
         cookingTimeTextOnScreen = findViewById(R.id.cookingTimeTextOnScreen);
         servingsTextOnScreen = findViewById(R.id.servingsTextOnScreen);
+        recipeTitleTextOnScreen = findViewById(R.id.recipeTitleTextOnScreen);
 
 
         getUrlButton.setOnClickListener(new View.OnClickListener() {
@@ -57,8 +59,9 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
     }
     private class Webscraper extends AsyncTask<Void, Void, Void> {
         String url;
-        String servings = "Servings unknown";
-        String cookingTime = "Cooking time unknown";
+        int servings = 0;
+        int cookingTime = 0;
+        String recipeTitle = "Unknown";
         List<String> recipeTextList = new ArrayList<>();
         List<String> ingredientTextList = new ArrayList<>();
 
@@ -76,21 +79,25 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
                 Document document = getDocument(url);
                 Elements recipeElements = null;
                 Elements ingredientElements = null;
-                Elements servingsElements = null;
-                Element cookingTimeElements = null;
+                Element servingsElement = null;
+                Element cookingTimeElement = null;
+                Element recipeTitleElement = null;
 
                 //checking the url to see what classes need to be scraped, don't think this can be done in a switch
                 if (url.contains("ah.nl/allerhande/recept")) {
                     recipeElements = document.getElementsByClass("recipe-steps_step__FYhB8");
                     ingredientElements = document.getElementsByClass("recipe-ingredients_ingredientsList__thXVo");
-                    servingsElements = document.getElementsByClass("recipe-ingredients_servings__f8HXF");
-                    cookingTimeElements = document.getElementsByClass("recipe-header-time_timeLine__nn84w").get(0);
+
+                    servingsElement = document.getElementsByClass("recipe-ingredients_servings__f8HXF").get(0);
+                    cookingTimeElement = document.getElementsByClass("recipe-header-time_timeLine__nn84w").get(0);
+                    recipeTitleElement = document.getElementsByClass("typography_root__Om3Wh typography_variant-superhero__239x3 typography_hasMargin__4EaQi recipe-header_title__tG0JE").get(0);
                 } else if(url.contains("allrecipes.com/recipe")){
                     recipeElements = document.getElementsByClass("comp recipe__steps-content mntl-sc-page mntl-block");
                     ingredientElements = document.getElementsByClass("comp mntl-structured-ingredients");
-                } else if(url.contains("www.jumbo.com/recepten")){
-                    recipeElements = document.getElementsByClass("preparation-container");
-                    ingredientElements = document.getElementsByClass("ingredients-container");
+
+                    servingsElement = document.getElementsByClass("mntl-recipe-details__value").get(3);
+                    cookingTimeElement = document.getElementsByClass("mntl-recipe-details__value").get(0);
+                    recipeTitleElement = document.getElementById("article-heading_1-0");
                 }
                 else {
                     recipeTextList.add("This site is unsupported");
@@ -106,8 +113,16 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
                     ingredientTextList.add("\n\n");
                 }
 
-                servings = (servingsElements != null) ? servingsElements.eachText().get(0) : null;
-                cookingTime = cookingTimeElements != null ? cookingTimeElements.text() : null;
+                if (servingsElement != null) {
+                    servings = Integer.parseInt(servingsElement.text().replaceAll("[^0-9]", ""));
+                }
+                if (cookingTimeElement != null) {
+                    cookingTime = Integer.parseInt(cookingTimeElement.text().replaceAll("[^0-9]", ""));
+                }
+
+                if (recipeTitleElement != null) {
+                    recipeTitle = recipeTitleElement.text();
+                }
 
             } else{
                 recipeTextList.add("Device not connected to the internet");
@@ -130,8 +145,9 @@ public class ScrapeFromUrlActivity extends AppCompatActivity {
             }
             recipeTextOnScreen.setText(recipeText);
             ingredientTextOnScreen.setText(ingredientText);
-            servingsTextOnScreen.setText(servings);
-            cookingTimeTextOnScreen.setText(cookingTime);
+            servingsTextOnScreen.setText("Servings: "+servings);
+            cookingTimeTextOnScreen.setText("Cooking time: "+cookingTime + " min");
+            recipeTitleTextOnScreen.setText(recipeTitle);
 
         }
 

@@ -36,6 +36,18 @@
                 android:layout_height="wrap_content"
                 android:text="Get Recipe" />
 
+            <TextView
+                android:id="@+id/recipeTitleTextOnScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:gravity="center"
+                android:text="Title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
