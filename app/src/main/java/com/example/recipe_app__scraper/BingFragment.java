@@ -1,19 +1,23 @@
 package com.example.recipe_app__scraper;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -23,8 +27,12 @@ import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class BingActivity extends AppCompatActivity {
-
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link BingFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class BingFragment extends Fragment {
     // Enter a valid subscription key.
     static String subscriptionKey;
 
@@ -39,19 +47,57 @@ public class BingActivity extends AppCompatActivity {
 
     private TextView bingText;
 
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    public BingFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment BingFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static BingFragment newInstance(String param1, String param2) {
+        BingFragment fragment = new BingFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bing);
-        Button bingSearchButton = findViewById(R.id.bingSearchButton);
-        TextInputEditText bingApiKeyInput = findViewById(R.id.bingApiKeyInput);
-        TextInputEditText bingSearchInput = findViewById(R.id.bingSearchInput);
-        bingText = findViewById(R.id.bingText);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_bing, container, false);
+        Button bingSearchButton = view.findViewById(R.id.bingSearchButton);
+        TextInputEditText bingSearchInput = view.findViewById(R.id.bingSearchInput);
 
         bingSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                subscriptionKey = String.valueOf(bingApiKeyInput.getText());
+                subscriptionKey = "API KEY";
                 searchTerm = String.valueOf(bingSearchInput.getText());
                 // Confirm the subscriptionKey is valid.
                 if (subscriptionKey.length() != 32) {
@@ -60,7 +106,7 @@ public class BingActivity extends AppCompatActivity {
                     bingText.setText("No search query given");
                 }
                 else {
-                    if(isNetworkAvailable()) {
+                    if(InternetConnection.isNetworkAvailable()) {
                         BingWebSearch bong = new BingWebSearch();
                         bong.execute();
                     } else {
@@ -69,30 +115,12 @@ public class BingActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_bing, container, false);
     }
 
-
-    private class BingWebSearch extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            // Call the SearchWeb method and print the response.
-            try {
-                SearchResults result = SearchWeb(searchTerm);
-
-            } catch (Exception e) {
-                e.printStackTrace(System.out);
-                System.exit(1);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void unused) {
-        }
-    }
-
-        public static SearchResults SearchWeb (String searchQuery) throws Exception {
+    public static SearchResults SearchWeb (String searchQuery) throws Exception {
         // Construct the URL.
         URL url = new URL(host + path + "?q=" + URLEncoder.encode(searchQuery, "UTF-8"));
 
@@ -119,11 +147,24 @@ public class BingActivity extends AppCompatActivity {
         return results;
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    class BingWebSearch extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Call the SearchWeb method and print the response.
+            try {
+                SearchResults result = SearchWeb(searchTerm);
+
+            } catch (Exception e) {
+                e.printStackTrace(System.out);
+                System.exit(1);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+        }
     }
 }
 
