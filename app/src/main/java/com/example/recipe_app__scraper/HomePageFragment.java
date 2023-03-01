@@ -1,5 +1,6 @@
 package com.example.recipe_app__scraper;
 
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +18,7 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class HomePageFragment extends Fragment {
+    private TextView dateTimeTextView;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -58,7 +63,13 @@ public class HomePageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home_page, container, false);
+
+        dateTimeTextView = view.findViewById(R.id.dateTimeTextView);
+        SimpleDateFormat sdf = new SimpleDateFormat("'Date\n'dd-MM-yyyy '\n\nand\n\nTime\n'HH:mm:ss z");
+        String currentDateAndTime = sdf.format(new Date());
+        dateTimeTextView.setText(currentDateAndTime);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home_page, container, false);
+        return view;
     }
 }

@@ -1,35 +1,15 @@
 package com.example.recipe_app__scraper;
 
-import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentSender;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.database.DatabaseErrorHandler;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.UserHandle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -40,17 +20,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +34,7 @@ public class ScrapeFromUrlFragment extends Fragment {
 
     private TextView recipeTextOnScreen;
     private TextView ingredientTextOnScreen;
-    private TextInputEditText websiteTextInput;
+    private TextInputEditText urlInput;
     private TextView cookingTimeTextOnScreen;
     private TextView servingsTextOnScreen;
     private TextView recipeTitleTextOnScreen;
@@ -117,7 +87,7 @@ public class ScrapeFromUrlFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_scrape_from_url, container, false);
 
         recipeTextOnScreen = view.findViewById(R.id.recipeTextOnScreen);
-        websiteTextInput = view.findViewById(R.id.websiteTextInput);
+        urlInput = view.findViewById(R.id.urlInput);
         getUrlButton = view.findViewById(R.id.getUrlButton);
         ingredientTextOnScreen = view.findViewById(R.id.ingredientTextOnScreen);
         cookingTimeTextOnScreen = view.findViewById(R.id.cookingTimeTextOnScreen);
@@ -125,21 +95,25 @@ public class ScrapeFromUrlFragment extends Fragment {
         recipeTitleTextOnScreen = view.findViewById(R.id.recipeTitleTextOnScreen);
 
         // Inflate the layout for this fragment
+
         getUrlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = websiteTextInput.getText().toString();
-                if(!url.isBlank()){
+                String url = String.valueOf(urlInput.getText());
+                if(!url.isBlank()) {
                     Webscraper wb = new Webscraper(url);
                     wb.execute();
                 }
             }
         });
 
-        return inflater.inflate(R.layout.fragment_scrape_from_url, container, false);
+
+        return view;
     }
 
     private class Webscraper extends AsyncTask<Void, Void, Void> {
+        boolean notConnected = false;
+        boolean notSupported = false;
         String url;
         int servings = 0;
         int cookingTime = 0;
@@ -182,8 +156,7 @@ public class ScrapeFromUrlFragment extends Fragment {
                     recipeTitleElement = document.getElementById("article-heading_1-0");
                 }
                 else {
-                    recipeTextList.add("This site is unsupported");
-                    ingredientTextList.add("This site is unsupported");
+                    notSupported = true;
                 }
 
                 for(int i = 0; i < (recipeElements != null ? recipeElements.size() : 0); i++){
@@ -205,10 +178,8 @@ public class ScrapeFromUrlFragment extends Fragment {
                 if (recipeTitleElement != null) {
                     recipeTitle = recipeTitleElement.text();
                 }
-
             } else{
-                recipeTextList.add("Device not connected to the internet");
-                ingredientTextList.add("Device not connected to the internet");
+                notConnected = true;
             }
 
             return null;
@@ -217,20 +188,25 @@ public class ScrapeFromUrlFragment extends Fragment {
         @Override
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
-            StringBuilder recipeText = new StringBuilder();
-            StringBuilder ingredientText = new StringBuilder();
-            for(int i = 0; i < recipeTextList.size(); i++){
-                recipeText.append(recipeTextList.get(i));
+            if(notSupported){
+                Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_LONG).show();
+            } else if(notConnected){
+                Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_LONG).show();
+            } else {
+                StringBuilder recipeText = new StringBuilder();
+                StringBuilder ingredientText = new StringBuilder();
+                for (int i = 0; i < recipeTextList.size(); i++) {
+                    recipeText.append(recipeTextList.get(i));
+                }
+                for (int i = 0; i < ingredientTextList.size(); i++) {
+                    ingredientText.append(ingredientTextList.get(i));
+                }
+                recipeTextOnScreen.setText(recipeText);
+                ingredientTextOnScreen.setText(ingredientText);
+                servingsTextOnScreen.setText("Servings: " + servings);
+                cookingTimeTextOnScreen.setText("Cooking time: " + cookingTime + " min");
+                recipeTitleTextOnScreen.setText(recipeTitle);
             }
-            for(int i = 0; i < ingredientTextList.size(); i++){
-                ingredientText.append(ingredientTextList.get(i));
-            }
-            recipeTextOnScreen.setText(recipeText);
-            ingredientTextOnScreen.setText(ingredientText);
-            servingsTextOnScreen.setText("Servings: "+servings);
-            cookingTimeTextOnScreen.setText("Cooking time: "+cookingTime + " min");
-            recipeTitleTextOnScreen.setText(recipeTitle);
-
         }
 
     }

@@ -1,38 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_constraintHeight_min="wrap"
     tools:context=".ScrapeFromUrlFragment">
 
-    <ScrollView
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/urlInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Website"
+            android:inputType="text"
+            android:minHeight="48dp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/getUrlButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="15dp"
+        android:text="Get Recipe" />
+
+    <ScrollView
+        android:id="@+id/recipeScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/websiteTextInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Website"
-                    android:inputType="text"
-                    android:minHeight="48dp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <Button
-                android:id="@+id/getUrlButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Get Recipe" />
 
             <TextView
                 android:id="@+id/recipeTitleTextOnScreen"
@@ -109,4 +117,5 @@
 
         </LinearLayout>
     </ScrollView>
-</FrameLayout>
+
+</LinearLayout>
