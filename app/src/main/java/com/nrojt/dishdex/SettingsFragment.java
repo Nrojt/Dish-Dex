@@ -1,5 +1,7 @@
-package com.example.recipe_app__scraper;
+package com.nrojt.dishdex;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +9,10 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
+import com.google.android.material.textfield.TextInputLayout;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +20,14 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class SettingsFragment extends Fragment {
+
+    private TextInputLayout bingApiKeyTextInput;
+    private Button saveSettingsButton;
+
+    public static final String SHARED_PREFS = "SharedPrefs";
+    public static final String BING_API_KEY = "bingApiKey";
+
+    private String loadedApiKey;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -58,7 +72,35 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+
+        bingApiKeyTextInput = view.findViewById(R.id.bingKeyTextInput);
+        saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
+
+        saveSettingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveData();
+            }
+        });
+
+        loadData();
+        bingApiKeyTextInput.getEditText().setText(loadedApiKey);
+
+        return view;
+    }
+
+    public void saveData(){
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(BING_API_KEY, bingApiKeyTextInput.getEditText().getText().toString());
+        editor.apply();
+    }
+
+    public void loadData(){
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        loadedApiKey = sharedPreferences.getString(BING_API_KEY, "");
+
     }
 }

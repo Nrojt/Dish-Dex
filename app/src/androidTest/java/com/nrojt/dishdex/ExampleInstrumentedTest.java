@@ -1,4 +1,4 @@
-package com.example.recipe_app__scraper;
+package com.nrojt.dishdex;
 
 import android.content.Context;
 

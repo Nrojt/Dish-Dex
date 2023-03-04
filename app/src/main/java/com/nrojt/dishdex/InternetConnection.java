@@ -1,4 +1,4 @@
-package com.example.recipe_app__scraper;
+package com.nrojt.dishdex;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

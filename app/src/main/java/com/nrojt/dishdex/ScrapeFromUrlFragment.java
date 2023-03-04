@@ -1,12 +1,12 @@
-package com.example.recipe_app__scraper;
+package com.nrojt.dishdex;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,12 +32,12 @@ import java.util.List;
  */
 public class ScrapeFromUrlFragment extends Fragment {
 
-    private TextView recipeTextOnScreen;
-    private TextView ingredientTextOnScreen;
+    private EditText recipeTextOnScreen;
+    private EditText ingredientTextOnScreen;
     private TextInputEditText urlInput;
-    private TextView cookingTimeTextOnScreen;
-    private TextView servingsTextOnScreen;
-    private TextView recipeTitleTextOnScreen;
+    private EditText cookingTimeTextOnScreen;
+    private EditText servingsTextOnScreen;
+    private EditText recipeTitleTextOnScreen;
     private Button getUrlButton;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -86,6 +86,7 @@ public class ScrapeFromUrlFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scrape_from_url, container, false);
 
+        //inflating the on screen elements
         recipeTextOnScreen = view.findViewById(R.id.recipeTextOnScreen);
         urlInput = view.findViewById(R.id.urlInput);
         getUrlButton = view.findViewById(R.id.getUrlButton);
@@ -94,8 +95,7 @@ public class ScrapeFromUrlFragment extends Fragment {
         servingsTextOnScreen = view.findViewById(R.id.servingsTextOnScreen);
         recipeTitleTextOnScreen = view.findViewById(R.id.recipeTitleTextOnScreen);
 
-        // Inflate the layout for this fragment
-
+        //onclick listener for the getUrlButton
         getUrlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,10 +107,10 @@ public class ScrapeFromUrlFragment extends Fragment {
             }
         });
 
-
         return view;
     }
 
+    //Class for scraping the websites
     private class Webscraper extends AsyncTask<Void, Void, Void> {
         boolean notConnected = false;
         boolean notSupported = false;
@@ -129,11 +129,12 @@ public class ScrapeFromUrlFragment extends Fragment {
             }
         }
 
+        //async
         @Override
         protected Void doInBackground(Void... voids) {
             if(InternetConnection.isNetworkAvailable()){
                 Document document = getDocument(url);
-                Elements recipeElements = null;
+                Elements instructionElements = null;
                 Elements ingredientElements = null;
                 Element servingsElement = null;
                 Element cookingTimeElement = null;
@@ -141,32 +142,59 @@ public class ScrapeFromUrlFragment extends Fragment {
 
                 //checking the url to see what classes need to be scraped, don't think this can be done in a switch
                 if (url.contains("ah.nl/allerhande/recept")) {
-                    recipeElements = document.getElementsByClass("recipe-steps_step__FYhB8");
-                    ingredientElements = document.getElementsByClass("recipe-ingredients_ingredientsList__thXVo");
+                    instructionElements = document.getElementsByClass("recipe-steps_step__FYhB8");
+                    Elements ahIngredientAmount = document.getElementsByClass("typography_root__Om3Wh typography_variant-paragraph__T5ZAU typography_weight-strong__uEXiN typography_hasMargin__4EaQi ingredient_unit__-ptEq");
+                    Elements ahIngredientNames = document.getElementsByClass("typography_root__Om3Wh typography_variant-paragraph__T5ZAU typography_hasMargin__4EaQi ingredient_name__WXu5R");
+
+                    for(int i = 0; i < ahIngredientNames.size(); i++){
+                        ingredientTextList.add(ahIngredientAmount.eachText().get(i) + " " + ahIngredientNames.eachText().get(i));
+                        ingredientTextList.add("\n");
+                    }
 
                     servingsElement = document.getElementsByClass("recipe-ingredients_servings__f8HXF").get(0);
                     cookingTimeElement = document.getElementsByClass("recipe-header-time_timeLine__nn84w").get(0);
                     recipeTitleElement = document.getElementsByClass("typography_root__Om3Wh typography_variant-superhero__239x3 typography_hasMargin__4EaQi recipe-header_title__tG0JE").get(0);
                 } else if(url.contains("allrecipes.com/recipe")){
-                    recipeElements = document.getElementsByClass("comp recipe__steps-content mntl-sc-page mntl-block");
-                    ingredientElements = document.getElementsByClass("comp mntl-structured-ingredients");
+                    instructionElements = document.getElementsByClass("comp mntl-sc-block-group--LI mntl-sc-block mntl-sc-block-startgroup");
+                    ingredientElements = document.getElementsByClass("mntl-structured-ingredients__list-item ");
 
                     servingsElement = document.getElementsByClass("mntl-recipe-details__value").get(3);
                     cookingTimeElement = document.getElementsByClass("mntl-recipe-details__value").get(0);
                     recipeTitleElement = document.getElementById("article-heading_1-0");
+                } else if (url.contains("food.com/recipe")){
+                    instructionElements = document.getElementsByClass("direction svelte-ovaflp");
+                    Elements foodComIngredientNames = document.getElementsByClass("ingredient-text svelte-ovaflp");
+                    Elements foodComIngredientAmount = document.getElementsByClass("ingredient-quantity svelte-ovaflp");
+
+
+                    for(int i = 0; i < foodComIngredientAmount.eachText().size(); i++){
+                        ingredientTextList.add(foodComIngredientAmount.eachText().get(i) + " " + foodComIngredientNames.eachText().get(i));
+                        ingredientTextList.add("\n");
+                    }
+
+                    for(int i = foodComIngredientAmount.eachText().size(); i < foodComIngredientNames.size(); i++){
+                        ingredientTextList.add(foodComIngredientNames.eachText().get(i));
+                        ingredientTextList.add("\n");
+                    }
+
+
+                    servingsElement = document.getElementsByClass("adjust svelte-1o10zxc").get(0);
+                    cookingTimeElement = document.getElementsByClass("facts__item svelte-ovaflp").get(0);
+                    recipeTitleElement = document.getElementsByClass("layout__item title svelte-ovaflp").get(0);
                 }
                 else {
                     notSupported = true;
                 }
 
-                for(int i = 0; i < (recipeElements != null ? recipeElements.size() : 0); i++){
-                    recipeTextList.add(recipeElements.eachText().get(i));
+                for(int i = 0; i < (instructionElements != null ? instructionElements.size() : 0); i++){
+                    recipeTextList.add(instructionElements.eachText().get(i));
                     recipeTextList.add("\n\n");
                 }
                 for(int i = 0; i < (ingredientElements != null ? ingredientElements.size() : 0); i++){
                     ingredientTextList.add(ingredientElements.eachText().get(i));
-                    ingredientTextList.add("\n\n");
+                    ingredientTextList.add("\n");
                 }
+
 
                 if (servingsElement != null) {
                     servings = Integer.parseInt(servingsElement.text().replaceAll("[^0-9]", ""));
@@ -223,7 +251,5 @@ public class ScrapeFromUrlFragment extends Fragment {
         }
         return document;
     }
-
-    //Checking if the user is connected to the internet
 
 }

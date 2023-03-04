@@ -1,16 +1,17 @@
-package com.example.recipe_app__scraper;
+package com.nrojt.dishdex;
 
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Date;
+import androidx.fragment.app.Fragment;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,9 +67,9 @@ public class HomePageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
         dateTimeTextView = view.findViewById(R.id.dateTimeTextView);
-        SimpleDateFormat sdf = new SimpleDateFormat("'Date\n'dd-MM-yyyy '\n\nand\n\nTime\n'HH:mm:ss z");
-        String currentDateAndTime = sdf.format(new Date());
-        dateTimeTextView.setText(currentDateAndTime);
+        DayOfWeek dow = LocalDate.now().getDayOfWeek();
+        String currentDay = dow.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH);
+        dateTimeTextView.setText("Hello\nToday is "+ currentDay);
         // Inflate the layout for this fragment
         return view;
     }

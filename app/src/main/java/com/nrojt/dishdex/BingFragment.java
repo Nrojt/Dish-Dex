@@ -1,4 +1,4 @@
-package com.example.recipe_app__scraper;
+package com.nrojt.dishdex;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,11 +13,7 @@ import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;

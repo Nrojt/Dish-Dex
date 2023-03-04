@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.recipe_app__scraper'
+    namespace 'com.nrojt.dishdex'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.recipe_app__scraper"
+        applicationId "com.nrojt.dishdex"
         minSdk 28
         targetSdk 32
         versionCode 1

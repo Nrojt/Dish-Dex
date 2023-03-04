@@ -1,4 +1,4 @@
-package com.example.recipe_app__scraper;
+package com.nrojt.dishdex;
 
 import android.os.Bundle;
 
@@ -7,7 +7,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.recipe_app__scraper.databinding.ActivityMainBinding;
+import com.nrojt.dishdex.databinding.ActivityMainBinding;
+
 
 public class MainActivity extends AppCompatActivity {
 
