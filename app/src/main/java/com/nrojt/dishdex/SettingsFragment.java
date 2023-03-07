@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -23,6 +24,8 @@ public class SettingsFragment extends Fragment {
 
     private TextInputLayout bingApiKeyTextInput;
     private Button saveSettingsButton;
+
+    private String bingApiKey;
 
     public static final String SHARED_PREFS = "SharedPrefs";
     public static final String BING_API_KEY = "bingApiKey";
@@ -80,6 +83,13 @@ public class SettingsFragment extends Fragment {
         saveSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                bingApiKey = bingApiKeyTextInput.getEditText().getText().toString();
+                System.out.println(bingApiKey);
+                if(!bingApiKey.isBlank()){
+                    if (bingApiKey.length() != 32) {
+                        Toast.makeText(getActivity().getApplicationContext(), "Invalid Bing Search API key", Toast.LENGTH_SHORT).show();
+                    }
+                }
                 saveData();
             }
         });
@@ -94,7 +104,7 @@ public class SettingsFragment extends Fragment {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putString(BING_API_KEY, bingApiKeyTextInput.getEditText().getText().toString());
+        editor.putString(BING_API_KEY, bingApiKey);
         editor.apply();
     }
 

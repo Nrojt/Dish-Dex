@@ -17,6 +17,5 @@ public class InternetConnection {
 
             return true;
         } catch (IOException e) { return false; }
-
     }
 }

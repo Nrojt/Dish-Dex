@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new HomePageFragment());
                     break;
                 case R.id.addRecipeButton:
-                    replaceFragment(new ScrapeFromUrlFragment());
+                    replaceFragment(new AddRecipeChooserFragment());
                     break;
                 case R.id.settingsButton:
                     replaceFragment(new SettingsFragment());

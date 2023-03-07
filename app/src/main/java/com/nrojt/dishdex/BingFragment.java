@@ -1,5 +1,10 @@
 package com.nrojt.dishdex;
 
+import static com.nrojt.dishdex.SettingsFragment.BING_API_KEY;
+import static com.nrojt.dishdex.SettingsFragment.SHARED_PREFS;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -41,7 +46,6 @@ public class BingFragment extends Fragment {
     static String path = "/v7.0/search";
     static String searchTerm;
 
-    private TextView bingText;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -87,30 +91,15 @@ public class BingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bing, container, false);
-        Button bingSearchButton = view.findViewById(R.id.bingSearchButton);
-        TextInputEditText bingSearchInput = view.findViewById(R.id.bingSearchInput);
 
-        bingSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                subscriptionKey = "API KEY";
-                searchTerm = String.valueOf(bingSearchInput.getText());
-                // Confirm the subscriptionKey is valid.
-                if (subscriptionKey.length() != 32) {
-                    bingText.setText("Invalid Bing Search API key!");
-                } else if(searchTerm.isBlank()){
-                    bingText.setText("No search query given");
-                }
-                else {
-                    if(InternetConnection.isNetworkAvailable()) {
-                        BingWebSearch bong = new BingWebSearch();
-                        bong.execute();
-                    } else {
-                        bingText.setText("Please connect to the internet");
-                    }
-                }
-            }
-        });
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
+        searchTerm = "";
+        /*
+        BingWebSearch bong = new BingWebSearch();
+        bong.execute();
+
+         */
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bing, container, false);
