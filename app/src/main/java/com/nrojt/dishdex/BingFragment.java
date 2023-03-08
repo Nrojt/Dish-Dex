@@ -95,6 +95,7 @@ public class BingFragment extends Fragment {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
         searchTerm = "";
+
         /*
         BingWebSearch bong = new BingWebSearch();
         bong.execute();

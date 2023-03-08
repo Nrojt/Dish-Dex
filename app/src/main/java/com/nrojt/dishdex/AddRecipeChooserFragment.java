@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -27,6 +28,7 @@ import java.util.concurrent.Executors;
 public class AddRecipeChooserFragment extends Fragment {
     private TextInputEditText urlInput;
     private Button getUrlButton;
+    private Button browseWebButton;
 
     private Button bingSearchButton;
     private TextInputEditText bingSearchInput;
@@ -81,11 +83,13 @@ public class AddRecipeChooserFragment extends Fragment {
         getUrlButton = view.findViewById(R.id.getUrlButton);
         bingSearchButton = view.findViewById(R.id.bingSearchButton);
         bingSearchInput = view.findViewById(R.id.bingSearchInput);
+        browseWebButton = view.findViewById(R.id.browseWebButton);
+
 
         getUrlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    String url = String.valueOf(urlInput.getText());
+                    String url = urlInput.getText().toString();
                     if (!url.isBlank()) {
                         WebScraper wb = new WebScraper(url);
                         ExecutorService service = Executors.newSingleThreadExecutor();
@@ -123,6 +127,13 @@ public class AddRecipeChooserFragment extends Fragment {
             }
         });
 
+        browseWebButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaceFragment(new WebBrowserFragment());
+            }
+        });
+
         bingSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,15 +150,18 @@ public class AddRecipeChooserFragment extends Fragment {
     }
 
     private void hideAllViewsBeforeSwitchingFragments(){
+        // Hiding all the other views that don't get replaced
+
         getUrlButton.setVisibility(View.GONE);
         urlInput.setVisibility(View.GONE);
         bingSearchButton.setVisibility(View.GONE);
         bingSearchInput.setVisibility(View.GONE);
+        browseWebButton.setVisibility(View.GONE);
     }
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.framelayout, fragment, null);
+        fragmentTransaction.replace(R.id.framelayout, fragment);
         hideAllViewsBeforeSwitchingFragments();
         fragmentTransaction.commit();
     }

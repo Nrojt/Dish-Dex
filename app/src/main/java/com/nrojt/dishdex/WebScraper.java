@@ -125,7 +125,15 @@ public class WebScraper implements Serializable {
                     servingsElement = document.getElementsByClass("adjust svelte-1o10zxc").get(0);
                     cookingTimeElement = document.getElementsByClass("facts__item svelte-ovaflp").get(0);
                     recipeTitleElement = document.getElementsByClass("layout__item title svelte-ovaflp").get(0);
-                } else {
+                } else if (url.contains("bellyfull.net")){
+                    instructionElements = document.getElementsByClass("wprm-recipe-instruction-text");
+                    ingredientElements = document.getElementsByClass("wprm-recipe-ingredient");
+
+                    servingsElement = document.getElementsByClass("wprm-recipe-servings-with-unit").get(0);
+                    cookingTimeElement = document.getElementsByClass("wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes").get(0);
+                    recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").get(0);
+                }
+                else {
                     notSupported = true;
                 }
 

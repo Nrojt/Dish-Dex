@@ -19,7 +19,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        binding.bottomNavigationView.setSelectedItemId(R.id.homeButton);
         replaceFragment(new HomePageFragment());
+
 
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
