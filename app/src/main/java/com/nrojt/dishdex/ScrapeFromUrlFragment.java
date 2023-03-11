@@ -66,7 +66,6 @@ public class ScrapeFromUrlFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
 
 
@@ -74,6 +73,7 @@ public class ScrapeFromUrlFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_scrape_from_url, container, false);
 
         //inflating the on screen elements
@@ -84,10 +84,12 @@ public class ScrapeFromUrlFragment extends Fragment {
         recipeTitleTextOnScreen = view.findViewById(R.id.recipeTitleTextOnScreen);
         noteTextOnScreen = view.findViewById(R.id.noteTextOnScreen);
 
+        //getting the url and WebScraper from the bundle
         Bundle bundle = getArguments();
         wb = (WebScraper) bundle.getSerializable("WebScraper");
-        url = (String) bundle.getString("Url");
+        url = bundle.getString("Url");
 
+        //setting the on screen elements
         recipeTextOnScreen.setText(wb.getRecipeText());
         ingredientTextOnScreen.setText(wb.getIngredientText());
         servingsTextOnScreen.setText("Servings: " + wb.getServings());

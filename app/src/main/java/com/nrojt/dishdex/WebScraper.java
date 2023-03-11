@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+//Serializable allows the object to be passed between fragments
 public class WebScraper implements Serializable {
     private boolean notConnected = false;
     private boolean notSupported = false;
@@ -25,7 +26,9 @@ public class WebScraper implements Serializable {
     private StringBuilder recipeText = new StringBuilder();
     private StringBuilder ingredientText = new StringBuilder();
 
+    //constructor
     public WebScraper(String url) {
+        //if the url doesn't contain http or https, add https. This is to prevent the app from crashing.
         if(!(url.contains("http://") || url.contains("https://"))){
             this.url = "https://"+url;
         } else{
@@ -66,7 +69,9 @@ public class WebScraper implements Serializable {
         return ingredientText;
     }
 
+    //method to scrape the website
     public void scrapeWebsite() {
+        //Checking if the user is connected to the internet
         if (InternetConnection.isNetworkAvailable()) {
             Document document = getDocument(url);
             if (document == null) {
@@ -132,11 +137,19 @@ public class WebScraper implements Serializable {
                     servingsElement = document.getElementsByClass("wprm-recipe-servings-with-unit").get(0);
                     cookingTimeElement = document.getElementsByClass("wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes").get(0);
                     recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").get(0);
+                } else if(url.contains("foodnetwork.co.uk/recipes")){
+                    instructionElements = document.getElementsByClass("legacy-method content e-instructions");
+                    ingredientElements = document.getElementsByClass("flex items-center mb-4");
+
+                    //servingsElement = document.getElementsByClass("flex px-4 py-2 border border-[#d8d8d8] rounded").get(0);
+                    //recipeTitleElement = document.getElementsByClass("mb-8 lg:mb-16 text-white p-name").get(0);
+
                 }
                 else {
                     notSupported = true;
                 }
 
+                //Converting the elements to text and adding them to the lists
                 for (int i = 0; i < (instructionElements != null ? instructionElements.size() : 0); i++) {
                     recipeTextList.add(instructionElements.eachText().get(i));
                     if (i != instructionElements.size() - 1) {
@@ -174,9 +187,11 @@ public class WebScraper implements Serializable {
         }
     }
 
+    //Method to get a Document from the website, this is part of Jsoup
     private static Document getDocument(String url) {
         Connection conn = Jsoup.connect(url);
         Document document = null;
+        //Setting the user agent as chrome since it is the most used browser so sites are more likely to support it
         conn.userAgent("Chrome");
         conn.followRedirects(true);
         try {

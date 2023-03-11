@@ -77,8 +77,10 @@ public class AddRecipeChooserFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_recipe_chooser, container, false);
 
+        //initializing the variables, assigning them to the corresponding on screen views
         urlInput = view.findViewById(R.id.urlInput);
         getUrlButton = view.findViewById(R.id.getUrlButton);
         bingSearchButton = view.findViewById(R.id.bingSearchButton);
@@ -86,22 +88,24 @@ public class AddRecipeChooserFragment extends Fragment {
         browseWebButton = view.findViewById(R.id.browseWebButton);
 
 
+        //When the user clicks the button, the url is passed to the WebScraper class which checks if the site is supported and if the site is reachable
         getUrlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                     String url = urlInput.getText().toString();
                     if (!url.isBlank()) {
                         WebScraper wb = new WebScraper(url);
+                        //creating a new thread for the WebScraper
                         ExecutorService service = Executors.newSingleThreadExecutor();
                         Handler handler = new Handler(Looper.getMainLooper());
                         service.execute(new Runnable() {
                             @Override
                             public void run() {
                                 wb.scrapeWebsite();
-
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
+                                        //checking to see if the site is supported and if the site is reachable
                                         if (wb.isNotSupported()) {
                                             Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
                                         } else if (wb.isNotConnected()) {
@@ -110,6 +114,7 @@ public class AddRecipeChooserFragment extends Fragment {
                                             Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
                                         }
                                         else {
+                                            //switching to the ScrapeFromUrlFragment and passing the WebScraper object and the url to the fragment
                                             Fragment scrapeUrlfragment = new ScrapeFromUrlFragment();
                                             Bundle bundle = new Bundle();
                                             bundle.putSerializable("WebScraper", wb);
@@ -121,12 +126,14 @@ public class AddRecipeChooserFragment extends Fragment {
                                 });
                             }
                         });
+                        service.shutdown();
                     } else {
                         Toast.makeText(getActivity().getApplicationContext(), "No url given", Toast.LENGTH_SHORT).show();
                     }
             }
         });
 
+        //When the user clicks this button, an in app browser is going to open in the WebBrowserFragment
         browseWebButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,6 +141,7 @@ public class AddRecipeChooserFragment extends Fragment {
             }
         });
 
+        //When the user clicks this button, the search query is passed to the BingSearch class
         bingSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,24 +153,16 @@ public class AddRecipeChooserFragment extends Fragment {
                 }
             }
         });
-        // Inflate the layout for this fragment
+
         return view;
     }
 
-    private void hideAllViewsBeforeSwitchingFragments(){
-        // Hiding all the other views that don't get replaced
 
-        getUrlButton.setVisibility(View.GONE);
-        urlInput.setVisibility(View.GONE);
-        bingSearchButton.setVisibility(View.GONE);
-        bingSearchInput.setVisibility(View.GONE);
-        browseWebButton.setVisibility(View.GONE);
-    }
+    //This method is used to replace the current fragment with a new fragment
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.framelayout, fragment);
-        hideAllViewsBeforeSwitchingFragments();
+        fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
     }
 }

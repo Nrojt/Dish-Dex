@@ -42,7 +42,8 @@ public class HomePageFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment HomePageFragment.
      */
-    // TODO: Rename and change types and number of parameters
+
+
     public static HomePageFragment newInstance(String param1, String param2) {
         HomePageFragment fragment = new HomePageFragment();
         Bundle args = new Bundle();
@@ -64,13 +65,15 @@ public class HomePageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
+        //Get the current day of the week and display it
         dateTimeTextView = view.findViewById(R.id.dateTimeTextView);
         DayOfWeek dow = LocalDate.now().getDayOfWeek();
         String currentDay = dow.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH);
         dateTimeTextView.setText("Hello\nToday is "+ currentDay);
-        // Inflate the layout for this fragment
+
         return view;
     }
 }

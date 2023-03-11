@@ -75,11 +75,14 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
+        //Getting the views
         bingApiKeyTextInput = view.findViewById(R.id.bingKeyTextInput);
         saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
 
+        //Saving the settings to shared preferences (local storage) when the save button is clicked
         saveSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,26 +93,35 @@ public class SettingsFragment extends Fragment {
                         Toast.makeText(getActivity().getApplicationContext(), "Invalid Bing Search API key", Toast.LENGTH_SHORT).show();
                     }
                 }
+                //Saving the data
                 saveData();
             }
         });
 
+        //Loading the settings from shared preferences (local storage) when the fragment is created
         loadData();
+
+        //Setting the text in the text input to the api key that was loaded in
         bingApiKeyTextInput.getEditText().setText(loadedApiKey);
 
         return view;
     }
 
+    //Saving the data to shared preferences
     public void saveData(){
+        //Creating a shared preferences object
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
+        //Saving the data, the first parameter is the key(name) and the second is the value(api key)
         editor.putString(BING_API_KEY, bingApiKey);
         editor.apply();
     }
 
+    //Loading the data from shared preferences
     public void loadData(){
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        //If the key doesn't exist, the default value is an empty string
         loadedApiKey = sharedPreferences.getString(BING_API_KEY, "");
 
     }

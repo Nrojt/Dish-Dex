@@ -17,14 +17,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Getting the binding object
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        //Setting the fragment that will show on app startup
         binding.bottomNavigationView.setSelectedItemId(R.id.homeButton);
         replaceFragment(new HomePageFragment());
 
-
-
+        //Onclick listener for the bottom navigation bar, which will replace the fragment when one of the buttons is clicked.
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
             switch (item.getItemId()){
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Method for replacing the fragment
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

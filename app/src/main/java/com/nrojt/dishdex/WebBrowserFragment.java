@@ -1,8 +1,8 @@
 package com.nrojt.dishdex;
 
-import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -13,16 +13,18 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.CookieManager;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,9 +34,11 @@ import java.util.concurrent.Executors;
  * create an instance of this fragment.
  */
 public class WebBrowserFragment extends Fragment {
+    private ArrayList<String> blockedUrls = new ArrayList<String>();
     private WebView urlBrowser;
     private EditText currentBrowserUrl;
     private Button scrapeThisUrlButton;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -79,10 +83,33 @@ public class WebBrowserFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_web_browser, container, false);
         urlBrowser = view.findViewById(R.id.urlBrowser);
         currentBrowserUrl = view.findViewById(R.id.currentBrowserUrl);
         scrapeThisUrlButton = view.findViewById(R.id.scrapeThisUrlButton);
+
+        LoadWebsiteBlockList loadWebsiteBlockList = new LoadWebsiteBlockList(getContext());
+        //creating a new thread for getting the blocked urls
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        //running the LoadBlockList in another thread
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                loadWebsiteBlockList.loadBlockList();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        blockedUrls = loadWebsiteBlockList.getAdUrls();
+                        System.out.println("list done loading");
+                    }
+                });
+            }
+        });
+        service.shutdown();
+
 
         //Overriding the standard WebClient to update the currentBrowserUrl
         urlBrowser.setWebChromeClient(new WebChromeClient() {
@@ -93,21 +120,44 @@ public class WebBrowserFragment extends Fragment {
             }
         });
 
-        //overriding the  shouldOverrideUrlLoading so the websites open in the webview in stead of in an external browser
+
         urlBrowser.setWebViewClient(new WebViewClient() {
+            //overriding shouldOverrideUrlLoading to update the currentBrowserUrl
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 currentBrowserUrl.setText(request.getUrl().toString());
                 return false;
             }
+
+            //overriding shouldInterceptRequest to block certain urls
+
+            @Nullable
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                // check if request is coming from an ad URL and return a fake resource if it is
+                if (isBlocked(request.getUrl().toString())) {
+                    System.out.println("blocked url: " + request.getUrl().toString());
+                    return new WebResourceResponse("text/plain", "utf-8", null);
+                } else {
+                    return super.shouldInterceptRequest(view, request);
+                }
+            }
+
+            //overriding onReceivedError to display a custom error message, mainly informing the user that the site has been blocked. This message will also show up on other errors.
+            /*
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                System.out.println(error.getErrorCode());
+                view.loadData("<html><body><h1>An error has occurred or this website has been blocked by DishDex</h1></body></html>", "text/html", "utf-8");
+            }
+             */
         });
 
         urlBrowser.getSettings().setJavaScriptEnabled(true);
         urlBrowser.loadUrl("https://www.google.com");
 
 
-
-        //making it so the user can go to the previous website in the webview
+        //making it so the user can go to the previous website in the WebView
         urlBrowser.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keycode, KeyEvent keyEvent) {
@@ -132,10 +182,10 @@ public class WebBrowserFragment extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
 
-                    //checking to see if the userinput is an actual url, if not it will perform a google search
+                    //checking to see if the user input is an actual url, if not it will perform a google search
                     String userInput = currentBrowserUrl.getText().toString();
                     if (URLUtil.isValidUrl(userInput)) {
-                        urlBrowser.loadUrl(userInput); //updating the webview
+                        urlBrowser.loadUrl(userInput); //updating the WebView
                     } else {
                         String googleSearchQuery = "https://www.google.com/search?q=" + userInput;
                         urlBrowser.loadUrl(googleSearchQuery);
@@ -146,66 +196,78 @@ public class WebBrowserFragment extends Fragment {
             }
         });
 
-        //the that will get the url and send it to the ScrapeFromUrlFragment
+        //the button that will get the url and send it to the ScrapeFromUrlFragment
         scrapeThisUrlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = currentBrowserUrl.getText().toString();
-                if (!url.isBlank()) {
-                    WebScraper wb = new WebScraper(url);
-                    ExecutorService service = Executors.newSingleThreadExecutor();
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    service.execute(new Runnable() { //running the webscraper on a seperate thread, so the ui thread doesnt lock
-                        @Override
-                        public void run() {
-                            wb.scrapeWebsite();
+                if (!url.isBlank()){
+                    if(URLUtil.isValidUrl(url)){
+                        WebScraper wb = new WebScraper(url);
+                        ExecutorService service = Executors.newSingleThreadExecutor();
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        service.execute(new Runnable() { //running the WebScraper on a separate thread, so the ui thread doesn't lock
+                            @Override
+                            public void run() {
+                                wb.scrapeWebsite();
 
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //checking if the website is supported
-                                    if (wb.isNotSupported()) {
-                                        Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
-                                    } else if (wb.isNotConnected()) { //checking if the user is connected to the internet. This cannot be done on main thread, cause this will throw an error
-                                        Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
-                                    } else if(wb.isNotReachable()){
-                                        Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //checking if the website is supported
+                                        if (wb.isNotSupported()) {
+                                            Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
+                                        } else if (wb.isNotConnected()) { //checking if the user is connected to the internet. This cannot be done on main thread, cause this will throw an error
+                                            Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
+                                        } else if (wb.isNotReachable()) {
+                                            Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            //sending the url and the WebScraper to the ScrapeFromUrlFragment
+                                            Fragment scrapeUrlfragment = new ScrapeFromUrlFragment();
+                                            Bundle bundle = new Bundle();
+                                            bundle.putSerializable("WebScraper", wb);
+                                            bundle.putString("Url", url);
+                                            scrapeUrlfragment.setArguments(bundle);
+                                            replaceFragment(scrapeUrlfragment);
+                                        }
                                     }
-                                    else {
-                                        Fragment scrapeUrlfragment = new ScrapeFromUrlFragment();
-                                        Bundle bundle = new Bundle();
-                                        bundle.putSerializable("WebScraper", wb);
-                                        bundle.putString("Url", url);
-                                        scrapeUrlfragment.setArguments(bundle);
-                                        replaceFragment(scrapeUrlfragment);
-                                    }
-                                }
-                            });
-                        }
-                    });
+                                });
+                            }
+                        });
+                        service.shutdown();
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "This site is blocked", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), "No url given", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        // Inflate the layout for this fragment
         return view;
     }
 
-    private void hideAllViewsBeforeSwitchingFragments(){
-        // Hiding all the other views that don't get replaced
-        urlBrowser.setVisibility(View.GONE);
-        currentBrowserUrl.setVisibility(View.GONE);
-        scrapeThisUrlButton.setVisibility(View.GONE);
+
+
+    //trying to see if it is possible to block ads
+    private boolean isBlocked(String url) {
+        //System.out.println(adUrls.size());
+        for(int i = 0; i < blockedUrls.size(); i++){
+            if(url.contains(blockedUrls.get(i))){
+                return true;
+            }
+        }
+        return false;
     }
 
+
+    //replacing the fragment with the ScrapeFromUrlFragment
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.webviewFragmentLinearLayout, fragment);
-        hideAllViewsBeforeSwitchingFragments();
+        fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
     }
+
 
 }
