@@ -18,6 +18,9 @@ import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -94,13 +97,11 @@ public class BingFragment extends Fragment {
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
-        searchTerm = "";
+        searchTerm = "noodle";
 
-        /*
+
         BingWebSearch bong = new BingWebSearch();
-        bong.execute();
 
-         */
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bing, container, false);
@@ -108,7 +109,7 @@ public class BingFragment extends Fragment {
 
     public static SearchResults SearchWeb (String searchQuery) throws Exception {
         // Construct the URL.
-        URL url = new URL(host + path + "?q=" + URLEncoder.encode(searchQuery, "UTF-8"));
+        URL url = new URL(host + path + "?q=" +  URLEncoder.encode(searchQuery, "UTF-8") + "&responseFilter=webpages&safeSearch=strict");
 
         // Open the connection.
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -129,6 +130,12 @@ public class BingFragment extends Fragment {
                 results.relevantHeaders.put(header, headers.get(header).get(0));
             }
         }
+
+        JSONObject jsonObject = new JSONObject(results.jsonResponse);
+        JSONArray jsonArray = jsonObject.getJSONObject("webPages").getJSONArray("value");
+        String urlFromJson = jsonArray.getJSONObject(0).getString("url");
+        System.out.println(urlFromJson);
+
         stream.close();
         return results;
     }
@@ -162,3 +169,206 @@ class SearchResults{
         jsonResponse = json;
     }
 }
+
+/*
+JSON Response:
+
+{
+  "_type": "SearchResponse",
+  "queryContext": {
+    "originalQuery": "Noodle recipe"
+  },
+  "webPages": {
+    "webSearchUrl": "https://www.bing.com/search?q\u003dNoodle+recipe",
+    "totalEstimatedMatches": 1680000,
+    "value": [
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.0",
+        "name": "Noodle recipes | BBC Good Food",
+        "url": "https://www.bbcgoodfood.com/recipes/collection/noodle-recipes",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://www.bbcgoodfood.com/recipes/collection/noodle",
+        "snippet": "Noodles make the perfect speedy, midweek supper. Flash fry some egg noodles for an Asian-style dish, or experiment with buckwheat, rice or soba noodles. Singapore noodles 46 ratings A low-fat, low-calorie stir-fry of pork and prawns, flavoured with teriyaki, madras and five-spice powder Peking-style noodles 20 ratings",
+        "dateLastCrawled": "2023-03-15T01:33:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.1",
+        "name": "Noodle Recipes",
+        "url": "https://www.allrecipes.com/recipes/530/pasta-and-noodles/noodles/",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://www.allrecipes.com/recipes/530/pasta-and-noodles/noodles",
+        "snippet": "Noodle Recipes Recipes Pasta and Noodles Noodles In a noodly kind of mood? Find recipes for egg noodles, udon, yakisoba, and rice noodles. Ramen Noodles Rice Noodles Chow Mein Noodles Egg Noodles Spicy Shrimp Ramen Noodles with Asparagus Chicken Teriyaki and Noodles Ground Beef Stroganoff Noodles 24 Ratings Lasagna Casserole 3 Ratings",
+        "dateLastCrawled": "2023-03-15T19:31:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.2",
+        "name": "The 20 best noodle recipes | Noodles | The Guardian",
+        "url": "https://www.theguardian.com/food/2020/mar/23/observer-food-monthly-20-best-noodle-recipes",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://www.theguardian.com/food/2020/mar/23/observer-food-monthly-20-best-noodle-recipes",
+        "snippet": "N oodles: the perfect lunch or dinner via Italy, Spain and China. All the best recipes are here, from Marcella’s spaghetti aio e oio to Nigella’s drunken noodles. There are delicious fragrant...",
+        "dateLastCrawled": "2023-03-13T18:30:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.3",
+        "name": "Chicken noodle recipes | BBC Good Food",
+        "url": "https://www.bbcgoodfood.com/recipes/collection/chicken-noodle-recipes",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://www.bbcgoodfood.com/recipes/collection/chicken-noodle",
+        "snippet": "A lean Asian-style rice noodle stir-fry flavoured with soy, chilli and coriander and packed with vegetable goodness Grilled chicken \u0026 noodles (Bun ga nuong) 7 ratings Serve spiced chicken thigh patties with a caramel glaze on a bed of rice noodles and julienned carrots for a classic Vietnamese dish bursting with flavour Chicken chow mein home made",
+        "dateLastCrawled": "2023-03-14T20:08:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.4",
+        "name": "25 Noodles Recipes | olivemagazine",
+        "url": "https://www.olivemagazine.com/recipes/collection/best-ever-noodles-recipes/",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://www.olivemagazine.com/recipes/collection/best-ever-noodles-recipes",
+        "snippet": "A quick and easy Thai noodle soup recipe. Beef, ginger and spring onion noodles Noodles are joined by succulent sirloin steak, fiery ginger and crunchy spring onions in this no-nonsense recipe. Ready in just 20 minutes, make this dish for a simple midweek meal for two. Yaki udon noodles",
+        "dateLastCrawled": "2023-03-14T16:50:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.5",
+        "name": "27 Easy Noodle Recipes - Insanely Good",
+        "url": "https://insanelygoodrecipes.com/noodle-recipes/",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://insanelygoodrecipes.com/noodle-recipes",
+        "snippet": "Thai Peanut Noodles Recipe If you have peanut butter, soy sauce, sesame oil, chili paste, and brown sugar, you’ll have the makings of one tasty noodle dish! If you don’t have chili paste, you can use Sriracha instead. Just whisk it all together and toss it with the cooked noodles.",
+        "dateLastCrawled": "2023-03-14T04:23:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.6",
+        "name": "Noodles recipes - BBC Food",
+        "url": "https://www.bbc.co.uk/food/noodle",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://www.bbc.co.uk/food/noodle",
+        "snippet": "Cook this authentic Chinese chow mein noodle stir-fry in less than ten minutes, adding any crisp seasonal vegetables you fancy. Each serving provides 580 kcal, 49g protein, 67g carbohydrates (of...",
+        "dateLastCrawled": "2023-03-13T18:28:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.7",
+        "name": "25 Best Noodle Recipes From Around the World - The Spruce Eats",
+        "url": "https://www.thespruceeats.com/best-noodle-recipes-from-around-the-world-4845735",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://www.thespruceeats.com/best-noodle-recipes-from-around-the-world-4845735",
+        "snippet": "Our easy recipe delivers all the flavors of the traditional dish, combining savory beef and onions with a creamy sauce made with a roux, beef broth, and sour cream, for ladling over hot buttered egg noodles. It is one of those magical dishes that you can throw together in less than an hour, and tastes better than the sum of its parts. 15 of 25",
+        "dateLastCrawled": "2023-03-13T21:49:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.8",
+        "name": "Homemade Egg Noodles Recipe - The Spruce Eats",
+        "url": "https://www.thespruceeats.com/homemade-egg-noodles-2215807",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://www.thespruceeats.com/homemade-egg-noodles-2215807",
+        "snippet": "Lay the noodles on a cooling or drying rack and let them sit until ready to cook. Repeat rolling and cutting with the remaining half of the dough. Boil the noodles in well-salted water until tender to the bite (2 to 10 minutes for fresh noodles depending on the thickness). Drain and use in your favorite recipe. Enjoy! Tips",
+        "dateLastCrawled": "2023-03-15T06:11:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      },
+      {
+        "id": "https://api.bing.microsoft.com/api/v7/#WebPages.9",
+        "name": "15 Popular Asian Noodle Recipes - Christie at Home",
+        "url": "https://christieathome.com/blog/15-popular-asian-noodle-recipes/",
+        "isFamilyFriendly": true,
+        "displayUrl": "https://christieathome.com/blog/15-popular-asian-noodle-recipes",
+        "snippet": "Savoury, flavourful flat wide rice noodles coated in a salty sweet soy sauce. Paired deliciously with pork belly, beansprouts, Chinese chives, garlic and egg. A perfect meal for dinner or lunch. This recipe only takes 30 minutes. These noodles are my ALL-time flavourite in the world.",
+        "dateLastCrawled": "2023-03-15T10:38:00.0000000Z",
+        "language": "en",
+        "isNavigational": false
+      }
+    ]
+  },
+  "rankingResponse": {
+    "mainline": {
+      "items": [
+        {
+          "answerType": "WebPages",
+          "resultIndex": 0,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.0"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 1,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.1"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 2,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.2"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 3,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.3"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 4,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.4"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 5,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.5"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 6,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.6"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 7,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.7"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 8,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.8"
+          }
+        },
+        {
+          "answerType": "WebPages",
+          "resultIndex": 9,
+          "value": {
+            "id": "https://api.bing.microsoft.com/api/v7/#WebPages.9"
+          }
+        }
+      ]
+    }
+  }
+}
+ */
