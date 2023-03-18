@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
  * create an instance of this fragment.
  */
 public class WebBrowserFragment extends Fragment {
-    private ArrayList<String> blockedUrls = new ArrayList<String>();
+    private ArrayList<String> blockedUrls = new ArrayList<>();
     private WebView urlBrowser;
     private EditText currentBrowserUrl;
     private Button scrapeThisUrlButton;

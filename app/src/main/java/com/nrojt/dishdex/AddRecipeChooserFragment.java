@@ -147,7 +147,7 @@ public class AddRecipeChooserFragment extends Fragment {
             public void onClick(View v) {
                 String bingSearchQuery = bingSearchInput.getText().toString();
                 if(!bingSearchQuery.isBlank()){
-
+                    replaceFragment(new BingFragment());
                 } else{
                     Toast.makeText(getActivity().getApplicationContext(), "No search query given", Toast.LENGTH_SHORT).show();
                 }

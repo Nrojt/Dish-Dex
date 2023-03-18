@@ -10,6 +10,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +26,13 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -39,6 +44,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class BingFragment extends Fragment {
     // Enter a valid subscription key.
     static String subscriptionKey;
+
+    ArrayList<String> bingReturnUrls;
 
     /*
      * If you encounter unexpected authorization errors, double-check these values
@@ -99,15 +106,51 @@ public class BingFragment extends Fragment {
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
         searchTerm = "noodle";
 
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runTheSearch();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println(bingReturnUrls);
+                    }
+                });
+            }
+        });
 
-        BingWebSearch bong = new BingWebSearch();
-
+        //System.out.println(results.jsonResponse);
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bing, container, false);
     }
 
-    public static SearchResults SearchWeb (String searchQuery) throws Exception {
+    private void runTheSearch(){
+        JSONObject jsonObject;
+        SearchResults results;
+        JSONArray jsonArray;
+        bingReturnUrls = new ArrayList<>();
+
+        try {
+            results = SearchWeb(searchTerm);
+            jsonObject = new JSONObject(results.jsonResponse);
+            jsonArray = jsonObject.getJSONObject("webPages").getJSONArray("value");
+            for(int i = 0; i < jsonArray.length(); i++){
+                bingReturnUrls.add(jsonArray.getJSONObject(i).getString("url"));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //SearchWeb was provided on the Microsoft bing api v7 website
+    public SearchResults SearchWeb(String searchQuery) throws Exception {
         // Construct the URL.
         URL url = new URL(host + path + "?q=" +  URLEncoder.encode(searchQuery, "UTF-8") + "&responseFilter=webpages&safeSearch=strict");
 
@@ -130,48 +173,16 @@ public class BingFragment extends Fragment {
                 results.relevantHeaders.put(header, headers.get(header).get(0));
             }
         }
-
-        JSONObject jsonObject = new JSONObject(results.jsonResponse);
-        JSONArray jsonArray = jsonObject.getJSONObject("webPages").getJSONArray("value");
-        String urlFromJson = jsonArray.getJSONObject(0).getString("url");
-        System.out.println(urlFromJson);
-
         stream.close();
         return results;
     }
-
-    class BingWebSearch extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            // Call the SearchWeb method and print the response.
-            try {
-                SearchResults result = SearchWeb(searchTerm);
-
-            } catch (Exception e) {
-                e.printStackTrace(System.out);
-                System.exit(1);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void unused) {
-        }
-    }
 }
 
-class SearchResults{
-    HashMap<String, String> relevantHeaders;
-    String jsonResponse;
-    SearchResults(HashMap<String, String> headers, String json) {
-        relevantHeaders = headers;
-        jsonResponse = json;
-    }
-}
+
+
 
 /*
-JSON Response:
+JSON Response example from the bing api v7:
 
 {
   "_type": "SearchResponse",
