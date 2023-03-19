@@ -1,4 +1,4 @@
-package com.nrojt.dishdex;
+package com.nrojt.utils.internet;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

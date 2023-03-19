@@ -4,8 +4,7 @@
     android:id="@+id/framelayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".AddRecipeChooserFragment">
+    tools:context=".fragments.AddRecipeChooserFragment">
 
     <LinearLayout
         android:id="@+id/addRecipeChooserLinearLayout"
@@ -16,7 +15,6 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -60,8 +58,10 @@
 
         <Button
             android:id="@+id/browseWebButton"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
             android:text="Browse the web" />
     </LinearLayout>
 

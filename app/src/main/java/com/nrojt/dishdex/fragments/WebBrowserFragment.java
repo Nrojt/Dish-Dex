@@ -1,4 +1,4 @@
-package com.nrojt.dishdex;
+package com.nrojt.dishdex.fragments;
 
 import android.os.Bundle;
 
@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -23,6 +22,10 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.nrojt.utils.internet.LoadWebsiteBlockList;
+import com.nrojt.dishdex.R;
+import com.nrojt.utils.internet.WebScraper;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;

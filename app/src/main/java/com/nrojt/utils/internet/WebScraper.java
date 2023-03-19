@@ -1,4 +1,4 @@
-package com.nrojt.dishdex;
+package com.nrojt.utils.internet;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -96,15 +96,15 @@ public class WebScraper implements Serializable {
                         }
                     }
 
-                    servingsElement = document.getElementsByClass("recipe-ingredients_servings__f8HXF").get(0);
-                    cookingTimeElement = document.getElementsByClass("recipe-header-time_timeLine__nn84w").get(0);
-                    recipeTitleElement = document.getElementsByClass("typography_root__Om3Wh typography_variant-superhero__239x3 typography_hasMargin__4EaQi recipe-header_title__tG0JE").get(0);
+                    servingsElement = document.getElementsByClass("recipe-ingredients_servings__f8HXF").first();
+                    cookingTimeElement = document.getElementsByClass("recipe-header-time_timeLine__nn84w").first();
+                    recipeTitleElement = document.getElementsByClass("typography_root__Om3Wh typography_variant-superhero__239x3 typography_hasMargin__4EaQi recipe-header_title__tG0JE").first();
                 } else if (url.contains("allrecipes.com/recipe")) {
                     instructionElements = document.getElementsByClass("comp mntl-sc-block-group--LI mntl-sc-block mntl-sc-block-startgroup");
                     ingredientElements = document.getElementsByClass("mntl-structured-ingredients__list-item ");
 
-                    servingsElement = document.getElementsByClass("mntl-recipe-details__value").get(3);
-                    cookingTimeElement = document.getElementsByClass("mntl-recipe-details__value").get(0);
+                    servingsElement = document.getElementsByClass("mntl-recipe-details__value").last();
+                    cookingTimeElement = document.getElementsByClass("mntl-recipe-details__value").first();
                     recipeTitleElement = document.getElementById("article-heading_1-0");
                 } else if (url.contains("food.com/recipe")) {
                     instructionElements = document.getElementsByClass("direction svelte-ovaflp");
@@ -127,25 +127,17 @@ public class WebScraper implements Serializable {
                     }
 
 
-                    servingsElement = document.getElementsByClass("adjust svelte-1o10zxc").get(0);
-                    cookingTimeElement = document.getElementsByClass("facts__item svelte-ovaflp").get(0);
-                    recipeTitleElement = document.getElementsByClass("layout__item title svelte-ovaflp").get(0);
+                    servingsElement = document.getElementsByClass("adjust svelte-1o10zxc").first();
+                    cookingTimeElement = document.getElementsByClass("facts__item svelte-ovaflp").first();
+                    recipeTitleElement = document.getElementsByClass("layout__item title svelte-ovaflp").first();
                 } else if (url.contains("bellyfull.net")){
                     instructionElements = document.getElementsByClass("wprm-recipe-instruction-text");
                     ingredientElements = document.getElementsByClass("wprm-recipe-ingredient");
 
-                    servingsElement = document.getElementsByClass("wprm-recipe-servings-with-unit").get(0);
+                    servingsElement = document.getElementsByClass("wprm-recipe-servings-with-unit").first();
                     cookingTimeElement = document.getElementsByClass("wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes").get(0);
-                    recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").get(0);
-                } else if(url.contains("foodnetwork.co.uk/recipes")){
-                    instructionElements = document.getElementsByClass("legacy-method content e-instructions");
-                    ingredientElements = document.getElementsByClass("flex items-center mb-4");
-
-                    //servingsElement = document.getElementsByClass("flex px-4 py-2 border border-[#d8d8d8] rounded").get(0);
-                    //recipeTitleElement = document.getElementsByClass("mb-8 lg:mb-16 text-white p-name").get(0);
-
-                }
-                else {
+                    recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").first();
+                } else {
                     notSupported = true;
                 }
 

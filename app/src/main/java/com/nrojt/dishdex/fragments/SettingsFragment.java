@@ -1,4 +1,4 @@
-package com.nrojt.dishdex;
+package com.nrojt.dishdex.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.nrojt.dishdex.R;
 
 
 /**

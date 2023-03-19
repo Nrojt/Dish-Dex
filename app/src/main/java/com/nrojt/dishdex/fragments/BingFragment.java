@@ -1,28 +1,28 @@
-package com.nrojt.dishdex;
+package com.nrojt.dishdex.fragments;
 
-import static com.nrojt.dishdex.SettingsFragment.BING_API_KEY;
-import static com.nrojt.dishdex.SettingsFragment.SHARED_PREFS;
+import static com.nrojt.dishdex.fragments.SettingsFragment.BING_API_KEY;
+import static com.nrojt.dishdex.fragments.SettingsFragment.SHARED_PREFS;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.Toast;
 
-import com.google.android.material.textfield.TextInputEditText;
+import androidx.fragment.app.Fragment;
+
+import com.nrojt.dishdex.R;
+import com.nrojt.utils.internet.SearchResults;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -55,6 +55,9 @@ public class BingFragment extends Fragment {
     static String host = "https://api.bing.microsoft.com";
     static String path = "/v7.0/search";
     static String searchTerm;
+
+    private EditText bingUrlTextOnScreen;
+    //TODO fix issue where the on screen text doesn't update
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -101,25 +104,31 @@ public class BingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bing, container, false);
+        bingUrlTextOnScreen = view.findViewById(R.id.bingUrlTextOnScreen);
+        bingUrlTextOnScreen.setText("Loading...");
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
-        searchTerm = "noodle";
+
+        Bundle bundle = getArguments();
+        searchTerm = bundle.getString("SearchQuery", "");
 
         ExecutorService service = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         service.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    runTheSearch();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                runTheSearch();
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        StringBuilder sb = new StringBuilder();
                         System.out.println(bingReturnUrls);
+                        for(String url : bingReturnUrls){
+                            sb.append(url);
+                            sb.append("\n");
+                        }
+                        bingUrlTextOnScreen.setText(sb.toString());
                     }
                 });
             }
@@ -140,10 +149,28 @@ public class BingFragment extends Fragment {
         try {
             results = SearchWeb(searchTerm);
             jsonObject = new JSONObject(results.jsonResponse);
-            jsonArray = jsonObject.getJSONObject("webPages").getJSONArray("value");
-            for(int i = 0; i < jsonArray.length(); i++){
-                bingReturnUrls.add(jsonArray.getJSONObject(i).getString("url"));
+
+            if (jsonObject.has("webPages")) {
+                jsonArray = jsonObject.getJSONObject("webPages").getJSONArray("value");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    bingReturnUrls.add(jsonArray.getJSONObject(i).getString("url"));
+                }
+            } else {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), "Error: No results found.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
+
+        } catch (FileNotFoundException e) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), "Error: API key is invalid or the API endpoint is unreachable.", Toast.LENGTH_SHORT).show();
+                }
+            });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -8,6 +8,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.nrojt.dishdex.databinding.ActivityMainBinding;
+import com.nrojt.dishdex.fragments.AddRecipeChooserFragment;
+import com.nrojt.dishdex.fragments.BingFragment;
+import com.nrojt.dishdex.fragments.HomePageFragment;
+import com.nrojt.dishdex.fragments.SettingsFragment;
 
 
 public class MainActivity extends AppCompatActivity {

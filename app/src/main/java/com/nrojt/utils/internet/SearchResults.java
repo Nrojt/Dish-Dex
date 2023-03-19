@@ -1,12 +1,12 @@
-package com.nrojt.dishdex;
+package com.nrojt.utils.internet;
 
 import java.util.HashMap;
 
 //SearchResults was provided on the Microsoft bing api v7 website
 public class SearchResults{
-    HashMap<String, String> relevantHeaders;
-    String jsonResponse;
-    SearchResults(HashMap<String, String> headers, String json) {
+    public HashMap<String, String> relevantHeaders;
+    public String jsonResponse;
+    public SearchResults(HashMap<String, String> headers, String json) {
         relevantHeaders = headers;
         jsonResponse = json;
     }

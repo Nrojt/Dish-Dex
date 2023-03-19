@@ -1,12 +1,19 @@
-package com.nrojt.dishdex;
+package com.nrojt.dishdex.fragments;
 
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
+
+import com.nrojt.dishdex.R;
+import com.nrojt.utils.internet.WebScraper;
 
 
 /**
@@ -17,15 +24,16 @@ import androidx.fragment.app.Fragment;
 public class ScrapeFromUrlFragment extends Fragment {
     private String url = "";
     private WebScraper wb;
-
+    private Button saveRecipeButton;
     private EditText recipeTextOnScreen;
     private EditText ingredientTextOnScreen;
 
     private EditText cookingTimeTextOnScreen;
-    private EditText servingsTextOnScreen;
     private EditText recipeTitleTextOnScreen;
+    private EditText servingsTextOnScreen;
 
     private EditText noteTextOnScreen;
+    private EditText urlTextOnScreen;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -83,6 +91,8 @@ public class ScrapeFromUrlFragment extends Fragment {
         servingsTextOnScreen = view.findViewById(R.id.servingsTextOnScreen);
         recipeTitleTextOnScreen = view.findViewById(R.id.recipeTitleTextOnScreen);
         noteTextOnScreen = view.findViewById(R.id.noteTextOnScreen);
+        saveRecipeButton = view.findViewById(R.id.saveRecipeButton);
+        urlTextOnScreen = view.findViewById(R.id.urlTextOnScreen);
 
         //getting the url and WebScraper from the bundle
         Bundle bundle = getArguments();
@@ -92,10 +102,36 @@ public class ScrapeFromUrlFragment extends Fragment {
         //setting the on screen elements
         recipeTextOnScreen.setText(wb.getRecipeText());
         ingredientTextOnScreen.setText(wb.getIngredientText());
-        servingsTextOnScreen.setText("Servings: " + wb.getServings());
-        cookingTimeTextOnScreen.setText("Cooking time: " + wb.getCookingTime() + " min");
+        cookingTimeTextOnScreen.setText(String.valueOf(wb.getCookingTime()));
+        servingsTextOnScreen.setText(String.valueOf(wb.getServings()));
         recipeTitleTextOnScreen.setText(wb.getRecipeTitle());
-        noteTextOnScreen.setText(url);
+        urlTextOnScreen.setText(url);
+
+        //setting the saveRecipeButton to be invisible when the keyboard is up. It does this by checking the height of the screen and the height of the keyboard and if the difference is greater than a certain threshold, it hides the button.
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                view.getWindowVisibleDisplayFrame(r);
+                int screenHeight = view.getRootView().getHeight();
+                Handler handler = new Handler();
+
+                // Calculate the difference between the visible screen height and the total screen height
+                int heightDifference = screenHeight - (r.bottom - r.top);
+
+                // Set an arbitrary threshold to determine if the keyboard is visible
+                if (heightDifference > screenHeight / 4) {
+                    saveRecipeButton.setVisibility(View.GONE); // Hide the saveRecipeButton
+                } else {
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            saveRecipeButton.setVisibility(View.VISIBLE); // Show the saveRecipeButton
+                        }
+                    }, 100); // Delay the showing of the saveRecipeButton to avoid flickering
+                }
+            }
+        });
 
         return view;
     }

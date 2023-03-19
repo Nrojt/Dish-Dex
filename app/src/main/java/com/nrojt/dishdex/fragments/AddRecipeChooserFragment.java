@@ -1,4 +1,4 @@
-package com.nrojt.dishdex;
+package com.nrojt.dishdex.fragments;
 
 import android.os.Bundle;
 
@@ -12,10 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.nrojt.dishdex.R;
+import com.nrojt.utils.internet.WebScraper;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -147,7 +148,11 @@ public class AddRecipeChooserFragment extends Fragment {
             public void onClick(View v) {
                 String bingSearchQuery = bingSearchInput.getText().toString();
                 if(!bingSearchQuery.isBlank()){
-                    replaceFragment(new BingFragment());
+                    Fragment bingFragment = new BingFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("SearchQuery", bingSearchQuery);
+                    bingFragment.setArguments(bundle);
+                    replaceFragment(bingFragment);
                 } else{
                     Toast.makeText(getActivity().getApplicationContext(), "No search query given", Toast.LENGTH_SHORT).show();
                 }

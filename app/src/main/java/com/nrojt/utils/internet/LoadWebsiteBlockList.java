@@ -1,6 +1,8 @@
-package com.nrojt.dishdex;
+package com.nrojt.utils.internet;
 
 import android.content.Context;
+
+import com.nrojt.dishdex.R;
 
 import java.io.BufferedReader;
 import java.io.IOException;
