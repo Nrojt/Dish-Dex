@@ -9,11 +9,15 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.nrojt.dishdex.R;
-import com.nrojt.utils.internet.WebScraper;
+import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
+import com.nrojt.dishdex.utils.internet.WebScraper;
 
 
 /**
@@ -133,7 +137,56 @@ public class ScrapeFromUrlFragment extends Fragment {
             }
         });
 
+        saveRecipeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MyDatabaseHelper db = new MyDatabaseHelper(getContext());
+
+                String recipeTitle = recipeTitleTextOnScreen.getText().toString().trim();
+                String ingredients = ingredientTextOnScreen.getText().toString().trim();
+                String recipeSteps = recipeTextOnScreen.getText().toString().toString();
+
+                // Convert cooking time input to integer
+                String cookingTimeStr = cookingTimeTextOnScreen.getText().toString().trim();
+                int cookingTime;
+                try {
+                    cookingTime = Integer.parseInt(cookingTimeStr);
+                } catch (NumberFormatException e) {
+                    // Handle invalid input
+                    Toast.makeText(getActivity().getApplicationContext(), "Cooking time must be a number", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Convert servings input to integer
+                String servingsStr = servingsTextOnScreen.getText().toString().trim();
+                int servings;
+                try {
+                    servings = Integer.parseInt(servingsStr);
+                } catch (NumberFormatException e) {
+                    // Handle invalid input
+                    Toast.makeText(getActivity().getApplicationContext(), "Servings must be a number", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String notes = noteTextOnScreen.getText().toString().trim();
+                String url = urlTextOnScreen.getText().toString().trim();
+
+                // Add recipe to database
+                if(db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url)) {
+                    replaceFragment(new ScrapeFromUrlFragment());
+                }
+
+            }
+        });
+
         return view;
     }
 
+    //This method is used to replace the current fragment with a new fragment
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
+        fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.commit();
+    }
 }

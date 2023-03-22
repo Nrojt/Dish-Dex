@@ -1,5 +1,6 @@
 package com.nrojt.dishdex.fragments;
 
+import android.net.http.SslError;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -9,12 +10,15 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.SslErrorHandler;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -23,9 +27,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.nrojt.utils.internet.LoadWebsiteBlockList;
+import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
 import com.nrojt.dishdex.R;
-import com.nrojt.utils.internet.WebScraper;
+import com.nrojt.dishdex.utils.internet.WebScraper;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -106,7 +110,6 @@ public class WebBrowserFragment extends Fragment {
                     @Override
                     public void run() {
                         blockedUrls = loadWebsiteBlockList.getAdUrls();
-                        System.out.println("list done loading");
                     }
                 });
             }
@@ -114,7 +117,7 @@ public class WebBrowserFragment extends Fragment {
         service.shutdown();
 
 
-        //Overriding the standard WebClient to update the currentBrowserUrl
+        //Overriding the standard ChromeClient to update the currentBrowserUrl
         urlBrowser.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
@@ -124,6 +127,7 @@ public class WebBrowserFragment extends Fragment {
         });
 
 
+        //Overriding the standard WebClient since I need different functionality
         urlBrowser.setWebViewClient(new WebViewClient() {
             //overriding shouldOverrideUrlLoading to update the currentBrowserUrl
             @Override
@@ -133,30 +137,32 @@ public class WebBrowserFragment extends Fragment {
             }
 
             //overriding shouldInterceptRequest to block certain urls
-
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 // check if request is coming from an ad URL and return a fake resource if it is
                 if (isBlocked(request.getUrl().toString())) {
-                    System.out.println("blocked url: " + request.getUrl().toString());
+                    Log.i("WebView", "blocked url: " + request.getUrl().toString());
                     return new WebResourceResponse("text/plain", "utf-8", null);
                 } else {
                     return super.shouldInterceptRequest(view, request);
                 }
             }
 
-            //overriding onReceivedError to display a custom error message, mainly informing the user that the site has been blocked. This message will also show up on other errors.
-            /*
+            //overriding onReceivedSslError to ignore SSL certificate errors
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.proceed(); // Ignore SSL certificate errors
+            }
+
+            //overriding onReceivedError to log the error
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                System.out.println(error.getErrorCode());
-                view.loadData("<html><body><h1>An error has occurred or this website has been blocked by DishDex</h1></body></html>", "text/html", "utf-8");
+                Log.e("WebView", error.toString());
             }
-             */
         });
 
-        urlBrowser.getSettings().setJavaScriptEnabled(true);
+        urlBrowser.getSettings().setJavaScriptEnabled(false);
         urlBrowser.loadUrl("https://www.google.com");
 
 
@@ -254,7 +260,6 @@ public class WebBrowserFragment extends Fragment {
 
     //trying to see if it is possible to block ads
     private boolean isBlocked(String url) {
-        //System.out.println(adUrls.size());
         for(int i = 0; i < blockedUrls.size(); i++){
             if(url.contains(blockedUrls.get(i))){
                 return true;

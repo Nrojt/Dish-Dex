@@ -17,7 +17,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.nrojt.dishdex.R;
-import com.nrojt.utils.internet.SearchResults;
+import com.nrojt.dishdex.utils.internet.SearchResults;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.nrojt.dishdex.R;
-import com.nrojt.utils.internet.WebScraper;
+import com.nrojt.dishdex.utils.internet.WebScraper;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -9,8 +9,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.nrojt.dishdex.databinding.ActivityMainBinding;
 import com.nrojt.dishdex.fragments.AddRecipeChooserFragment;
-import com.nrojt.dishdex.fragments.BingFragment;
 import com.nrojt.dishdex.fragments.HomePageFragment;
+import com.nrojt.dishdex.fragments.SavedRecipesFragment;
 import com.nrojt.dishdex.fragments.SettingsFragment;
 
 
@@ -44,10 +44,9 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new SettingsFragment());
                     break;
                 case R.id.recipesButton:
-                    replaceFragment(new BingFragment());
+                    replaceFragment(new SavedRecipesFragment());
                     break;
             }
-
             return true;
         });
     }
