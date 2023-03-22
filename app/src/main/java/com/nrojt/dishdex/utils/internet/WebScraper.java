@@ -138,7 +138,8 @@ public class WebScraper implements Serializable {
                     cookingTimeElement = document.getElementsByClass("wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes").get(0);
                     recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").first();
                 } else {
-                    notSupported = true;
+                    recipeTitleElement = document.head().getElementsByTag("title").first();
+                    //notSupported = true;
                 }
 
                 //Converting the elements to text and adding them to the lists

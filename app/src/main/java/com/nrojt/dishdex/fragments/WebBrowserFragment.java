@@ -158,11 +158,11 @@ public class WebBrowserFragment extends Fragment {
             //overriding onReceivedError to log the error
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                Log.e("WebView", error.toString());
+                Log.e("WebView", error.getDescription().toString());
             }
         });
 
-        urlBrowser.getSettings().setJavaScriptEnabled(false);
+        urlBrowser.getSettings().setJavaScriptEnabled(true);
         urlBrowser.loadUrl("https://www.google.com");
 
 
@@ -231,13 +231,9 @@ public class WebBrowserFragment extends Fragment {
                                         } else if (wb.isNotReachable()) {
                                             Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
                                         } else {
-                                            //sending the url and the WebScraper to the ScrapeFromUrlFragment
-                                            Fragment scrapeUrlfragment = new ScrapeFromUrlFragment();
-                                            Bundle bundle = new Bundle();
-                                            bundle.putSerializable("WebScraper", wb);
-                                            bundle.putString("Url", url);
-                                            scrapeUrlfragment.setArguments(bundle);
-                                            replaceFragment(scrapeUrlfragment);
+                                            //switching to the showAndEditRecipeFragment
+                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(true, -1, wb, url);
+                                            replaceFragment(showAndEditRecipeFragment);
                                         }
                                     }
                                 });

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     app:layout_constraintHeight_min="wrap"
-    tools:context="com.nrojt.dishdex.fragments.ScrapeFromUrlFragment">
+    tools:context="com.nrojt.dishdex.fragments.ShowAndEditRecipeFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -157,13 +157,13 @@
         </ScrollView>
 
         <Button
-            android:id="@+id/saveRecipeButton"
+            android:id="@+id/saveOrEditRecipeButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
-            android:text="Save" />
+            android:text="Save Or Edit" />
 
     </RelativeLayout>
 

@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 
@@ -28,9 +29,9 @@ import java.util.concurrent.Executors;
  */
 public class AddRecipeChooserFragment extends Fragment {
     private TextInputEditText urlInput;
-    private Button getUrlButton;
+    private Button getRecipeFromUrlButton;
     private Button browseWebButton;
-
+    private Button emptyRecipeButton;
     private Button bingSearchButton;
     private TextInputEditText bingSearchInput;
 
@@ -83,16 +84,18 @@ public class AddRecipeChooserFragment extends Fragment {
 
         //initializing the variables, assigning them to the corresponding on screen views
         urlInput = view.findViewById(R.id.urlInput);
-        getUrlButton = view.findViewById(R.id.getUrlButton);
+        getRecipeFromUrlButton = view.findViewById(R.id.getRecipeFromUrlButton);
         bingSearchButton = view.findViewById(R.id.bingSearchButton);
         bingSearchInput = view.findViewById(R.id.bingSearchInput);
         browseWebButton = view.findViewById(R.id.browseWebButton);
+        emptyRecipeButton = view.findViewById(R.id.emptyRecipeButton);
 
 
         //When the user clicks the button, the url is passed to the WebScraper class which checks if the site is supported and if the site is reachable
-        getUrlButton.setOnClickListener(new View.OnClickListener() {
+        getRecipeFromUrlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                    System.out.println("Button clicked");
                     String url = urlInput.getText().toString();
                     if (!url.isBlank()) {
                         WebScraper wb = new WebScraper(url);
@@ -106,6 +109,7 @@ public class AddRecipeChooserFragment extends Fragment {
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
+                                        System.out.println("Scraping done");
                                         //checking to see if the site is supported and if the site is reachable
                                         if (wb.isNotSupported()) {
                                             Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
@@ -115,13 +119,9 @@ public class AddRecipeChooserFragment extends Fragment {
                                             Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
                                         }
                                         else {
-                                            //switching to the ScrapeFromUrlFragment and passing the WebScraper object and the url to the fragment
-                                            Fragment scrapeUrlfragment = new ScrapeFromUrlFragment();
-                                            Bundle bundle = new Bundle();
-                                            bundle.putSerializable("WebScraper", wb);
-                                            bundle.putString("Url", url);
-                                            scrapeUrlfragment.setArguments(bundle);
-                                            replaceFragment(scrapeUrlfragment);
+                                            //switching to the ShowAndEditRecipeFragment
+                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(true, -1, wb, url);
+                                            replaceFragment(showAndEditRecipeFragment);
                                         }
                                     }
                                 });
@@ -148,14 +148,19 @@ public class AddRecipeChooserFragment extends Fragment {
             public void onClick(View v) {
                 String bingSearchQuery = bingSearchInput.getText().toString();
                 if(!bingSearchQuery.isBlank()){
-                    Fragment bingFragment = new BingFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("SearchQuery", bingSearchQuery);
-                    bingFragment.setArguments(bundle);
+                    Fragment bingFragment = BingFragment.newInstance(bingSearchQuery);
                     replaceFragment(bingFragment);
                 } else{
                     Toast.makeText(getActivity().getApplicationContext(), "No search query given", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        emptyRecipeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(true, -1, null, null);
+                replaceFragment(showAndEditRecipeFragment);
             }
         });
 

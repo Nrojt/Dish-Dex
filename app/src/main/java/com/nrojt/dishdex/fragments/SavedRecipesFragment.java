@@ -25,8 +25,6 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class SavedRecipesFragment extends Fragment {
-    private RecyclerView savedRecipesRecyclerView;
-    private CustomAdapter customAdapter;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -40,14 +38,10 @@ public class SavedRecipesFragment extends Fragment {
     private MyDatabaseHelper db;
 
     private final ArrayList<String> recipeTitles = new ArrayList<>();
-    private final ArrayList<String> recipeIngredients = new ArrayList<>();
-    private final ArrayList<String> recipeInstructions = new ArrayList<>();
-    private final ArrayList<String> recipeNotes = new ArrayList<>();
-    private final ArrayList<String> recipeUrls = new ArrayList<>();
-
     private final ArrayList<Integer> recipeCookingTimes = new ArrayList<>();
     private final ArrayList<Integer> recipeServings = new ArrayList<>();
-    private final ArrayList<Integer> recipeIds = new ArrayList<>();
+    private final ArrayList<Integer> recipeIDs = new ArrayList<>();
+
 
     public SavedRecipesFragment() {
         // Required empty public constructor
@@ -87,13 +81,13 @@ public class SavedRecipesFragment extends Fragment {
 
         db = new MyDatabaseHelper(getContext());
 
+        RecyclerView savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
 
-        savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
-
-        customAdapter = new CustomAdapter(getContext(), recipeTitles, recipeIngredients, recipeInstructions, recipeNotes, recipeUrls, recipeCookingTimes, recipeServings, recipeIds);
+        //Adding padding to the recyclerView and setting the adapter and layout manager
+        savedRecipesRecyclerView.addItemDecoration(new ItemPaddingDecoration(20));
+        CustomAdapter customAdapter = new CustomAdapter(getContext(), recipeTitles, recipeCookingTimes, recipeServings);
         savedRecipesRecyclerView.setAdapter(customAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        savedRecipesRecyclerView.addItemDecoration(new ItemPaddingDecoration(16));
 
 
         displayRecipes();
@@ -103,33 +97,18 @@ public class SavedRecipesFragment extends Fragment {
 
     //Adding the recipes to a recyclerView
     private void displayRecipes() {
-        //Clearing the lists
-        recipeIds.clear();
-        recipeTitles.clear();
-        recipeIngredients.clear();
-        recipeInstructions.clear();
-        recipeNotes.clear();
-        recipeUrls.clear();
-        recipeCookingTimes.clear();
-        recipeServings.clear();
-
         //Getting the data from the database
-        Cursor cursor = db.readAllData();
+        Cursor cursor = db.readDataForSavedRecipesRecyclerView();
 
         if (cursor.getCount() == 0) {
             Toast.makeText(getContext(), "No saved recipes found.", Toast.LENGTH_SHORT).show();
         } else {
             while (cursor.moveToNext()) {
-                recipeIds.add(cursor.getInt(0));
+                recipeIDs.add(cursor.getInt(0));
                 recipeTitles.add(cursor.getString(1));
                 recipeCookingTimes.add(cursor.getInt(2));
                 recipeServings.add(cursor.getInt(3));
-                recipeIngredients.add(cursor.getString(4));
-                recipeInstructions.add(cursor.getString(5));
-                recipeNotes.add(cursor.getString(6));
-                recipeUrls.add(cursor.getString(7));
             }
         }
-        System.out.println(recipeTitles);
     }
 }

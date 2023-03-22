@@ -14,29 +14,21 @@ import com.nrojt.dishdex.R;
 import java.util.ArrayList;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder>{
-    private Context context;
-    private ArrayList<String> recipeTitles;
-    private ArrayList<String> recipeIngredients;
-    private ArrayList<String> recipeInstructions;
-    private ArrayList<String> recipeNotes;
-    private ArrayList<String> recipeUrls;
+    private final Context context;
+    private final ArrayList<String> recipeTitles;
 
-    private ArrayList<Integer> recipeCookingTimes;
-    private ArrayList<Integer> recipeServings;
-    private ArrayList<Integer> recipeIds;
+    private final ArrayList<Integer> recipeCookingTimes;
+    private final ArrayList<Integer> recipeServings;
 
-    public CustomAdapter(Context context, ArrayList<String> recipeTitles, ArrayList<String> recipeIngredients, ArrayList<String> recipeInstructions, ArrayList<String> recipeNotes, ArrayList<String> recipeUrls, ArrayList<Integer> recipeCookingTimes, ArrayList<Integer> recipeServings, ArrayList<Integer> recipeIds) {
+    //Constructor
+    public CustomAdapter(Context context, ArrayList<String> recipeTitles, ArrayList<Integer> recipeCookingTimes, ArrayList<Integer> recipeServings) {
         this.context = context;
         this.recipeTitles = recipeTitles;
-        this.recipeIngredients = recipeIngredients;
-        this.recipeInstructions = recipeInstructions;
-        this.recipeNotes = recipeNotes;
-        this.recipeUrls = recipeUrls;
         this.recipeCookingTimes = recipeCookingTimes;
         this.recipeServings = recipeServings;
-        this.recipeIds = recipeIds;
     }
 
+    //Inflate the view
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -45,11 +37,12 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         return new MyViewHolder(view);
     }
 
+    //Setting the text for each recipe card
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.recipeTitleText.setText(recipeTitles.get(position));
-        holder.recipeCookingTimeText.setText(String.valueOf(recipeCookingTimes.get(position))+ " mins");
-        holder.recipeServingsText.setText(String.valueOf(recipeServings.get(position))+ " servings");
+        holder.recipeCookingTimeText.setText(recipeCookingTimes.get(position) + " mins");
+        holder.recipeServingsText.setText(recipeServings.get(position) + " servings");
     }
 
     @Override
@@ -57,6 +50,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         return recipeTitles.size();
     }
 
+    //Inflate the layout for each recipe card
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView recipeServingsText, recipeTitleText, recipeCookingTimeText;
         public MyViewHolder(@NonNull View itemView) {

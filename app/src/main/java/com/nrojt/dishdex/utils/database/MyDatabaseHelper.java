@@ -22,14 +22,18 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    // Handle database creation
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         // Create the initial schema of the database
         sqLiteDatabase.execSQL("CREATE TABLE 'category' ('categoryName'	TEXT, 'categoryID'	INTEGER, PRIMARY KEY('categoryID' AUTOINCREMENT))");
         sqLiteDatabase.execSQL("CREATE TABLE 'recipe_categories' ('recipeID' INTEGER, 'categoryID'	INTEGER, FOREIGN KEY('categoryID') REFERENCES 'category'('categoryID'), FOREIGN KEY ('recipeID') REFERENCES 'saved_recipes' ('recipeID') , PRIMARY KEY ('recipeID','categoryID'))");
         sqLiteDatabase.execSQL("CREATE TABLE 'saved_recipes' ('recipeID'	INTEGER, 'recipeName'	TEXT, 'cookingTime'	INTEGER, 'servings'	INTEGER, 'ingredients'	TEXT, 'instructions'	TEXT, 'notes'	TEXT, 'sourceURL'	TEXT, PRIMARY KEY('recipeID' AUTOINCREMENT))");
+        // Adding standard categories to the database
+        sqLiteDatabase.execSQL("INSERT INTO category (categoryName) VALUES ('Breakfast'), ('Lunch'), ('Dinner'), ('Dessert'), ('Snack'), ('Side Dish')");
     }
 
+    // Handle database upgrades and changes, currently dummy code
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Handle upgrades from one version of the database to the next
@@ -43,6 +47,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    // Add a recipe to the database
     public boolean addRecipe(String recipeName, String ingredients, String instructions, int cookingTime, int servings,  String notes, String sourceURL){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -66,13 +71,62 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Cursor readAllData(){
+    //Reading all data from a table
+    public Cursor readAllDataFromTable(String tableName){
         Cursor cursor = null;
-        String query = "SELECT * FROM saved_recipes";
+        String query = "SELECT * FROM " + tableName;
         SQLiteDatabase db = this.getReadableDatabase();
         if(db != null){
            cursor = db.rawQuery(query, null);
         }
         return cursor;
+    }
+
+    //Getting the data from the database for the saved recipes recycler view
+    public Cursor readDataForSavedRecipesRecyclerView(){
+        Cursor cursor = null;
+        String query = "SELECT recipeID, recipeName, cookingTime, servings FROM saved_recipes";
+        SQLiteDatabase db = this.getReadableDatabase();
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        } else {
+            Toast.makeText(context, "Database is null", Toast.LENGTH_SHORT).show();
+        }
+        return cursor;
+    }
+
+    //Getting the data from a specific recipe for ShowAndEditRecipeActivity to show a saved recipe
+    public Cursor readAllDataFromSavedRecipesWhereRecipeID(int recipeID){
+        Cursor cursor = null;
+        String query = "SELECT * FROM saved_recipes WHERE recipeID = " + recipeID;
+        SQLiteDatabase db = this.getReadableDatabase();
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+    //Updating a recipe in the database
+    public boolean updateRecipe(int recipeId, String recipeName, String ingredients, String instructions, int cookingTime, int servings,  String notes, String sourceURL){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("recipeName", recipeName);
+        cv.put("cookingTime", cookingTime);
+        cv.put("servings", servings);
+        cv.put("ingredients", ingredients);
+        cv.put("instructions", instructions);
+        cv.put("notes", notes);
+        cv.put("sourceURL", sourceURL);
+
+        long result = db.update( "saved_recipes", cv, "recipeID = ?", new String[]{String.valueOf(recipeId)});
+        db.close();
+        if (result == -1){
+            Toast.makeText(context, "Failed to update recipe", Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            Toast.makeText(context, "Updated recipe successfully!", Toast.LENGTH_SHORT).show();
+            return true;
+        }
     }
 }
