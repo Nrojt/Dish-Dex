@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.SearchResults;
 
 import org.json.JSONArray;
@@ -41,7 +42,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Use the {@link BingFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BingFragment extends Fragment {
+public class BingFragment extends Fragment implements FragmentReplacer {
     // Enter a valid subscription key.
     static String subscriptionKey;
 

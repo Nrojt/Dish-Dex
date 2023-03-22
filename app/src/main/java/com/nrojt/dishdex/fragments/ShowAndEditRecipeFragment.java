@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
+import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 
 
@@ -26,9 +27,7 @@ import com.nrojt.dishdex.utils.internet.WebScraper;
  * Use the {@link ShowAndEditRecipeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ShowAndEditRecipeFragment extends Fragment {
-    private String url = "";
-    private WebScraper wb;
+public class ShowAndEditRecipeFragment extends Fragment implements FragmentReplacer {
     private Button saveOrEditRecipeButton;
     private EditText recipeTextOnScreen;
     private EditText ingredientTextOnScreen;
@@ -42,23 +41,25 @@ public class ShowAndEditRecipeFragment extends Fragment {
 
 
     // the fragment initialization parameters
-    private static final String SCRAPE_FROM_URL = "scrapeFromUrl";
+    private static final String MODE = "mode";
     private static final String RECIPE_ID = "recipeId";
     private static final String WEB_SCRAPER = "WebScraper";
     private static final String URL = "Url";
 
 
-    private boolean scrapeFromUrl;
+    private int mode;
     private int recipeId;
+    private String url = "";
+    private WebScraper wb;
 
     public ShowAndEditRecipeFragment() {
         // Required empty public constructor
     }
 
-    public static ShowAndEditRecipeFragment newInstance(boolean scrapeFromUrl, int recipeId, WebScraper wb, String url) {
+    public static ShowAndEditRecipeFragment newInstance(int mode, int recipeId, WebScraper wb, String url) {
         ShowAndEditRecipeFragment fragment = new ShowAndEditRecipeFragment();
         Bundle args = new Bundle();
-        args.putBoolean(SCRAPE_FROM_URL, scrapeFromUrl);
+        args.putInt(MODE, mode);
         args.putInt(RECIPE_ID, recipeId);
         args.putSerializable(WEB_SCRAPER, wb);
         args.putString(URL, url);
@@ -70,7 +71,7 @@ public class ShowAndEditRecipeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            scrapeFromUrl = getArguments().getBoolean(SCRAPE_FROM_URL);
+            mode = getArguments().getInt(MODE);
             recipeId = getArguments().getInt(RECIPE_ID);
             wb = (WebScraper) getArguments().getSerializable("WebScraper");
             url = getArguments().getString("Url");
@@ -95,38 +96,49 @@ public class ShowAndEditRecipeFragment extends Fragment {
         saveOrEditRecipeButton = view.findViewById(R.id.saveOrEditRecipeButton);
         urlTextOnScreen = view.findViewById(R.id.urlTextOnScreen);
 
-        if(scrapeFromUrl) {
-            saveOrEditRecipeButton.setText("Save Recipe");
-            if(wb != null) {
-                //setting the on screen elements to the values scraped from the url
-                recipeTextOnScreen.setText(wb.getRecipeText());
-                ingredientTextOnScreen.setText(wb.getIngredientText());
-                cookingTimeTextOnScreen.setText(String.valueOf(wb.getCookingTime()));
-                servingsTextOnScreen.setText(String.valueOf(wb.getServings()));
-                recipeTitleTextOnScreen.setText(wb.getRecipeTitle());
-                urlTextOnScreen.setText(url);
-            }
-
-        } else {
-            saveOrEditRecipeButton.setText("Update Recipe");
-            Cursor cursor;
-            try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
-                cursor = db.readAllDataFromSavedRecipesWhereRecipeID(recipeId);
-
-                if (cursor.getCount() == 0) {
-                    Toast.makeText(getContext(), "No data", Toast.LENGTH_SHORT).show();
+        switch (mode) {
+            case 0:
+                saveOrEditRecipeButton.setText("Save Recipe");
+                if(wb != null) {
+                    //setting the on screen elements to the values scraped from the url
+                    recipeTextOnScreen.setText(wb.getRecipeText());
+                    ingredientTextOnScreen.setText(wb.getIngredientText());
+                    cookingTimeTextOnScreen.setText(String.valueOf(wb.getCookingTime()));
+                    servingsTextOnScreen.setText(String.valueOf(wb.getServings()));
+                    recipeTitleTextOnScreen.setText(wb.getRecipeTitle());
+                    urlTextOnScreen.setText(url);
                 } else {
-                    while (cursor.moveToNext()) {
-                        recipeTextOnScreen.setText(cursor.getString(1));
-                        ingredientTextOnScreen.setText(cursor.getString(2));
-                        cookingTimeTextOnScreen.setText(cursor.getString(3));
-                        servingsTextOnScreen.setText(cursor.getString(4));
-                        recipeTitleTextOnScreen.setText(cursor.getString(5));
-                        noteTextOnScreen.setText(cursor.getString(6));
-                        urlTextOnScreen.setText(cursor.getString(7));
+                    Toast.makeText(getContext(), "No data on website", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 1:
+                saveOrEditRecipeButton.setText("Change Recipe");
+                Cursor cursor;
+                try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
+                    cursor = db.readAllDataFromSavedRecipesWhereRecipeID(recipeId);
+
+                    if (cursor.getCount() == 0) {
+                        Toast.makeText(getContext(), "No data", Toast.LENGTH_SHORT).show();
+                    } else {
+                        while (cursor.moveToNext()) {
+                            recipeTitleTextOnScreen.setText(cursor.getString(1));
+                            cookingTimeTextOnScreen.setText(cursor.getString(2));
+                            servingsTextOnScreen.setText(cursor.getString(3));
+                            ingredientTextOnScreen.setText(cursor.getString(4));
+                            recipeTextOnScreen.setText(cursor.getString(5));
+                            noteTextOnScreen.setText(cursor.getString(6));
+                            urlTextOnScreen.setText(cursor.getString(7));
+                        }
                     }
                 }
-            }
+                cursor.close();
+                break;
+            case 2:
+                saveOrEditRecipeButton.setText("Save Recipe");
+                break;
+            default:
+                saveOrEditRecipeButton.setText("Change Recipe");
+                break;
         }
 
         //setting the saveRecipeButton to be invisible when the keyboard is up. It does this by checking the height of the screen and the height of the keyboard and if the difference is greater than a certain threshold, it hides the button.
@@ -188,15 +200,19 @@ public class ShowAndEditRecipeFragment extends Fragment {
                         return;
                     }
 
-                    if (scrapeFromUrl) {
-                        // Add recipe to database
-                        if (db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url)) {
-                            replaceFragment(new AddRecipeChooserFragment());
-                        }
-                    } else {
-                        if (db.updateRecipe(recipeId, recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url)) {
-                            replaceFragment(new SavedRecipesFragment());
-                        }
+                    switch (mode) {
+                        case 0:
+                        case 2:
+                            // Add recipe to database
+                            if (db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url)) {
+                                replaceFragment(new AddRecipeChooserFragment());
+                            }
+                            break;
+                        default:
+                            if (db.updateRecipe(recipeId, recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url)) {
+                                replaceFragment(new SavedRecipesFragment());
+                            }
+                            break;
                     }
                 }
             }

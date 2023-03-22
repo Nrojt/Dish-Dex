@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputEditText;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 
 import java.util.concurrent.ExecutorService;
@@ -27,7 +28,7 @@ import java.util.concurrent.Executors;
  * Use the {@link AddRecipeChooserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddRecipeChooserFragment extends Fragment {
+public class AddRecipeChooserFragment extends Fragment implements FragmentReplacer {
     private TextInputEditText urlInput;
     private Button getRecipeFromUrlButton;
     private Button browseWebButton;
@@ -48,14 +49,7 @@ public class AddRecipeChooserFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddRecipeChooserFragment.
-     */
+
     // TODO: Rename and change types and number of parameters
     public static AddRecipeChooserFragment newInstance(String param1, String param2) {
         AddRecipeChooserFragment fragment = new AddRecipeChooserFragment();
@@ -120,7 +114,7 @@ public class AddRecipeChooserFragment extends Fragment {
                                         }
                                         else {
                                             //switching to the ShowAndEditRecipeFragment
-                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(true, -1, wb, url);
+                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
                                             replaceFragment(showAndEditRecipeFragment);
                                         }
                                     }
@@ -159,7 +153,7 @@ public class AddRecipeChooserFragment extends Fragment {
         emptyRecipeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(true, -1, null, null);
+                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, null, null);
                 replaceFragment(showAndEditRecipeFragment);
             }
         });

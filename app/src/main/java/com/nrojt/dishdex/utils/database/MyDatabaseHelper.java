@@ -129,4 +129,16 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             return true;
         }
     }
+
+    public boolean deleteRecipe(int recipeId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.delete("saved_recipes", "recipeID = ?", new String[]{String.valueOf(recipeId)});
+        db.close();
+        if (result == -1){
+            Toast.makeText(context, "Failed to delete recipe", Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

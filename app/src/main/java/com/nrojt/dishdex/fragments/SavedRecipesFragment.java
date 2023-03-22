@@ -3,7 +3,12 @@ package com.nrojt.dishdex.fragments;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,10 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
-import com.nrojt.dishdex.utils.recycler.CustomAdapter;
-import com.nrojt.dishdex.utils.recycler.ItemPaddingDecoration;
+import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
+import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
+import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
+import com.nrojt.dishdex.utils.recycler.SavedRecipesItemPaddingDecoration;
 
 import java.util.ArrayList;
 
@@ -24,7 +32,7 @@ import java.util.ArrayList;
  * Use the {@link SavedRecipesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SavedRecipesFragment extends Fragment {
+public class SavedRecipesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -41,6 +49,14 @@ public class SavedRecipesFragment extends Fragment {
     private final ArrayList<Integer> recipeCookingTimes = new ArrayList<>();
     private final ArrayList<Integer> recipeServings = new ArrayList<>();
     private final ArrayList<Integer> recipeIDs = new ArrayList<>();
+
+    private SearchView savedRecipesSearchView;
+    private RecyclerView savedRecipesRecyclerView;
+
+    private String deletedRecipeTitle = null;
+    private int deletedRecipeID = -1;
+    private int deletedRecipeCookingTime = -1;
+    private int deletedRecipeServings = -1;
 
 
     public SavedRecipesFragment() {
@@ -81,18 +97,111 @@ public class SavedRecipesFragment extends Fragment {
 
         db = new MyDatabaseHelper(getContext());
 
-        RecyclerView savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
+        savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
+        savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);
 
         //Adding padding to the recyclerView and setting the adapter and layout manager
-        savedRecipesRecyclerView.addItemDecoration(new ItemPaddingDecoration(20));
-        CustomAdapter customAdapter = new CustomAdapter(getContext(), recipeTitles, recipeCookingTimes, recipeServings);
-        savedRecipesRecyclerView.setAdapter(customAdapter);
+        savedRecipesRecyclerView.addItemDecoration(new SavedRecipesItemPaddingDecoration(20));
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipeIDs, recipeTitles, recipeCookingTimes, recipeServings, this);
+        savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        savedRecipesSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText);
+                return true;
+            }
+        });
+
+
+
+        //Adding swipe to delete functionality
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                //Remove swiped item from list and notify the RecyclerView
+                int position = viewHolder.getAdapterPosition();
+                if (direction == ItemTouchHelper.RIGHT) {
+                    deletedRecipeTitle = recipeTitles.get(position);
+                    deletedRecipeID = recipeIDs.get(position);
+                    deletedRecipeCookingTime = recipeCookingTimes.get(position);
+                    deletedRecipeServings = recipeServings.get(position);
+
+                    recipeTitles.remove(position);
+                    recipeIDs.remove(position);
+                    recipeCookingTimes.remove(position);
+                    recipeServings.remove(position);
+
+                    savedRecipesCustomRecyclerAdapter.notifyItemRemoved(position);
+
+                    //This snackbar allows the user to undo the deletion
+                    Snackbar snackbar = Snackbar.make(savedRecipesRecyclerView, deletedRecipeTitle, Snackbar.LENGTH_LONG)
+                            .setAction("Undo", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //recipeTitles.add(position, deletedRecipe);
+                                    recipeTitles.add(position, deletedRecipeTitle);
+                                    recipeIDs.add(position, deletedRecipeID);
+                                    recipeCookingTimes.add(position, deletedRecipeCookingTime);
+                                    recipeServings.add(position, deletedRecipeServings);
+                                    savedRecipesCustomRecyclerAdapter.notifyItemInserted(position);
+                                }
+                            });
+
+                    //This callback is called when the snackbar is dismissed
+                    snackbar.addCallback(new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar transientBottomBar, int event) {
+                            if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                                db.deleteRecipe(deletedRecipeID);
+                            }
+                        }
+                    });
+                    snackbar.show();
+                }
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(savedRecipesRecyclerView);
+
+        //This method displays the recipes in the database
         displayRecipes();
 
         return view;
+    }
+
+    //This method is called when the user enters text into the search bar and it filters the recipes based on their titles
+    private void filter(String newText) {
+        //TODO filter by category once that is implemented
+        ArrayList<String> filteredRecipeTitles = new ArrayList<>();
+        ArrayList<Integer> filteredRecipeCookingTimes = new ArrayList<>();
+        ArrayList<Integer> filteredRecipeServings = new ArrayList<>();
+        ArrayList<Integer> filteredRecipeIDs = new ArrayList<>();
+
+        for (String recipeTitle : recipeTitles) {
+            if (recipeTitle.toLowerCase().contains(newText.toLowerCase())) {
+                filteredRecipeTitles.add(recipeTitle);
+                filteredRecipeCookingTimes.add(recipeCookingTimes.get(recipeTitles.indexOf(recipeTitle)));
+                filteredRecipeServings.add(recipeServings.get(recipeTitles.indexOf(recipeTitle)));
+                filteredRecipeIDs.add(recipeIDs.get(recipeTitles.indexOf(recipeTitle)));
+            }
+        }
+
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipeIDs, filteredRecipeTitles, filteredRecipeCookingTimes, filteredRecipeServings, this);
+        savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
+        savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     //Adding the recipes to a recyclerView
@@ -110,5 +219,22 @@ public class SavedRecipesFragment extends Fragment {
                 recipeServings.add(cursor.getInt(3));
             }
         }
+        cursor.close();
+    }
+
+
+    //This code runs when a recipe is clicked
+    @Override
+    public void onRecipeClick(int position) {
+        Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipeIDs.get(position), null, null);
+        replaceFragment(showAndEditRecipeFragment);
+    }
+
+    //replacing the fragment
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
+        fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.commit();
     }
 }

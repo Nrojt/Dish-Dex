@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.internet.WebScraper;
@@ -40,7 +41,7 @@ import java.util.concurrent.Executors;
  * Use the {@link WebBrowserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WebBrowserFragment extends Fragment {
+public class WebBrowserFragment extends Fragment implements FragmentReplacer {
     private ArrayList<String> blockedUrls = new ArrayList<>();
     private WebView urlBrowser;
     private EditText currentBrowserUrl;
@@ -232,7 +233,7 @@ public class WebBrowserFragment extends Fragment {
                                             Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
                                         } else {
                                             //switching to the showAndEditRecipeFragment
-                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(true, -1, wb, url);
+                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, wb, url);
                                             replaceFragment(showAndEditRecipeFragment);
                                         }
                                     }
@@ -265,7 +266,7 @@ public class WebBrowserFragment extends Fragment {
     }
 
 
-    //replacing the fragment with the ScrapeFromUrlFragment
+    //replacing the fragment
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);

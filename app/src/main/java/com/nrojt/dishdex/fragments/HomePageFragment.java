@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ import java.util.Locale;
  * Use the {@link HomePageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomePageFragment extends Fragment {
+public class HomePageFragment extends Fragment implements FragmentReplacer {
     private TextView dateTimeTextView;
 
     // TODO: Rename parameter arguments, choose names that match
