@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/savedRecipesFabAddCategory"
+        android:title="Add category" />
+    <item
+        android:id="@+id/savedRecipesFabBrowser"
+        android:title="Browse the web" />
+    <item
+        android:id="@+id/savedRecipesFabAddEmptyRecipe"
+        android:title="Add empty recipe" />
+</menu>

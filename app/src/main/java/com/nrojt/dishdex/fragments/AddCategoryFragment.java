@@ -1,37 +1,29 @@
 package com.nrojt.dishdex.fragments;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.nrojt.dishdex.R;
-import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.util.Locale;
+import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
+import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link HomePageFragment#newInstance} factory method to
+ * Use the {@link AddCategoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomePageFragment extends Fragment implements FragmentReplacer {
-    private TextView dateTimeTextView;
+public class AddCategoryFragment extends Fragment implements FragmentReplacer {
+    private Button saveCategoryButton;
+    private EditText categoryNameEditText;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -42,7 +34,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer {
     private String mParam1;
     private String mParam2;
 
-    public HomePageFragment() {
+    public AddCategoryFragment() {
         // Required empty public constructor
     }
 
@@ -52,12 +44,11 @@ public class HomePageFragment extends Fragment implements FragmentReplacer {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomePageFragment.
+     * @return A new instance of fragment AddCategoryFragment.
      */
-
-
-    public static HomePageFragment newInstance(String param1, String param2) {
-        HomePageFragment fragment = new HomePageFragment();
+    // TODO: Rename and change types and number of parameters
+    public static AddCategoryFragment newInstance(String param1, String param2) {
+        AddCategoryFragment fragment = new AddCategoryFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -77,22 +68,32 @@ public class HomePageFragment extends Fragment implements FragmentReplacer {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home_page, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_category, container, false);
+        saveCategoryButton = view.findViewById(R.id.saveCategoryButton);
+        categoryNameEditText = view.findViewById(R.id.categoryNameEditText);
 
-        //Get the current day of the week and display it
-        dateTimeTextView = view.findViewById(R.id.dateTimeTextView);
-        DayOfWeek dow = LocalDate.now().getDayOfWeek();
-        String currentDay = dow.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH);
-        dateTimeTextView.setText("Hello\nToday is "+ currentDay);
+        saveCategoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String categoryName = categoryNameEditText.getText().toString().trim();
+                if (categoryName.isBlank()) {
+                    categoryNameEditText.setError("Category name is required");
+                    return;
+                }
 
+                MyDatabaseHelper db = new MyDatabaseHelper(getContext());
+                if(db.addCategory(categoryName)){
+                    Fragment fragment = new SavedRecipesFragment();
+                    replaceFragment(fragment);
+                }
 
-
+            }
+        });
         return view;
     }
 
     @Override
-    public void replaceFragment(Fragment fragment) {
+    public void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
         fragmentTransaction.replace(R.id.frame_layout, fragment);

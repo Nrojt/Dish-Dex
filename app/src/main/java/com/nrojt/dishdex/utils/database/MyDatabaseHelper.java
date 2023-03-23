@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -48,7 +49,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Add a recipe to the database
-    public boolean addRecipe(String recipeName, String ingredients, String instructions, int cookingTime, int servings,  String notes, String sourceURL){
+    public boolean addRecipe(String recipeName, String ingredients, String instructions, int cookingTime, int servings, String notes, String sourceURL) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -60,10 +61,11 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         cv.put("notes", notes);
         cv.put("sourceURL", sourceURL);
 
-        long result = db.insert( "saved_recipes", null, cv);
+        long result = db.insert("saved_recipes", null, cv);
         db.close();
-        if (result == -1){
+        if (result == -1) {
             Toast.makeText(context, "Failed to save recipe", Toast.LENGTH_SHORT).show();
+            Log.e("Database", "Failed to save recipe");
             return false;
         } else {
             Toast.makeText(context, "Saved recipe successfully!", Toast.LENGTH_SHORT).show();
@@ -72,42 +74,44 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     }
 
     //Reading all data from a table
-    public Cursor readAllDataFromTable(String tableName){
+    public Cursor readAllDataFromTable(String tableName) {
         Cursor cursor = null;
         String query = "SELECT * FROM " + tableName;
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db != null){
-           cursor = db.rawQuery(query, null);
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        } else {
+            Log.e("Database", "Database is null");
         }
         return cursor;
     }
 
     //Getting the data from the database for the saved recipes recycler view
-    public Cursor readDataForSavedRecipesRecyclerView(){
+    public Cursor readDataForSavedRecipesRecyclerView() {
         Cursor cursor = null;
         String query = "SELECT recipeID, recipeName, cookingTime, servings FROM saved_recipes";
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         } else {
-            Toast.makeText(context, "Database is null", Toast.LENGTH_SHORT).show();
+            Log.e("Database", "Database is null");
         }
         return cursor;
     }
 
     //Getting the data from a specific recipe for ShowAndEditRecipeActivity to show a saved recipe
-    public Cursor readAllDataFromSavedRecipesWhereRecipeID(int recipeID){
+    public Cursor readAllDataFromSavedRecipesWhereRecipeID(int recipeID) {
         Cursor cursor = null;
         String query = "SELECT * FROM saved_recipes WHERE recipeID = " + recipeID;
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
-        }
+        } Log.e("Database", "Failed to read data from saved_recipes");
         return cursor;
     }
 
     //Updating a recipe in the database
-    public boolean updateRecipe(int recipeId, String recipeName, String ingredients, String instructions, int cookingTime, int servings,  String notes, String sourceURL){
+    public boolean updateRecipe(int recipeId, String recipeName, String ingredients, String instructions, int cookingTime, int servings, String notes, String sourceURL) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -119,10 +123,11 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         cv.put("notes", notes);
         cv.put("sourceURL", sourceURL);
 
-        long result = db.update( "saved_recipes", cv, "recipeID = ?", new String[]{String.valueOf(recipeId)});
+        long result = db.update("saved_recipes", cv, "recipeID = ?", new String[]{String.valueOf(recipeId)});
         db.close();
-        if (result == -1){
+        if (result == -1) {
             Toast.makeText(context, "Failed to update recipe", Toast.LENGTH_SHORT).show();
+            Log.e("Database", "Failed to update recipe");
             return false;
         } else {
             Toast.makeText(context, "Updated recipe successfully!", Toast.LENGTH_SHORT).show();
@@ -130,15 +135,49 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean deleteRecipe(int recipeId){
+    //Deleting a recipe from the database
+    public boolean deleteRecipe(int recipeId) {
         SQLiteDatabase db = this.getWritableDatabase();
         long result = db.delete("saved_recipes", "recipeID = ?", new String[]{String.valueOf(recipeId)});
         db.close();
-        if (result == -1){
+        if (result == -1) {
             Toast.makeText(context, "Failed to delete recipe", Toast.LENGTH_SHORT).show();
+            Log.e("Database", "Failed to delete recipe");
             return false;
         } else {
             return true;
         }
+    }
+
+    //Adding a category to the database
+    public boolean addCategory(String categoryName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("categoryName", categoryName);
+
+        long result = db.insert("category", null, cv);
+        db.close();
+        if (result == -1) {
+            Toast.makeText(context, "Failed to update recipe", Toast.LENGTH_SHORT).show();
+            Log.e("Database", "Failed to update recipe");
+            return false;
+        } else {
+            Toast.makeText(context, "Updated recipe successfully!", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+    }
+
+    public Cursor readAllDataFromCategories() {
+        Cursor cursor = null;
+        String query = "SELECT * FROM category";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        } else {
+            Log.e("Database", "Database is null");
+        }
+        return cursor;
     }
 }

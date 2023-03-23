@@ -267,7 +267,8 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer {
 
 
     //replacing the fragment
-    private void replaceFragment(Fragment fragment){
+    @Override
+    public void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
         fragmentTransaction.replace(R.id.frame_layout, fragment);

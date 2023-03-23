@@ -42,7 +42,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Use the {@link BingFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BingFragment extends Fragment implements FragmentReplacer {
+public class BingFragment extends Fragment {
     // Enter a valid subscription key.
     static String subscriptionKey;
 

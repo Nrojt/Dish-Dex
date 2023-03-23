@@ -1,17 +1,21 @@
 package com.nrojt.dishdex.fragments;
 
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -21,23 +25,25 @@ import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 
+import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ShowAndEditRecipeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class ShowAndEditRecipeFragment extends Fragment implements FragmentReplacer {
     private Button saveOrEditRecipeButton;
     private EditText recipeTextOnScreen;
     private EditText ingredientTextOnScreen;
-
+    private TextView chooseCategoriesTextView;
     private EditText cookingTimeTextOnScreen;
     private EditText recipeTitleTextOnScreen;
     private EditText servingsTextOnScreen;
 
     private EditText noteTextOnScreen;
     private EditText urlTextOnScreen;
+
+    // for getting and selecting categories
+    private ArrayList<String> categoryNames = new ArrayList<>();
+    private ArrayList<Integer> categoryIDs = new ArrayList<>();
+    private boolean[] selectedCategories;
 
 
     // the fragment initialization parameters
@@ -95,7 +101,11 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
         noteTextOnScreen = view.findViewById(R.id.noteTextOnScreen);
         saveOrEditRecipeButton = view.findViewById(R.id.saveOrEditRecipeButton);
         urlTextOnScreen = view.findViewById(R.id.urlTextOnScreen);
+        chooseCategoriesTextView = view.findViewById(R.id.chooseCategoriesTextView);
 
+        getCategoriesFromDatabase();
+
+        //Checking if the mode is 0, 1 or 2. 0 is for when the user is adding a recipe from a website, 1 is for when the user is editing a recipe and 2 is for when the user is adding a recipe from scratch.
         switch (mode) {
             case 0:
                 saveOrEditRecipeButton.setText("Save Recipe");
@@ -167,6 +177,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
             }
         });
 
+        //setting the onClickListener for the saveOrEditRecipeButton
         saveOrEditRecipeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -185,6 +196,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
                         cookingTime = Integer.parseInt(cookingTimeStr);
                     } catch (NumberFormatException e) {
                         // Handle invalid input
+                        cookingTimeTextOnScreen.setError("Cooking time must be a number");
                         Toast.makeText(getActivity().getApplicationContext(), "Cooking time must be a number", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -196,6 +208,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
                         servings = Integer.parseInt(servingsStr);
                     } catch (NumberFormatException e) {
                         // Handle invalid input
+                        servingsTextOnScreen.setError("Servings must be a number");
                         Toast.makeText(getActivity().getApplicationContext(), "Servings must be a number", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -218,11 +231,77 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
             }
         });
 
+        //setting the onClickListener for the chooseCategoriesTextView
+        chooseCategoriesTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //creating a new AlertDialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Choose Categories");
+
+                //setting the multiChoiceItems to the categories in the database
+                builder.setMultiChoiceItems(categoryNames.toArray(new String[0]), selectedCategories, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        selectedCategories[which] = isChecked;
+                    }
+                });
+
+                //setting the positive button to save the categories
+                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //creating a new ArrayList to store the selected categories
+                        ArrayList<String> selectedCategoriesList = new ArrayList<>();
+                        for (int i = 0; i < selectedCategories.length; i++) {
+                            if (selectedCategories[i]) {
+                                selectedCategoriesList.add(categoryNames.get(i));
+                                selectedCategories[i] = true;
+                            } else {
+                                selectedCategories[i] = false;
+                            }
+                        }
+
+                        //setting the text of the chooseCategoriesTextView to the selected categories
+                        chooseCategoriesTextView.setText(TextUtils.join(", ", selectedCategoriesList));
+                    }
+                });
+
+                //setting the negative button to cancel the dialog
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                //creating and showing the dialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
         return view;
     }
 
+    private void getCategoriesFromDatabase() {
+        try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
+            Cursor cursor = db.readAllDataFromCategories();
+            if (cursor.getCount() == 0) {
+                //This should never happen, since the database is created with default categories
+                Toast.makeText(getContext(), "No Categories", Toast.LENGTH_SHORT).show();
+            } else {
+                while (cursor.moveToNext()) {
+                    categoryIDs.add(cursor.getInt(1));
+                    categoryNames.add(cursor.getString(0));
+                }
+            }
+            selectedCategories = new boolean[categoryIDs.size()];
+        }
+    }
+
     //This method is used to replace the current fragment with a new fragment
-    private void replaceFragment(Fragment fragment){
+    @Override
+    public void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
         fragmentTransaction.replace(R.id.frame_layout, fragment);

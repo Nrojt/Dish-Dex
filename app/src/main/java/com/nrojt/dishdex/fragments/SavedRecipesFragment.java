@@ -2,6 +2,13 @@ package com.nrojt.dishdex.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
@@ -12,11 +19,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
@@ -27,12 +30,10 @@ import com.nrojt.dishdex.utils.recycler.SavedRecipesItemPaddingDecoration;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SavedRecipesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SavedRecipesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer{
+
+    private FloatingActionButton savedRecipesFab;
+    private PopupWindow fabMenu;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -99,6 +100,14 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
         savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);
+        savedRecipesFab = view.findViewById(R.id.savedRecipesFab);
+
+        savedRecipesFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showFabMenu();
+            }
+        });
 
         //Adding padding to the recyclerView and setting the adapter and layout manager
         savedRecipesRecyclerView.addItemDecoration(new SavedRecipesItemPaddingDecoration(20));
@@ -184,7 +193,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     //This method is called when the user enters text into the search bar and it filters the recipes based on their titles
     private void filter(String newText) {
-        //TODO filter by category once that is implemented
+        //TODO filter by category once that is implemented, not gonna make this before opt2 though
         ArrayList<String> filteredRecipeTitles = new ArrayList<>();
         ArrayList<Integer> filteredRecipeCookingTimes = new ArrayList<>();
         ArrayList<Integer> filteredRecipeServings = new ArrayList<>();
@@ -222,6 +231,35 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         cursor.close();
     }
 
+    //This method displays the FAB menu
+    private void showFabMenu() {
+        PopupMenu popupMenu = new PopupMenu(requireContext(), savedRecipesFab);
+        popupMenu.getMenuInflater().inflate(R.menu.saved_recipes_fab_menu, popupMenu.getMenu());
+
+        // Add click listeners for your menu items, if needed
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.savedRecipesFabAddCategory:
+                        Fragment addCategoryFragment = new AddCategoryFragment();
+                        replaceFragment(addCategoryFragment);
+                        return true;
+                    case R.id.savedRecipesFabBrowser:
+                        Fragment browserFragment = new WebBrowserFragment();
+                        replaceFragment(browserFragment);
+                        return true;
+                    case R.id.savedRecipesFabAddEmptyRecipe:
+                        Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, null, null);
+                        replaceFragment(showAndEditRecipeFragment);
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        popupMenu.show();
+    }
 
     //This code runs when a recipe is clicked
     @Override
@@ -231,7 +269,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     }
 
     //replacing the fragment
-    private void replaceFragment(Fragment fragment){
+    @Override
+    public void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
         fragmentTransaction.replace(R.id.frame_layout, fragment);

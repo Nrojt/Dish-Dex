@@ -84,6 +84,9 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
         browseWebButton = view.findViewById(R.id.browseWebButton);
         emptyRecipeButton = view.findViewById(R.id.emptyRecipeButton);
 
+        //setting the visibility of the bing search button and input to invisible, because they're not at a working state yet
+        bingSearchButton.setVisibility(View.INVISIBLE);
+        bingSearchInput.setVisibility(View.INVISIBLE);
 
         //When the user clicks the button, the url is passed to the WebScraper class which checks if the site is supported and if the site is reachable
         getRecipeFromUrlButton.setOnClickListener(new View.OnClickListener() {
@@ -163,7 +166,8 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
 
 
     //This method is used to replace the current fragment with a new fragment
-    private void replaceFragment(Fragment fragment){
+    @Override
+    public void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
         fragmentTransaction.replace(R.id.frame_layout, fragment);
