@@ -8,6 +8,13 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 
@@ -76,6 +83,8 @@ public class HomePageFragment extends Fragment implements FragmentReplacer {
         DayOfWeek dow = LocalDate.now().getDayOfWeek();
         String currentDay = dow.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH);
         dateTimeTextView.setText("Hello\nToday is "+ currentDay);
+
+
 
         return view;
     }
