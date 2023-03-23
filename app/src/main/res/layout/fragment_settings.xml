@@ -19,11 +19,22 @@
             android:hint="Bing Api Key" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <ToggleButton
+        android:id="@+id/proUserToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bingKeyTextInput"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:text="ToggleButton"
+        android:textOff="Normal User"
+        android:textOn="Pro User" />
+
     <Button
         android:id="@+id/saveSettingsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bingKeyTextInput"
+        android:layout_below="@id/proUserToggleButton"
         android:layout_centerInParent="true"
         android:text="Save" />
 

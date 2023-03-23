@@ -1,8 +1,13 @@
 package com.nrojt.dishdex;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -14,6 +19,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.nrojt.dishdex.databinding.ActivityMainBinding;
 import com.nrojt.dishdex.fragments.AddRecipeChooserFragment;
 import com.nrojt.dishdex.fragments.HomePageFragment;
@@ -23,6 +29,8 @@ import com.nrojt.dishdex.fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity {
     private AdView adView;
+
+    private boolean isProUser;
 
     ActivityMainBinding binding;
 
@@ -37,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
         //Setting the fragment that will show on app startup
         binding.bottomNavigationView.setSelectedItemId(R.id.homeButton);
         replaceFragment(new HomePageFragment());
+
+        SharedPreferences sharedPreferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
+        isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
 
         //Onclick listener for the bottom navigation bar, which will replace the fragment when one of the buttons is clicked.
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -103,6 +114,24 @@ public class MainActivity extends AppCompatActivity {
                 // covers the screen.
             }
         });
+
+        FrameLayout frameLayout = findViewById(R.id.frame_layout);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
+        // Set the top and bottom constraints of the FrameLayout and disabling adview if the user is a pro user.
+        if (isProUser) {
+            // Remove the ad view
+            ConstraintLayout adContainer = findViewById(R.id.mainPageConstraintLayout);
+            View adView = findViewById(R.id.adView);
+            adContainer.removeView(adView);
+
+            // Set the top and bottom constraints of the FrameLayout
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(adContainer);
+            constraintSet.connect(frameLayout.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+            constraintSet.connect(frameLayout.getId(), ConstraintSet.BOTTOM, bottomNavigationView.getId(), ConstraintSet.TOP, 0);
+            constraintSet.applyTo(adContainer);
+        }
     }
 
     //Method for replacing the fragment
