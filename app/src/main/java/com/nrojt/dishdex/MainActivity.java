@@ -30,7 +30,8 @@ import com.nrojt.dishdex.fragments.SettingsFragment;
 public class MainActivity extends AppCompatActivity {
     private AdView adView;
 
-    private boolean isProUser;
+    public static boolean isProUser;
+    public static final int MAX_CATEGORIES_FREE = 16;
 
     ActivityMainBinding binding;
 

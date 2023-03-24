@@ -43,6 +43,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
     // for getting and selecting categories
     private ArrayList<String> categoryNames = new ArrayList<>();
     private ArrayList<Integer> categoryIDs = new ArrayList<>();
+    private ArrayList<Integer> savedCategoryIDs = new ArrayList<>();
     private boolean[] selectedCategories;
 
 
@@ -57,6 +58,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
     private int recipeId;
     private String url = "";
     private WebScraper wb;
+    private int recipeIDFromDatabase;
 
     public ShowAndEditRecipeFragment() {
         // Required empty public constructor
@@ -142,12 +144,16 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
                     }
                 }
                 cursor.close();
+                //getting the categories from the database and setting the selectedCategories array to the correct values;
+                getSavedCategoryNamesFromDatabase();
                 break;
             case 2:
                 saveOrEditRecipeButton.setText("Save Recipe");
+                getSavedCategoryNamesFromDatabase();
                 break;
             default:
                 saveOrEditRecipeButton.setText("Change Recipe");
+                getSavedCategoryNamesFromDatabase();
                 break;
         }
 
@@ -189,40 +195,72 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
                     String notes = noteTextOnScreen.getText().toString().trim();
                     String url = urlTextOnScreen.getText().toString().trim();
 
-                    // Convert cooking time input to integer
-                    String cookingTimeStr = cookingTimeTextOnScreen.getText().toString().trim();
-                    int cookingTime;
-                    try {
-                        cookingTime = Integer.parseInt(cookingTimeStr);
-                    } catch (NumberFormatException e) {
-                        // Handle invalid input
-                        cookingTimeTextOnScreen.setError("Cooking time must be a number");
-                        Toast.makeText(getActivity().getApplicationContext(), "Cooking time must be a number", Toast.LENGTH_SHORT).show();
-                        return;
+                    int cookingTime = 0;
+                    if(!cookingTimeTextOnScreen.getText().toString().isBlank()) {
+                        // Convert cooking time input to integer
+                        String cookingTimeStr = cookingTimeTextOnScreen.getText().toString().trim();
+                        try {
+                            cookingTime = Integer.parseInt(cookingTimeStr);
+                        } catch (NumberFormatException e) {
+                            // Handle invalid input
+                            cookingTimeTextOnScreen.setError("Cooking time must be a number");
+                            Toast.makeText(getActivity().getApplicationContext(), "Cooking time must be a number", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
 
-                    // Convert servings input to integer
-                    String servingsStr = servingsTextOnScreen.getText().toString().trim();
-                    int servings;
-                    try {
-                        servings = Integer.parseInt(servingsStr);
-                    } catch (NumberFormatException e) {
-                        // Handle invalid input
-                        servingsTextOnScreen.setError("Servings must be a number");
-                        Toast.makeText(getActivity().getApplicationContext(), "Servings must be a number", Toast.LENGTH_SHORT).show();
-                        return;
+                    int servings = 0;
+                    if(!servingsTextOnScreen.getText().toString().isBlank()) {
+                        // Convert servings input to integer
+                        String servingsStr = servingsTextOnScreen.getText().toString().trim();
+                        try {
+                            servings = Integer.parseInt(servingsStr);
+                        } catch (NumberFormatException e) {
+                            // Handle invalid input
+                            servingsTextOnScreen.setError("Servings must be a number");
+                            Toast.makeText(getActivity().getApplicationContext(), "Servings must be a number", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
 
                     switch (mode) {
                         case 0:
                         case 2:
                             // Add recipe to database
-                            if (db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url)) {
+                            recipeIDFromDatabase = db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
+                            db.deleteRecipeCategories(recipeIDFromDatabase);
+
+                            for(int i = 0; i < selectedCategories.length; i++) {
+                                if(selectedCategories[i]) {
+                                    System.out.println("Adding category " + categoryIDs.get(i));
+                                    db.addRecipeCategory(recipeIDFromDatabase, categoryIDs.get(i));
+                                }
+                            }
+
+                            if (recipeIDFromDatabase != -1) {
                                 replaceFragment(new AddRecipeChooserFragment());
                             }
+
                             break;
                         default:
-                            if (db.updateRecipe(recipeId, recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url)) {
+                            // Update recipe in database
+                            db.updateRecipe(recipeId, recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
+                            db.deleteRecipeCategories(recipeId);
+
+                            for(int i = 0; i < selectedCategories.length; i++) {
+                                if(selectedCategories[i]) {
+                                    // The category is selected, so add it to the recipe
+                                    db.addRecipeCategory(recipeId, categoryIDs.get(i));
+                                } else {
+                                    // The category is not selected, so remove it from the recipe
+                                    db.removeRecipeCategory(recipeId, categoryIDs.get(i));
+                                }
+                            }
+
+
+
+
+                            if (recipeIDFromDatabase != -1) {
                                 replaceFragment(new SavedRecipesFragment());
                             }
                             break;
@@ -296,6 +334,28 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
                 }
             }
             selectedCategories = new boolean[categoryIDs.size()];
+            cursor.close();
+        }
+    }
+
+    //Getting the saved categoryNames and categoryIDs from the database
+    private void getSavedCategoryNamesFromDatabase() {
+        try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
+            Cursor cursor = db.getAllCategoriesWhereRecipeID(recipeId);
+            while (cursor.moveToNext()) {
+                savedCategoryIDs.add(cursor.getInt(0));
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //Setting the selectedCategories array to true for the categories that are already saved
+        for(int i = 0; i < categoryIDs.size(); i++) {
+            for(int j = 0; j < savedCategoryIDs.size(); j++) {
+                if(categoryIDs.get(i) == savedCategoryIDs.get(j)) {
+                    selectedCategories[i] = true;
+                }
+            }
         }
     }
 

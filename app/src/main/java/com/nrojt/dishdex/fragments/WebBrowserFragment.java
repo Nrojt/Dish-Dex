@@ -233,7 +233,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer {
                                             Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
                                         } else {
                                             //switching to the showAndEditRecipeFragment
-                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, wb, url);
+                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
                                             replaceFragment(showAndEditRecipeFragment);
                                         }
                                     }

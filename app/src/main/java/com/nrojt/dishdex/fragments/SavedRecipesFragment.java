@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
@@ -243,7 +244,13 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
                 switch (item.getItemId()) {
                     case R.id.savedRecipesFabAddCategory:
                         Fragment addCategoryFragment = new AddCategoryFragment();
-                        replaceFragment(addCategoryFragment);
+                        //checking the amount of categories already created
+                        if (!MainActivity.isProUser && db.getCategoryCount() >= MainActivity.MAX_CATEGORIES_FREE) {
+                            Toast.makeText(getContext(), "You have reached the maximum amount of categories for the free version of the app. Please upgrade to the pro version to create more categories.", Toast.LENGTH_LONG).show();
+                            return false;
+                        } else {
+                            replaceFragment(addCategoryFragment);
+                        }
                         return true;
                     case R.id.savedRecipesFabBrowser:
                         Fragment browserFragment = new WebBrowserFragment();

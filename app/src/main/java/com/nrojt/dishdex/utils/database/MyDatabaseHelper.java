@@ -49,9 +49,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Add a recipe to the database
-    public boolean addRecipe(String recipeName, String ingredients, String instructions, int cookingTime, int servings, String notes, String sourceURL) {
+    public int addRecipe(String recipeName, String ingredients, String instructions, int cookingTime, int servings, String notes, String sourceURL) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
+        int recipeID = -1;
 
         cv.put("recipeName", recipeName);
         cv.put("cookingTime", cookingTime);
@@ -66,11 +67,11 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         if (result == -1) {
             Toast.makeText(context, "Failed to save recipe", Toast.LENGTH_SHORT).show();
             Log.e("Database", "Failed to save recipe");
-            return false;
         } else {
             Toast.makeText(context, "Saved recipe successfully!", Toast.LENGTH_SHORT).show();
-            return true;
+            recipeID = (int) result;
         }
+        return recipeID;
     }
 
     //Reading all data from a table
@@ -106,12 +107,14 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         if (db != null) {
             cursor = db.rawQuery(query, null);
-        } Log.e("Database", "Failed to read data from saved_recipes");
+        } else {
+            Log.e("Database", "Failed to read data from saved_recipes");
+        }
         return cursor;
     }
 
     //Updating a recipe in the database
-    public boolean updateRecipe(int recipeId, String recipeName, String ingredients, String instructions, int cookingTime, int servings, String notes, String sourceURL) {
+    public void updateRecipe(int recipeId, String recipeName, String ingredients, String instructions, int cookingTime, int servings, String notes, String sourceURL) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -128,10 +131,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         if (result == -1) {
             Toast.makeText(context, "Failed to update recipe", Toast.LENGTH_SHORT).show();
             Log.e("Database", "Failed to update recipe");
-            return false;
         } else {
             Toast.makeText(context, "Updated recipe successfully!", Toast.LENGTH_SHORT).show();
-            return true;
         }
     }
 
@@ -168,6 +169,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    //Reading all data from the category table
     public Cursor readAllDataFromCategories() {
         Cursor cursor = null;
         String query = "SELECT * FROM category";
@@ -180,4 +182,99 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
+    //Adding data to the recipe_category table
+    public boolean addRecipeCategory(int recipeID, int categoryID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("recipeID", recipeID);
+        cv.put("categoryID", categoryID);
+
+        // Check if the combination of recipeID and categoryID already exists in the recipe_categories table
+        String[] columns = {"recipeID", "categoryID"};
+        String selection = "recipeID = ? AND categoryID = ?";
+        String[] selectionArgs = {Integer.toString(recipeID), Integer.toString(categoryID)};
+        Cursor cursor = db.query("recipe_categories", columns, selection, selectionArgs, null, null, null);
+
+        if (cursor.getCount() > 0) {
+            System.out.println("The combination of recipeID and categoryID already exists in the recipe_categories table");
+            // The combination of recipeID and categoryID already exists in the recipe_categories table, so don't insert a new row
+            cursor.close();
+            db.close();
+            return false;
+        } else {
+            // The combination of recipeID and categoryID doesn't exist yet in the recipe_categories table, so insert a new row
+            long result = db.insert("recipe_categories", null, cv);
+            cursor.close();
+            db.close();
+            return result != -1;
+        }
+    }
+
+    //Deleting all recipeCategories from a recipe
+    public void deleteRecipeCategories(int recipeID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String whereClause = "recipeID = ?";
+        String[] whereArgs = { String.valueOf(recipeID) };
+        db.delete("recipe_categories", whereClause, whereArgs);
+        db.close();
+    }
+
+
+    //Deleting the combination of recipeID and categoryID from the recipe_categories table
+    public boolean removeRecipeCategory(int recipeID, int categoryID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if the combination of recipeID and categoryID exists in the recipe_categories table
+        String selection = "recipeID = ? AND categoryID = ?";
+        String[] selectionArgs = {Integer.toString(recipeID), Integer.toString(categoryID)};
+        Cursor cursor = db.query("recipe_categories", null, selection, selectionArgs, null, null, null);
+
+        if (cursor.getCount() == 0) {
+            // The combination of recipeID and categoryID does not exist in the recipe_categories table
+            cursor.close();
+            db.close();
+            return false;
+        } else {
+            // The combination of recipeID and categoryID exists in the recipe_categories table, so remove it
+            int result = db.delete("recipe_categories", selection, selectionArgs);
+            cursor.close();
+            db.close();
+            return result != 0;
+        }
+    }
+
+
+
+
+    //checking the count of the category table
+    public int getCategoryCount() {
+        Cursor cursor = null;
+        String query = "SELECT COUNT(*) FROM category";
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        } else {
+            Log.e("Database", "Database is null");
+        }
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        db.close();
+        cursor.close();
+        return count;
+    }
+
+    //getting the categories from recipe_categories where recipeID = recipeID
+    public Cursor getAllCategoriesWhereRecipeID(int recipeID) {
+        Cursor cursor = null;
+        String query = "SELECT categoryID FROM recipe_categories WHERE recipeID = " + recipeID;
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        } else {
+            Log.e("Database", "Database is null");
+        }
+        return cursor;
+    }
+
 }
