@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
@@ -21,9 +23,10 @@ import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
  * Use the {@link AddCategoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddCategoryFragment extends Fragment implements FragmentReplacer {
+public class AddCategoryFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private Button saveCategoryButton;
     private EditText categoryNameEditText;
+    private FragmentManager fragmentManager;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -72,6 +75,8 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer {
         saveCategoryButton = view.findViewById(R.id.saveCategoryButton);
         categoryNameEditText = view.findViewById(R.id.categoryNameEditText);
 
+        fragmentManager = getActivity().getSupportFragmentManager();
+
         saveCategoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,8 +88,7 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer {
 
                 MyDatabaseHelper db = new MyDatabaseHelper(getContext());
                 if(db.addCategory(categoryName)){
-                    Fragment fragment = new SavedRecipesFragment();
-                    replaceFragment(fragment);
+                    fragmentManager.popBackStack();
                 }
 
             }
@@ -92,11 +96,28 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer {
         return view;
     }
 
+
     @Override
     public void replaceFragment(Fragment fragment){
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
-        fragmentTransaction.commit();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).replaceFragment(fragment);
+        }
+
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (getActivity() != null) {
+            fragmentManager.removeOnBackStackChangedListener(this);
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).onBackStackChanged();
+        }
     }
 }

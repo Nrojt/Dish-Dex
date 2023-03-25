@@ -5,6 +5,9 @@
         android:id="@+id/savedRecipesFabAddCategory"
         android:title="Add category" />
     <item
+        android:id="@+id/savedRecipesFabAllCategories"
+        android:title="All Categories" />
+    <item
         android:id="@+id/savedRecipesFabBrowser"
         android:title="Browse the web" />
     <item

@@ -2,6 +2,7 @@ package com.nrojt.dishdex;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -27,8 +28,9 @@ import com.nrojt.dishdex.fragments.SavedRecipesFragment;
 import com.nrojt.dishdex.fragments.SettingsFragment;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener{
     private AdView adView;
+
 
     public static boolean isProUser;
     public static final int MAX_CATEGORIES_FREE = 16;
@@ -50,25 +52,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
         isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
 
-        //Onclick listener for the bottom navigation bar, which will replace the fragment when one of the buttons is clicked.
-        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
-            switch (item.getItemId()){
-                case R.id.homeButton:
-                    replaceFragment(new HomePageFragment());
-                    break;
-                case R.id.addRecipeButton:
-                    replaceFragment(new AddRecipeChooserFragment());
-                    break;
-                case R.id.settingsButton:
-                    replaceFragment(new SettingsFragment());
-                    break;
-                case R.id.recipesButton:
-                    replaceFragment(new SavedRecipesFragment());
-                    break;
-            }
-            return true;
-        });
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
 
         //Initialize the AdMob SDK
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
@@ -116,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Setting onclicklistener for the bottom navigation bar
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+            navigateToFragment(item.getItemId());
+            return true;
+        });
+
         FrameLayout frameLayout = findViewById(R.id.frame_layout);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
@@ -135,12 +126,105 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Method for replacing the fragment
-    private void replaceFragment(Fragment fragment){
+    //Method for replacing the fragment from the main activity
+    public void replaceFragment(Fragment fragment){
+        Log.d("MainActivity", "replaceFragment called with fragment: " + fragment.getClass().getName());
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.addToBackStack(fragment.getClass().getName());
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
+    }
+
+    //Method for popping the backstack
+    @Override
+    public void onBackStackChanged() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.frame_layout);
+
+        // Check if the current fragment is already in the back stack
+        boolean isFragmentInBackStack = false;
+        int backStackCount = fragmentManager.getBackStackEntryCount();
+        for (int i = 0; i < backStackCount; i++) {
+            FragmentManager.BackStackEntry entry = fragmentManager.getBackStackEntryAt(i);
+            String fragmentName = entry.getName();
+            if (currentFragment != null && currentFragment.getClass().getName().equals(fragmentName)) {
+                isFragmentInBackStack = true;
+                break;
+            }
+        }
+
+        // Add the current fragment to the back stack if it's not already in the back stack
+        if (!isFragmentInBackStack && currentFragment != null) {
+            String fragmentName = currentFragment.getClass().getName();
+            fragmentManager.beginTransaction().addToBackStack(fragmentName).commit();
+        }
+
+        updateBottomNavigationItem(currentFragment);
+    }
+
+    private void updateBottomNavigationItem(Fragment fragment) {
+        int selectedItemId = -1;
+        switch (fragment.getClass().getName()) {
+            case "com.nrojt.dishdex.fragments.HomePageFragment":
+                selectedItemId = R.id.homeButton;
+                break;
+            case "com.nrojt.dishdex.fragments.AddRecipeChooserFragment":
+            case "com.nrojt.dishdex.fragments.BingFragment":
+            case "com.nrojt.dishdex.fragments.ShowAndEditRecipeFragment":
+            case "com.nrojt.dishdex.fragments.WebBrowserFragment":
+                selectedItemId = R.id.addRecipeButton;
+                break;
+            case "com.nrojt.dishdex.fragments.SettingsFragment":
+                selectedItemId = R.id.settingsButton;
+                break;
+            case "com.nrojt.dishdex.fragments.SavedRecipesFragment":
+            case "com.nrojt.dishdex.fragments.AddCategoryFragment":
+                selectedItemId = R.id.recipesButton;
+                break;
+            default:
+                break;
+        }
+        // Check if the selected item in the bottom navigation view is already the same as the item you are going to set
+        if (selectedItemId != -1 && binding.bottomNavigationView.getSelectedItemId() != selectedItemId) {
+            binding.bottomNavigationView.setOnItemSelectedListener(null);
+            binding.bottomNavigationView.setSelectedItemId(selectedItemId);
+            binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+                navigateToFragment(item.getItemId());
+                return true;
+            });
+            //binding.bottomNavigationView.setSelectedItemId(selectedItemId);
+        }
+    }
+
+    //Method for handling the back button
+    @Override
+    public void onBackPressed() {
+        // Check if the back stack has any fragments other than the home fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int backStackCount = fragmentManager.getBackStackEntryCount();
+        if (backStackCount > 0) {
+            fragmentManager.popBackStack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void navigateToFragment(int itemId) {
+        switch (itemId) {
+            case R.id.homeButton:
+                replaceFragment(new HomePageFragment());
+                break;
+            case R.id.addRecipeButton:
+                replaceFragment(new AddRecipeChooserFragment());
+                break;
+            case R.id.settingsButton:
+                replaceFragment(new SettingsFragment());
+                break;
+            case R.id.recipesButton:
+                replaceFragment(new SavedRecipesFragment());
+                break;
+        }
     }
 
 }

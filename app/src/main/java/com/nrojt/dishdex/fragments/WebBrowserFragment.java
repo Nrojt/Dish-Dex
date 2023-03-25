@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
 import com.nrojt.dishdex.R;
@@ -41,11 +42,13 @@ import java.util.concurrent.Executors;
  * Use the {@link WebBrowserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WebBrowserFragment extends Fragment implements FragmentReplacer {
+public class WebBrowserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private ArrayList<String> blockedUrls = new ArrayList<>();
     private WebView urlBrowser;
     private EditText currentBrowserUrl;
     private Button scrapeThisUrlButton;
+
+    private FragmentManager fragmentManager;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -91,6 +94,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        fragmentManager = getActivity().getSupportFragmentManager();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_web_browser, container, false);
         urlBrowser = view.findViewById(R.id.urlBrowser);
@@ -269,10 +273,24 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer {
     //replacing the fragment
     @Override
     public void replaceFragment(Fragment fragment){
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
-        fragmentTransaction.commit();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).replaceFragment(fragment);
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).onBackStackChanged();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (getActivity() != null) {
+            fragmentManager.removeOnBackStackChangedListener(this);
+        }
     }
 
 

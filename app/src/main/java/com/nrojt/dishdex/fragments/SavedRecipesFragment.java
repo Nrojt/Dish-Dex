@@ -7,7 +7,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,14 +26,13 @@ import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
-import com.nrojt.dishdex.utils.recycler.SavedRecipesItemPaddingDecoration;
+import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
 
 import java.util.ArrayList;
 
-public class SavedRecipesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer{
+public class SavedRecipesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer, FragmentManager.OnBackStackChangedListener{
 
     private FloatingActionButton savedRecipesFab;
-    private PopupWindow fabMenu;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +57,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     private int deletedRecipeID = -1;
     private int deletedRecipeCookingTime = -1;
     private int deletedRecipeServings = -1;
+
+    private FragmentManager fragmentManager;
 
 
     public SavedRecipesFragment() {
@@ -95,6 +95,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        fragmentManager = getActivity().getSupportFragmentManager();
         View view = inflater.inflate(R.layout.fragment_saved_recipes, container, false);
 
         db = new MyDatabaseHelper(getContext());
@@ -111,11 +112,12 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         });
 
         //Adding padding to the recyclerView and setting the adapter and layout manager
-        savedRecipesRecyclerView.addItemDecoration(new SavedRecipesItemPaddingDecoration(20));
+        savedRecipesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
         SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipeIDs, recipeTitles, recipeCookingTimes, recipeServings, this);
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        //Adding the search functionality
         savedRecipesSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -260,6 +262,10 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
                         Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, null, null);
                         replaceFragment(showAndEditRecipeFragment);
                         return true;
+                    case R.id.savedRecipesFabAllCategories:
+                        Fragment allCategoriesFragment = new SavedCategoriesFragment();
+                        replaceFragment(allCategoriesFragment);
+                        return true;
                 }
                 return false;
             }
@@ -270,7 +276,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     //This code runs when a recipe is clicked
     @Override
-    public void onRecipeClick(int position) {
+    public void onItemClick(int position) {
         Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipeIDs.get(position), null, null);
         replaceFragment(showAndEditRecipeFragment);
     }
@@ -278,9 +284,23 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     //replacing the fragment
     @Override
     public void replaceFragment(Fragment fragment){
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
-        fragmentTransaction.commit();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).replaceFragment(fragment);
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).onBackStackChanged();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (getActivity() != null) {
+            fragmentManager.removeOnBackStackChangedListener(this);
+        }
     }
 }

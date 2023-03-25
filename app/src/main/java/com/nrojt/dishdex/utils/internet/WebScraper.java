@@ -139,7 +139,7 @@ public class WebScraper implements Serializable {
                     recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").first();
                 } else {
                     recipeTitleElement = document.head().getElementsByTag("title").first();
-                    //notSupported = true;
+                    notSupported = true;
                 }
 
                 //Converting the elements to text and adding them to the lists

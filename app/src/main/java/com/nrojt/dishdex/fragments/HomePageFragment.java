@@ -17,6 +17,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 
@@ -30,8 +31,9 @@ import java.util.Locale;
  * Use the {@link HomePageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomePageFragment extends Fragment implements FragmentReplacer {
+public class HomePageFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private TextView dateTimeTextView;
+    private FragmentManager fragmentManager;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -80,6 +82,8 @@ public class HomePageFragment extends Fragment implements FragmentReplacer {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
+        fragmentManager = getActivity().getSupportFragmentManager();
+
         //Get the current day of the week and display it
         dateTimeTextView = view.findViewById(R.id.dateTimeTextView);
         DayOfWeek dow = LocalDate.now().getDayOfWeek();
@@ -92,10 +96,24 @@ public class HomePageFragment extends Fragment implements FragmentReplacer {
     }
 
     @Override
-    public void replaceFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
-        fragmentTransaction.commit();
+    public void replaceFragment(Fragment fragment){
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).replaceFragment(fragment);
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).onBackStackChanged();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (getActivity() != null) {
+            fragmentManager.removeOnBackStackChangedListener(this);
+        }
     }
 }

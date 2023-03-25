@@ -5,10 +5,10 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SavedRecipesItemPaddingDecoration extends RecyclerView.ItemDecoration {
+public class CustomItemPaddingDecoration extends RecyclerView.ItemDecoration {
     private final int padding;
 
-    public SavedRecipesItemPaddingDecoration(int padding) {
+    public CustomItemPaddingDecoration(int padding) {
         this.padding = padding;
     }
 

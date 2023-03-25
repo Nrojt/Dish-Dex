@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
@@ -28,7 +30,7 @@ import com.nrojt.dishdex.utils.internet.WebScraper;
 import java.util.ArrayList;
 
 
-public class ShowAndEditRecipeFragment extends Fragment implements FragmentReplacer {
+public class ShowAndEditRecipeFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private Button saveOrEditRecipeButton;
     private EditText recipeTextOnScreen;
     private EditText ingredientTextOnScreen;
@@ -39,6 +41,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
 
     private EditText noteTextOnScreen;
     private EditText urlTextOnScreen;
+
+    private FragmentManager fragmentManager;
 
     // for getting and selecting categories
     private ArrayList<String> categoryNames = new ArrayList<>();
@@ -91,6 +95,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("ShowAndEditRecipes", "onCreateView");
+        fragmentManager = getActivity().getSupportFragmentManager();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_show_and_edit_recipe, container, false);
 
@@ -238,7 +244,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
                             }
 
                             if (recipeIDFromDatabase != -1) {
-                                replaceFragment(new AddRecipeChooserFragment());
+                                fragmentManager.popBackStack();
                             }
 
                             break;
@@ -257,11 +263,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
                                 }
                             }
 
-
-
-
                             if (recipeIDFromDatabase != -1) {
-                                replaceFragment(new SavedRecipesFragment());
+                                fragmentManager.popBackStack();
                             }
                             break;
                     }
@@ -362,9 +365,23 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
     //This method is used to replace the current fragment with a new fragment
     @Override
     public void replaceFragment(Fragment fragment){
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
-        fragmentTransaction.commit();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).replaceFragment(fragment);
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).onBackStackChanged();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (getActivity() != null) {
+            fragmentManager.removeOnBackStackChangedListener(this);
+        }
     }
 }

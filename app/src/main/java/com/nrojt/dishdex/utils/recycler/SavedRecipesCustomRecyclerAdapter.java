@@ -72,7 +72,7 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        recyclerViewInterface.onRecipeClick(position);
+                        recyclerViewInterface.onItemClick(position);
                     }
                 }
             });

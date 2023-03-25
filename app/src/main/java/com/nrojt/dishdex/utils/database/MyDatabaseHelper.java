@@ -28,7 +28,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         // Create the initial schema of the database
         sqLiteDatabase.execSQL("CREATE TABLE 'category' ('categoryName'	TEXT, 'categoryID'	INTEGER, PRIMARY KEY('categoryID' AUTOINCREMENT))");
-        sqLiteDatabase.execSQL("CREATE TABLE 'recipe_categories' ('recipeID' INTEGER, 'categoryID'	INTEGER, FOREIGN KEY('categoryID') REFERENCES 'category'('categoryID'), FOREIGN KEY ('recipeID') REFERENCES 'saved_recipes' ('recipeID') , PRIMARY KEY ('recipeID','categoryID'))");
+        sqLiteDatabase.execSQL("CREATE TABLE 'recipe_categories' ('recipeID' INTEGER, 'categoryID'	INTEGER, FOREIGN KEY('categoryID') REFERENCES 'category'('categoryID') ON DELETE CASCADE, FOREIGN KEY ('recipeID') REFERENCES 'saved_recipes' ('recipeID') ON DELETE CASCADE, PRIMARY KEY ('recipeID','categoryID'))");
         sqLiteDatabase.execSQL("CREATE TABLE 'saved_recipes' ('recipeID'	INTEGER, 'recipeName'	TEXT, 'cookingTime'	INTEGER, 'servings'	INTEGER, 'ingredients'	TEXT, 'instructions'	TEXT, 'notes'	TEXT, 'sourceURL'	TEXT, PRIMARY KEY('recipeID' AUTOINCREMENT))");
         // Adding standard categories to the database
         sqLiteDatabase.execSQL("INSERT INTO category (categoryName) VALUES ('Breakfast'), ('Lunch'), ('Dinner'), ('Dessert'), ('Snack'), ('Side Dish')");
@@ -100,6 +100,19 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    //Getting the data from the database for the saved categories recycler view
+    public Cursor readDataForSavedCategoriesRecyclerView() {
+        Cursor cursor = null;
+        String query = "SELECT categoryID, categoryName FROM category";
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        } else {
+            Log.e("Database", "Database is null");
+        }
+        return cursor;
+    }
+
     //Getting the data from a specific recipe for ShowAndEditRecipeActivity to show a saved recipe
     public Cursor readAllDataFromSavedRecipesWhereRecipeID(int recipeID) {
         Cursor cursor = null;
@@ -144,6 +157,20 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         if (result == -1) {
             Toast.makeText(context, "Failed to delete recipe", Toast.LENGTH_SHORT).show();
             Log.e("Database", "Failed to delete recipe");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //Deleting a category from the database
+    public boolean deleteCategory(int categoryId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.delete("category", "categoryID = ?", new String[]{String.valueOf(categoryId)});
+        db.close();
+        if (result == -1) {
+            Toast.makeText(context, "Failed to delete category", Toast.LENGTH_SHORT).show();
+            Log.e("Database", "Failed to delete category");
             return false;
         } else {
             return true;

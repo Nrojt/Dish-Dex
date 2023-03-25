@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,13 +29,15 @@ import java.util.concurrent.Executors;
  * Use the {@link AddRecipeChooserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddRecipeChooserFragment extends Fragment implements FragmentReplacer {
+public class AddRecipeChooserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener{
     private TextInputEditText urlInput;
     private Button getRecipeFromUrlButton;
     private Button browseWebButton;
     private Button emptyRecipeButton;
     private Button bingSearchButton;
     private TextInputEditText bingSearchInput;
+
+    private FragmentManager fragmentManager;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -73,6 +76,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        fragmentManager = getActivity().getSupportFragmentManager();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_recipe_chooser, container, false);
 
@@ -168,9 +172,23 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
     //This method is used to replace the current fragment with a new fragment
     @Override
     public void replaceFragment(Fragment fragment){
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().setReorderingAllowed(true);
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
-        fragmentTransaction.commit();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).replaceFragment(fragment);
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).onBackStackChanged();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (getActivity() != null) {
+            fragmentManager.removeOnBackStackChangedListener(this);
+        }
     }
 }
