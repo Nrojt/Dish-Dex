@@ -174,21 +174,21 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         //making it so the user can go to the previous website in the WebView
         urlBrowser.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public boolean onKey(View v, int keycode, KeyEvent keyEvent) {
-                if(keyEvent.getAction() == KeyEvent.ACTION_DOWN){
-                    if(keycode == KeyEvent.KEYCODE_BACK){
-                        if(urlBrowser != null){
-                            if (urlBrowser.canGoBack()){
-                                urlBrowser.goBack();
-                            } else {
-                                getActivity().onBackPressed();
-                            }
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        if (urlBrowser.canGoBack()) {
+                            urlBrowser.goBack();
+                            return true;
                         }
                     }
                 }
-                return true;
+                return false;
             }
         });
+
+
+
 
         //searching the web if the user presses the enter key in the edittext
         currentBrowserUrl.setOnKeyListener( new View.OnKeyListener() {

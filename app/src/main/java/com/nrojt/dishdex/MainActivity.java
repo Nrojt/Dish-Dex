@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         fragmentTransaction.commit();
     }
 
-    //Method for popping the backstack
+    //Method for when the backstack changes
     @Override
     public void onBackStackChanged() {
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -193,22 +194,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 navigateToFragment(item.getItemId());
                 return true;
             });
-            //binding.bottomNavigationView.setSelectedItemId(selectedItemId);
         }
     }
 
-    //Method for handling the back button
-    @Override
-    public void onBackPressed() {
-        // Check if the back stack has any fragments other than the home fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        int backStackCount = fragmentManager.getBackStackEntryCount();
-        if (backStackCount > 0) {
-            fragmentManager.popBackStack();
-        } else {
-            super.onBackPressed();
-        }
-    }
+
 
     private void navigateToFragment(int itemId) {
         switch (itemId) {
