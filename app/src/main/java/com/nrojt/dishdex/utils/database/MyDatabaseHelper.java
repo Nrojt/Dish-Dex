@@ -191,7 +191,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             Log.e("Database", "Failed to update recipe");
             return false;
         } else {
-            Toast.makeText(context, "Updated recipe successfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Added category", Toast.LENGTH_SHORT).show();
             return true;
         }
     }
@@ -302,6 +302,26 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             Log.e("Database", "Database is null");
         }
         return cursor;
+    }
+
+    //getting a random recipeID from the recipe_categories table where categoryID = categoryID
+    public int getRandomRecipeIDWhereCategoryID(int categoryID) {
+        int recipeID = -1;
+        Cursor cursor = null;
+        String query = "SELECT recipeID FROM recipe_categories WHERE categoryID = ? ORDER BY RANDOM() LIMIT 1";
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db != null) {
+            cursor = db.rawQuery(query, new String[] {String.valueOf(categoryID)});
+        } else {
+            Log.e("Database", "Database is null");
+        }
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            recipeID = cursor.getInt(0);
+        }
+        db.close();
+        cursor.close();
+        return recipeID;
     }
 
 }

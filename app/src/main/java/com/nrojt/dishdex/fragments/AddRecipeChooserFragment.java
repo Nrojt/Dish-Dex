@@ -112,14 +112,15 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
                                     public void run() {
                                         System.out.println("Scraping done");
                                         //checking to see if the site is supported and if the site is reachable
-                                        if (wb.isNotSupported()) {
-                                            Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
-                                        } else if (wb.isNotConnected()) {
+                                        if (wb.isNotConnected()) {
                                             Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
                                         } else if(wb.isNotReachable()){
                                             Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
                                         }
                                         else {
+                                            if (wb.isNotSupported()) {
+                                                Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
+                                            }
                                             //switching to the ShowAndEditRecipeFragment
                                             Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
                                             replaceFragment(showAndEditRecipeFragment);

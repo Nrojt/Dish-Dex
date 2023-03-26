@@ -229,13 +229,14 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
                                     @Override
                                     public void run() {
                                         //checking if the website is supported
-                                        if (wb.isNotSupported()) {
-                                            Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
-                                        } else if (wb.isNotConnected()) { //checking if the user is connected to the internet. This cannot be done on main thread, cause this will throw an error
+                                        if (wb.isNotConnected()) { //checking if the user is connected to the internet. This cannot be done on main thread, cause this will throw an error
                                             Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
                                         } else if (wb.isNotReachable()) {
                                             Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
                                         } else {
+                                            if (wb.isNotSupported()) {
+                                                Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
+                                            }
                                             //switching to the showAndEditRecipeFragment
                                             Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
                                             replaceFragment(showAndEditRecipeFragment);

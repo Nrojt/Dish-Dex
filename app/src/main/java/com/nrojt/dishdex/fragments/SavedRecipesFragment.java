@@ -218,6 +218,13 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     //Adding the recipes to a recyclerView
     private void displayRecipes() {
+
+        //Clearing the lists so that the data is not duplicated
+        recipeIDs.clear();
+        recipeTitles.clear();
+        recipeCookingTimes.clear();
+        recipeServings.clear();
+
         //Getting the data from the database
         Cursor cursor = db.readDataForSavedRecipesRecyclerView();
 
@@ -303,4 +310,5 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
             fragmentManager.removeOnBackStackChangedListener(this);
         }
     }
+
 }

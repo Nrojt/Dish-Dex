@@ -1,28 +1,25 @@
 package com.nrojt.dishdex.fragments;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
@@ -32,8 +29,16 @@ import java.util.Locale;
  * create an instance of this fragment.
  */
 public class HomePageFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
-    private TextView dateTimeTextView;
+    private TextView dateTextView, timeTextView, recipeTimeTitleTextView, recipeTimeCookingTimeTextView, recipeTimeServingsTextView;
+    private CardView recipeTimeCardView;
     private FragmentManager fragmentManager;
+
+    private int timeCategoryID;
+    private int timeRecipeID;
+
+    private String recipeName;
+    private int recipeServings;
+    private int recipeCookingTime;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -82,17 +87,99 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
+
+        recipeTimeCardView = view.findViewById(R.id.recipeTimeCardView);
+        recipeTimeTitleTextView = view.findViewById(R.id.recipeTimeTitleTextView);
+        recipeTimeCookingTimeTextView = view.findViewById(R.id.recipeTimeCookingTimeTextView);
+        recipeTimeServingsTextView = view.findViewById(R.id.recipeTimeServingsTextView);
+
+
+
         fragmentManager = getActivity().getSupportFragmentManager();
 
         //Get the current day of the week and display it
-        dateTimeTextView = view.findViewById(R.id.dateTimeTextView);
+        dateTextView = view.findViewById(R.id.dateTextView);
+        timeTextView = view.findViewById(R.id.timeTextView);
+
         DayOfWeek dow = LocalDate.now().getDayOfWeek();
         String currentDay = dow.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH);
-        dateTimeTextView.setText("Hello\nToday is "+ currentDay);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String currentTime = formatter.format(LocalTime.now());
+
+
+        dateTextView.setText("Today is "+ currentDay);
+        timeTextView.setText("And the time is " + currentTime);
+
+        //Getting a random recipeID based on the time of day
+        getRandomRecipeIDBasedOnTime();
+
+        //Getting the recipe information from the database
+        getInformationFromRecipe();
+
+
+        recipeTimeTitleTextView.setText(recipeName);
+        recipeTimeCookingTimeTextView.setText("Cooking time: " + recipeCookingTime + " minutes");
+        recipeTimeServingsTextView.setText("Servings: " + recipeServings);
+
+
+        if(timeRecipeID == -1){
+            recipeTimeCardView.setVisibility(View.GONE);
+        } else {
+            recipeTimeCardView.setVisibility(View.VISIBLE);
+            recipeTimeCardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, timeRecipeID, null, null);
+                    replaceFragment(showAndEditRecipeFragment);
+                }
+            });
+        }
 
 
         return view;
+    }
+
+    //getting a random recipeID based on the time of day
+    private void getRandomRecipeIDBasedOnTime(){
+        LocalTime currentTime = LocalTime.now();
+        LocalTime breakfastTime = LocalTime.of(9, 0);
+        LocalTime lunchTime = LocalTime.of(12, 0);
+        LocalTime dinnerTime = LocalTime.of(18, 0);
+        LocalTime lateNightTime = LocalTime.of(22, 0);
+
+        if (currentTime.isBefore(breakfastTime)){
+            timeCategoryID = 1;
+        } else if (currentTime.isBefore(lunchTime)){
+            timeCategoryID = 2;
+        } else if (currentTime.isBefore(dinnerTime)){
+            timeCategoryID = 3;
+        } else if (currentTime.isBefore(lateNightTime)){
+            timeCategoryID = 5;
+        } else {
+            timeCategoryID = 5;
+        }
+
+        MyDatabaseHelper db = new MyDatabaseHelper(getContext());
+        timeRecipeID = db.getRandomRecipeIDWhereCategoryID(timeCategoryID);
+        db.close();
+    }
+
+    //Getting the recipe information from the database
+    private void getInformationFromRecipe(){
+        MyDatabaseHelper db = new MyDatabaseHelper(getContext());
+        System.out.println("timeRecipeID: " + timeRecipeID);
+
+        if(timeRecipeID != -1) {
+            Cursor cursor = db.readAllDataFromSavedRecipesWhereRecipeID(timeRecipeID);
+            cursor.moveToFirst();
+            recipeName = cursor.getString(1);
+            recipeCookingTime = cursor.getInt(2);
+            recipeServings = cursor.getInt(3);
+            cursor.close();
+        }
+
+        db.close();
     }
 
     @Override

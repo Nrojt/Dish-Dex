@@ -30,7 +30,7 @@ import com.nrojt.dishdex.utils.internet.WebScraper;
 import java.util.ArrayList;
 
 
-public class ShowAndEditRecipeFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
+public class ShowAndEditRecipeFragment extends Fragment implements FragmentManager.OnBackStackChangedListener {
     private Button saveOrEditRecipeButton;
     private EditText recipeTextOnScreen;
     private EditText ingredientTextOnScreen;
@@ -362,13 +362,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentRepla
         }
     }
 
-    //This method is used to replace the current fragment with a new fragment
-    @Override
-    public void replaceFragment(Fragment fragment){
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment);
-        }
-    }
 
     @Override
     public void onBackStackChanged() {
