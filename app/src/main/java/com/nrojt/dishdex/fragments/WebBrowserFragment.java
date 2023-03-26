@@ -1,8 +1,10 @@
 package com.nrojt.dishdex.fragments;
 
+import android.content.Context;
 import android.net.http.SslError;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -29,6 +31,7 @@ import android.widget.Toast;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
+import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
 import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.internet.WebScraper;
@@ -42,7 +45,8 @@ import java.util.concurrent.Executors;
  * Use the {@link WebBrowserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WebBrowserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
+public class WebBrowserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
+    private OnBackPressedListener onBackPressedListener;
     private ArrayList<String> blockedUrls = new ArrayList<>();
     private WebView urlBrowser;
     private EditText currentBrowserUrl;
@@ -171,25 +175,6 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         urlBrowser.loadUrl("https://www.google.com");
 
 
-        //making it so the user can go to the previous website in the WebView
-        urlBrowser.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        if (urlBrowser.canGoBack()) {
-                            urlBrowser.goBack();
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        });
-
-
-
-
         //searching the web if the user presses the enter key in the edittext
         currentBrowserUrl.setOnKeyListener( new View.OnKeyListener() {
             @Override
@@ -258,6 +243,16 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         return view;
     }
 
+    //overriding the back button
+    @Override
+    public boolean handleOnBackPressed() {
+        System.out.println("back pressed");
+        if (urlBrowser != null && urlBrowser.canGoBack()) {
+            urlBrowser.goBack();
+            return true;
+        }
+        return false;
+    }
 
 
     //trying to see if it is possible to block ads

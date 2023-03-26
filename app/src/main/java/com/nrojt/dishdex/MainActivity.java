@@ -1,12 +1,14 @@
 package com.nrojt.dishdex;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -27,11 +29,13 @@ import com.nrojt.dishdex.fragments.AddRecipeChooserFragment;
 import com.nrojt.dishdex.fragments.HomePageFragment;
 import com.nrojt.dishdex.fragments.SavedRecipesFragment;
 import com.nrojt.dishdex.fragments.SettingsFragment;
+import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
 
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener{
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
     private AdView adView;
 
+    private OnBackPressedCallback onBackPressedCallback;
 
     public static boolean isProUser;
     public static final int MAX_CATEGORIES_FREE = 16;
@@ -125,6 +129,32 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             constraintSet.connect(frameLayout.getId(), ConstraintSet.BOTTOM, bottomNavigationView.getId(), ConstraintSet.TOP, 0);
             constraintSet.applyTo(adContainer);
         }
+
+        //Method for handling the back button
+        onBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
+                boolean handledByFragment = false;
+
+                //If the current fragment is an instance of OnBackPressedListener, then call the handleOnBackPressed method.
+                //Used to handle the back button in the WebBrowserFragment to allow the user to go back in the webview.
+                if (currentFragment instanceof OnBackPressedListener) {
+                    OnBackPressedListener listener = (OnBackPressedListener) currentFragment;
+                    handledByFragment = listener.handleOnBackPressed();
+                }
+
+                if (!handledByFragment) {
+                    setEnabled(false);
+                    MainActivity.this.onBackPressed();
+                    setEnabled(true);
+                }
+
+                Log.d(TAG, "onBackPressedCallback: handleOnBackPressed");
+            }
+        };
+
+        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
     }
 
     //Method for replacing the fragment from the main activity
@@ -198,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
 
-
+    //Method for navigating to the correct fragment when the user taps on a bottom navigation item
     private void navigateToFragment(int itemId) {
         switch (itemId) {
             case R.id.homeButton:
@@ -215,5 +245,14 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 break;
         }
     }
+
+
+    @Override
+    public boolean handleOnBackPressed() {
+        //This method needs to be implemented because of the interface, but it is not used in this class
+        //The method is implemented in the fragments (currently only in the WebBrowserFragment)
+        return false;
+    }
+
 
 }
