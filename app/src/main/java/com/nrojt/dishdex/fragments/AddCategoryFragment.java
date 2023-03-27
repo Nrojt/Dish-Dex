@@ -41,15 +41,6 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddCategoryFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static AddCategoryFragment newInstance(String param1, String param2) {
         AddCategoryFragment fragment = new AddCategoryFragment();
         Bundle args = new Bundle();

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //Serializable allows the object to be passed between fragments
 public class WebScraper implements Serializable {
@@ -160,8 +162,21 @@ public class WebScraper implements Serializable {
                 if (servingsElement != null) {
                     servings = Integer.parseInt(servingsElement.text().replaceAll("[^0-9]", ""));
                 }
+
+                // setting the cooking time, but some websites report time in hours and minutes, so we need to convert that to minutes. But for now it just adds all the numbers it can find together.
+                //TODO convert hours to minutes
                 if (cookingTimeElement != null) {
-                    cookingTime = Integer.parseInt(cookingTimeElement.text().replaceAll("[^0-9]", ""));
+                    String text = cookingTimeElement.text();
+                    Pattern pattern = Pattern.compile("\\d+");
+                    Matcher matcher = pattern.matcher(text);
+                    int totalTime = 0;
+
+                    while (matcher.find()) {
+                        int value = Integer.parseInt(matcher.group());
+                        totalTime += value;
+                    }
+
+                    cookingTime = totalTime;
                 }
 
                 if (recipeTitleElement != null) {
@@ -181,7 +196,7 @@ public class WebScraper implements Serializable {
     }
 
     //Method to get a Document from the website, this is part of Jsoup
-    private static Document getDocument(String url) {
+    public static Document getDocument(String url) {
         Connection conn = Jsoup.connect(url);
         Document document = null;
         //Setting the user agent as chrome since it is the most used browser so sites are more likely to support it

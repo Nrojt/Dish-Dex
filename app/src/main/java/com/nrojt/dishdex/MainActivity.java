@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     public static boolean isProUser;
     public static final int MAX_CATEGORIES_FREE = 16;
 
+    public boolean handledByFragment = false;
+
     ActivityMainBinding binding;
 
     @Override
@@ -135,11 +137,12 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             @Override
             public void handleOnBackPressed() {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
-                boolean handledByFragment = false;
+                handledByFragment = false;
 
                 //If the current fragment is an instance of OnBackPressedListener, then call the handleOnBackPressed method.
                 //Used to handle the back button in the WebBrowserFragment to allow the user to go back in the webview.
                 if (currentFragment instanceof OnBackPressedListener) {
+                    handledByFragment = true;
                     OnBackPressedListener listener = (OnBackPressedListener) currentFragment;
                     handledByFragment = listener.handleOnBackPressed();
                 }

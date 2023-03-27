@@ -196,6 +196,20 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    //checking if a category with a name exists in the database
+    public boolean checkIfCategoryExists(String categoryName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {"categoryName"};
+        String selection = "categoryName = ?";
+        String[] selectionArgs = {categoryName};
+        Cursor cursor = db.query("category", columns, selection, selectionArgs, null, null, null);
+        if (cursor.getCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     //Reading all data from the category table
     public Cursor readAllDataFromCategories() {
         Cursor cursor = null;
@@ -270,8 +284,6 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             return result != 0;
         }
     }
-
-
 
 
     //checking the count of the category table
