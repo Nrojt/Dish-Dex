@@ -1,0 +1,922 @@
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:demostyle2="http://www.yworks.com/yFilesHTML/demos/FlatDemoStyle/2.0" xmlns:demostyle="http://www.yworks.com/yFilesHTML/demos/FlatDemoStyle/1.0" xmlns:icon-style="http://www.yworks.com/yed-live/icon-style/1.0" xmlns:bpmn="http://www.yworks.com/xml/yfiles-bpmn/2.0" xmlns:demotablestyle="http://www.yworks.com/yFilesHTML/demos/FlatDemoTableStyle/1.0" xmlns:uml="http://www.yworks.com/yFilesHTML/demos/UMLDemoStyle/1.0" xmlns:GraphvizNodeStyle="http://www.yworks.com/yFilesHTML/graphviz-node-style/1.0" xmlns:VuejsNodeStyle="http://www.yworks.com/demos/yfiles-vuejs-node-style/1.0" xmlns:explorer-style="http://www.yworks.com/data-explorer/1.0" xmlns:y="http://www.yworks.com/xml/yfiles-common/3.0" xmlns:x="http://www.yworks.com/xml/yfiles-common/markup/3.0" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0" xmlns:yjs="http://www.yworks.com/xml/yfiles-for-html/2.0/xaml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml.html/2.0/ygraphml.xsd ">
+  <key id="d0" for="node" attr.type="int" attr.name="zOrder" y:attr.uri="http://www.yworks.com/xml/yfiles-z-order/1.0/zOrder" />
+  <key id="d1" for="node" attr.type="boolean" attr.name="Expanded" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/Expanded">
+    <default>true</default>
+  </key>
+  <key id="d2" for="node" attr.type="string" attr.name="url" />
+  <key id="d3" for="node" attr.type="string" attr.name="description" />
+  <key id="d4" for="node" attr.name="NodeLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeLabels" />
+  <key id="d5" for="node" attr.name="NodeGeometry" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeGeometry" />
+  <key id="d6" for="all" attr.name="UserTags" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/UserTags" />
+  <key id="d7" for="node" attr.name="NodeStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeStyle" />
+  <key id="d8" for="node" attr.name="NodeViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/NodeViewState" />
+  <key id="d9" for="edge" attr.type="string" attr.name="url" />
+  <key id="d10" for="edge" attr.type="string" attr.name="description" />
+  <key id="d11" for="edge" attr.name="EdgeLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeLabels" />
+  <key id="d12" for="edge" attr.name="EdgeGeometry" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeGeometry" />
+  <key id="d13" for="edge" attr.name="EdgeStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeStyle" />
+  <key id="d14" for="edge" attr.name="EdgeViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/EdgeViewState" />
+  <key id="d15" for="port" attr.name="PortLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortLabels" />
+  <key id="d16" for="port" attr.name="PortLocationParameter" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortLocationParameter">
+    <default>
+      <x:Static Member="y:FreeNodePortLocationModel.NodeCenterAnchored" />
+    </default>
+  </key>
+  <key id="d17" for="port" attr.name="PortStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortStyle">
+    <default>
+      <x:Static Member="y:VoidPortStyle.Instance" />
+    </default>
+  </key>
+  <key id="d18" for="port" attr.name="PortViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/PortViewState" />
+  <key id="d19" attr.name="SharedData" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/SharedData" />
+  <data key="d19">
+    <y:SharedData>
+      <y:InteriorLabelModel x:Key="1" />
+      <y:CompositeLabelModelParameter x:Key="2">
+        <y:CompositeLabelModelParameter.Parameter>
+          <y:InteriorLabelModelParameter Position="Center" Model="{y:GraphMLReference 1}" />
+        </y:CompositeLabelModelParameter.Parameter>
+        <y:CompositeLabelModelParameter.Model>
+          <y:CompositeLabelModel>
+            <y:CompositeLabelModel.LabelModels>
+              <y:ExteriorLabelModel Insets="5" />
+              <y:GraphMLReference ResourceKey="1" />
+              <y:FreeNodeLabelModel />
+            </y:CompositeLabelModel.LabelModels>
+          </y:CompositeLabelModel>
+        </y:CompositeLabelModelParameter.Model>
+      </y:CompositeLabelModelParameter>
+      <y:SmartEdgeLabelModel x:Key="3" />
+    </y:SharedData>
+  </data>
+  <graph id="G" edgedefault="directed">
+    <data key="d6">
+      <y:Json>{&quot;version&quot;:&quot;2.0.0&quot;,&quot;theme&quot;:{&quot;name&quot;:&quot;light&quot;,&quot;version&quot;:&quot;1.0.0&quot;},&quot;bridge-style&quot;:&quot;ARC_SCALED&quot;}</y:Json>
+    </data>
+    <node id="node12">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="-158" Y="953" Width="338" Height="195" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="AddCategoryFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- mParam2: String</sys:String>
+                  <sys:String>- fragmentManager: FragmentManager</sys:String>
+                  <sys:String>- ARG_PARAM1: String</sys:String>
+                  <sys:String>- saveCategoryButton: Button</sys:String>
+                  <sys:String>- ARG_PARAM2: String</sys:String>
+                  <sys:String>- categoryNameEditText: EditText</sys:String>
+                  <sys:String>- mParam1: String</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ AddCategoryFragment():</sys:String>
+                  <sys:String>+ replaceFragment(Fragment): void</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>+ onBackStackChanged(): void</sys:String>
+                  <sys:String>+ newInstance(String, String): AddCategoryFragment</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                  <sys:String>+ onPause(): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node16">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="213" Y="1417" Width="238" Height="89" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="AddCategoryFragmentTest" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object" />
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ AddCategoryFragmentTest():</sys:String>
+                  <sys:String>+ testAddCategoryToDatabase(): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node23">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="1078" Y="623" Width="349" Height="195" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="AddRecipeChooserFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- ARG_PARAM2: String</sys:String>
+                  <sys:String>- getRecipeFromUrlButton: Button</sys:String>
+                  <sys:String>- urlInput: TextInputEditText</sys:String>
+                  <sys:String>- mParam2: String</sys:String>
+                  <sys:String>- browseWebButton: Button</sys:String>
+                  <sys:String>- bingSearchInput: TextInputEditText</sys:String>
+                  <sys:String>- fragmentManager: FragmentManager</sys:String>
+                  <sys:String>- ARG_PARAM1: String</sys:String>
+                  <sys:String>- bingSearchButton: Button</sys:String>
+                  <sys:String>- mParam1: String</sys:String>
+                  <sys:String>- emptyRecipeButton: Button</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ AddRecipeChooserFragment():</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>+ onBackStackChanged(): void</sys:String>
+                  <sys:String>+ onPause(): void</sys:String>
+                  <sys:String>+ replaceFragment(Fragment): void</sys:String>
+                  <sys:String>+ newInstance(String, String): AddRecipeChooserFragment</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node19">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="1166" Y="953" Width="338" Height="171" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="BingFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- SEARCH_QUERY: String</sys:String>
+                  <sys:String>~ searchTerm: String</sys:String>
+                  <sys:String>~ subscriptionKey: String</sys:String>
+                  <sys:String>~ bingReturnUrls: ArrayList&lt;String&gt;</sys:String>
+                  <sys:String>- bingUrlTextOnScreen: EditText</sys:String>
+                  <sys:String>~ path: String</sys:String>
+                  <sys:String>~ host: String</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ BingFragment():</sys:String>
+                  <sys:String>+ newInstance(String): BingFragment</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                  <sys:String>- runTheSearch(): void</sys:String>
+                  <sys:String>+ SearchWeb(String): SearchResults</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node0">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="-158" Y="1417" Width="326" Height="89" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="CustomItemPaddingDecoration" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- padding: int</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ CustomItemPaddingDecoration(int):</sys:String>
+                  <sys:String>+ getItemOffsets(Rect, View, RecyclerView, State): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node7">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="-158" Y="1551" Width="224" Height="60" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#4CAF50" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="interface" constraint="" className="FragmentReplacer" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object" />
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ replaceFragment(Fragment): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node10">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="-158" Y="623" Width="338" Height="214" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="HomePageFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- recipeTimeServingsTextView: TextView</sys:String>
+                  <sys:String>- timeRecipeID: int</sys:String>
+                  <sys:String>- ARG_PARAM2: String</sys:String>
+                  <sys:String>- recipeTimeTitleTextView: TextView</sys:String>
+                  <sys:String>- recipeTimeCookingTimeTextView: TextView</sys:String>
+                  <sys:String>- timeCategoryID: int</sys:String>
+                  <sys:String>- fragmentManager: FragmentManager</sys:String>
+                  <sys:String>- recipeServings: int</sys:String>
+                  <sys:String>- ARG_PARAM1: String</sys:String>
+                  <sys:String>- recipeCookingTime: int</sys:String>
+                  <sys:String>- mParam1: String</sys:String>
+                  <sys:String>- recipeTimeCardView: CardView</sys:String>
+                  <sys:String>- recipeName: String</sys:String>
+                  <sys:String>- dateTextView: TextView</sys:String>
+                  <sys:String>- timeTextView: TextView</sys:String>
+                  <sys:String>- mParam2: String</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ HomePageFragment():</sys:String>
+                  <sys:String>- getRandomRecipeIDBasedOnTime(): void</sys:String>
+                  <sys:String>- getInformationFromRecipe(): void</sys:String>
+                  <sys:String>+ onBackStackChanged(): void</sys:String>
+                  <sys:String>+ newInstance(String, String): HomePageFragment</sys:String>
+                  <sys:String>+ replaceFragment(Fragment): void</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                  <sys:String>+ onPause(): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node20">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="749" Y="1417" Width="206" Height="89" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="InternetConnection" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object" />
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ InternetConnection():</sys:String>
+                  <sys:String>+ isNetworkAvailable(): boolean</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node2">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="909" Y="1227" Width="217" Height="117" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="LoadWebsiteBlockList" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- context: Context</sys:String>
+                  <sys:String>- adUrls: ArrayList&lt;String&gt;</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ LoadWebsiteBlockList(Context):</sys:String>
+                  <sys:String>+ loadBlockList(): void</sys:String>
+                  <sys:String>+ getAdUrls(): ArrayList&lt;String&gt;</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node6">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="646" Y="1227" Width="218" Height="117" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="LoadWebsiteBlockListTest" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- context: Context</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ LoadWebsiteBlockListTest():</sys:String>
+                  <sys:String>+ setup(): void</sys:String>
+                  <sys:String>+ testLoadBlockList(): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node25">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="225" Y="953" Width="295" Height="195" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="MainActivity" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- onBackPressedCallback: OnBackPressedCallback</sys:String>
+                  <sys:String>+ handledByFragment: boolean</sys:String>
+                  <sys:String>~ binding: ActivityMainBinding</sys:String>
+                  <sys:String>- adView: AdView</sys:String>
+                  <sys:String>+ MAX_CATEGORIES_FREE: int</sys:String>
+                  <sys:String>+ isProUser: boolean</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ MainActivity():</sys:String>
+                  <sys:String>+ handleOnBackPressed(): boolean</sys:String>
+                  <sys:String>- updateBottomNavigationItem(Fragment): void</sys:String>
+                  <sys:String>+ onBackStackChanged(): void</sys:String>
+                  <sys:String># onCreate(Bundle): void</sys:String>
+                  <sys:String>+ replaceFragment(Fragment): void</sys:String>
+                  <sys:String>- navigateToFragment(int): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node14">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="-158" Y="-15" Width="359" Height="445" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="MyDatabaseHelper" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- context: Context</sys:String>
+                  <sys:String>- DATABASE_NAME: String</sys:String>
+                  <sys:String>- DATABASE_VERSION: int</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ MyDatabaseHelper(Context):</sys:String>
+                  <sys:String>+ updateRecipe(int, String, String, String, int, int, String ...): void</sys:String>
+                  <sys:String>+ readDataForSavedCategoriesRecyclerView(): Cursor</sys:String>
+                  <sys:String>+ deleteCategory(int): boolean</sys:String>
+                  <sys:String>+ removeRecipeCategory(int, int): boolean</sys:String>
+                  <sys:String>+ getRandomRecipeIDWhereCategoryID(int): int</sys:String>
+                  <sys:String>+ addRecipe(String, String, String, int, int, String, String): int</sys:String>
+                  <sys:String>+ getAllCategoriesWhereRecipeID(int): Cursor</sys:String>
+                  <sys:String>+ getCategoryCount(): int</sys:String>
+                  <sys:String>+ onUpgrade(SQLiteDatabase, int, int): void</sys:String>
+                  <sys:String>+ addCategory(String): boolean</sys:String>
+                  <sys:String>+ deleteRecipe(int): boolean</sys:String>
+                  <sys:String>+ deleteRecipeCategories(int): void</sys:String>
+                  <sys:String>+ readAllDataFromSavedRecipesWhereRecipeID(int): Cursor</sys:String>
+                  <sys:String>+ onCreate(SQLiteDatabase): void</sys:String>
+                  <sys:String>+ readAllDataFromCategories(): Cursor</sys:String>
+                  <sys:String>+ checkIfCategoryExists(String): boolean</sys:String>
+                  <sys:String>+ readAllDataFromTable(String): Cursor</sys:String>
+                  <sys:String>+ readDataForSavedRecipesRecyclerView(): Cursor</sys:String>
+                  <sys:String>+ addRecipeCategory(int, int): boolean</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node8">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="111" Y="1551" Width="222" Height="60" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#4CAF50" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="interface" constraint="" className="OnBackPressedListener" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object" />
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ handleOnBackPressed(): boolean</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node13">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="378" Y="1551" Width="195" Height="60" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#4CAF50" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="interface" constraint="" className="RecyclerViewInterface" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object" />
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ onItemClick(int): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node22">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="-158" Y="1227" Width="362" Height="123" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="SavedCategoriesCustomRecyclerAdapter" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- categoryIDs: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- listener: RecyclerViewInterface</sys:String>
+                  <sys:String>- context: Context</sys:String>
+                  <sys:String>- categoryNames: ArrayList&lt;String&gt;</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ SavedCategoriesCustomRecyclerAdapter(Context, ArrayList&lt; ...):</sys:String>
+                  <sys:String>+ onCreateViewHolder(ViewGroup, int): MyViewHolder</sys:String>
+                  <sys:String>+ onBindViewHolder(MyViewHolder, int): void</sys:String>
+                  <sys:String>+ getItemCount(): int</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node15">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="896" Y="-15" Width="338" Height="235" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="SavedCategoriesFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- db: MyDatabaseHelper</sys:String>
+                  <sys:String>- savedCategoriesSearchView: SearchView</sys:String>
+                  <sys:String>- categoryNames: ArrayList&lt;String&gt;</sys:String>
+                  <sys:String>- deletedCategoryName: String</sys:String>
+                  <sys:String>- ARG_PARAM2: String</sys:String>
+                  <sys:String>- mParam2: String</sys:String>
+                  <sys:String>- mParam1: String</sys:String>
+                  <sys:String>- savedCategoriesRecyclerView: RecyclerView</sys:String>
+                  <sys:String>~ fragmentManager: FragmentManager</sys:String>
+                  <sys:String>- ARG_PARAM1: String</sys:String>
+                  <sys:String>- categoryIDs: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- deletedCategoryID: int</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ SavedCategoriesFragment():</sys:String>
+                  <sys:String>- filter(String): void</sys:String>
+                  <sys:String>+ replaceFragment(Fragment): void</sys:String>
+                  <sys:String>- displayCategories(): void</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                  <sys:String>+ onItemClick(int): void</sys:String>
+                  <sys:String>+ onBackStackChanged(): void</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>+ onPause(): void</sys:String>
+                  <sys:String>+ newInstance(String, String): SavedCategoriesFragment</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node11">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="249" Y="1227" Width="352" Height="123" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="SavedRecipesCustomRecyclerAdapter" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- recipeCookingTimes: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- listener: RecyclerViewInterface</sys:String>
+                  <sys:String>- context: Context</sys:String>
+                  <sys:String>- recipeTitles: ArrayList&lt;String&gt;</sys:String>
+                  <sys:String>- recipeServings: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- recipeIDs: ArrayList&lt;Integer&gt;</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ SavedRecipesCustomRecyclerAdapter(Context, ArrayList&lt; ...):</sys:String>
+                  <sys:String>+ onCreateViewHolder(ViewGroup, int): MyViewHolder</sys:String>
+                  <sys:String>+ getItemCount(): int</sys:String>
+                  <sys:String>+ onBindViewHolder(MyViewHolder, int): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node1">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="513" Y="-15" Width="338" Height="256" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="SavedRecipesFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- savedRecipesSearchView: SearchView</sys:String>
+                  <sys:String>- fragmentManager: FragmentManager</sys:String>
+                  <sys:String>- recipeCookingTimes: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- recipeServings: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- deletedRecipeTitle: String</sys:String>
+                  <sys:String>- ARG_PARAM1: String</sys:String>
+                  <sys:String>- savedRecipesFab: FloatingActionButton</sys:String>
+                  <sys:String>- deletedRecipeCookingTime: int</sys:String>
+                  <sys:String>- mParam1: String</sys:String>
+                  <sys:String>- deletedRecipeServings: int</sys:String>
+                  <sys:String>- savedRecipesRecyclerView: RecyclerView</sys:String>
+                  <sys:String>- ARG_PARAM2: String</sys:String>
+                  <sys:String>- recipeIDs: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- deletedRecipeID: int</sys:String>
+                  <sys:String>- recipeTitles: ArrayList&lt;String&gt;</sys:String>
+                  <sys:String>- mParam2: String</sys:String>
+                  <sys:String>- db: MyDatabaseHelper</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ SavedRecipesFragment():</sys:String>
+                  <sys:String>- filter(String): void</sys:String>
+                  <sys:String>- showFabMenu(): void</sys:String>
+                  <sys:String>+ onItemClick(int): void</sys:String>
+                  <sys:String>+ onPause(): void</sys:String>
+                  <sys:String>- displayRecipes(): void</sys:String>
+                  <sys:String>+ onBackStackChanged(): void</sys:String>
+                  <sys:String>+ newInstance(String, String): SavedRecipesFragment</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>+ replaceFragment(Fragment): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node17">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="1000" Y="1417" Width="309" Height="60" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="SearchResults" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ relevantHeaders: HashMap&lt;String, String&gt;</sys:String>
+                  <sys:String>+ jsonResponse: String</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ SearchResults(HashMap&lt;String, String&gt;, String):</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node18">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="783" Y="953" Width="338" Height="171" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="SettingsFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- saveSettingsButton: Button</sys:String>
+                  <sys:String>+ IS_PRO_USER: String</sys:String>
+                  <sys:String>- loadedIsProUser: boolean</sys:String>
+                  <sys:String>- isProUser: boolean</sys:String>
+                  <sys:String>- mParam1: String</sys:String>
+                  <sys:String>- bingApiKey: String</sys:String>
+                  <sys:String>+ SHARED_PREFS: String</sys:String>
+                  <sys:String>- proUserToggleButton: ToggleButton</sys:String>
+                  <sys:String>- ARG_PARAM2: String</sys:String>
+                  <sys:String>- mParam2: String</sys:String>
+                  <sys:String>- bingApiKeyTextInput: TextInputLayout</sys:String>
+                  <sys:String>- ARG_PARAM1: String</sys:String>
+                  <sys:String>- loadedApiKey: String</sys:String>
+                  <sys:String>+ BING_API_KEY: String</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ SettingsFragment():</sys:String>
+                  <sys:String>+ newInstance(String, String): SettingsFragment</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                  <sys:String>+ saveData(): void</sys:String>
+                  <sys:String>+ loadData(): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node24">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="496" Y="1417" Width="208" Height="89" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="SettingsFragmentTest" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object" />
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ SettingsFragmentTest():</sys:String>
+                  <sys:String>+ testSaveProUserSetting(): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node5">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="608" Y="623" Width="425" Height="193" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="ShowAndEditRecipeFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- MODE: String</sys:String>
+                  <sys:String>- recipeTitleTextOnScreen: EditText</sys:String>
+                  <sys:String>- mode: int</sys:String>
+                  <sys:String>- recipeId: int</sys:String>
+                  <sys:String>- wb: WebScraper</sys:String>
+                  <sys:String>- chooseCategoriesTextView: TextView</sys:String>
+                  <sys:String>- categoryNames: ArrayList&lt;String&gt;</sys:String>
+                  <sys:String>- RECIPE_ID: String</sys:String>
+                  <sys:String>- cookingTimeTextOnScreen: EditText</sys:String>
+                  <sys:String>- servingsTextOnScreen: EditText</sys:String>
+                  <sys:String>- selectedCategories: boolean[]</sys:String>
+                  <sys:String>- WEB_SCRAPER: String</sys:String>
+                  <sys:String>- recipeIDFromDatabase: int</sys:String>
+                  <sys:String>- urlTextOnScreen: EditText</sys:String>
+                  <sys:String>- savedCategoryIDs: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- saveOrEditRecipeButton: Button</sys:String>
+                  <sys:String>- fragmentManager: FragmentManager</sys:String>
+                  <sys:String>- recipeTextOnScreen: EditText</sys:String>
+                  <sys:String>- url: String</sys:String>
+                  <sys:String>- ingredientTextOnScreen: EditText</sys:String>
+                  <sys:String>- noteTextOnScreen: EditText</sys:String>
+                  <sys:String>- categoryIDs: ArrayList&lt;Integer&gt;</sys:String>
+                  <sys:String>- URL: String</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ ShowAndEditRecipeFragment():</sys:String>
+                  <sys:String>- getCategoriesFromDatabase(): void</sys:String>
+                  <sys:String>+ newInstance(int, int, WebScraper, String): ShowAndEditRecipeFragment</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                  <sys:String>+ onPause(): void</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>- getSavedCategoryNamesFromDatabase(): void</sys:String>
+                  <sys:String>+ onBackStackChanged(): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node21">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="225" Y="623" Width="338" Height="214" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="WebBrowserFragment" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- currentBrowserUrl: EditText</sys:String>
+                  <sys:String>- blockedUrls: ArrayList&lt;String&gt;</sys:String>
+                  <sys:String>- scrapeThisUrlButton: Button</sys:String>
+                  <sys:String>- fragmentManager: FragmentManager</sys:String>
+                  <sys:String>- mParam1: String</sys:String>
+                  <sys:String>- ARG_PARAM1: String</sys:String>
+                  <sys:String>- urlBrowser: WebView</sys:String>
+                  <sys:String>- ARG_PARAM2: String</sys:String>
+                  <sys:String>- mParam2: String</sys:String>
+                  <sys:String>- onBackPressedListener: OnBackPressedListener</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ WebBrowserFragment():</sys:String>
+                  <sys:String>- isBlocked(String): boolean</sys:String>
+                  <sys:String>+ onCreate(Bundle): void</sys:String>
+                  <sys:String>+ onBackStackChanged(): void</sys:String>
+                  <sys:String>+ newInstance(String, String): WebBrowserFragment</sys:String>
+                  <sys:String>+ onPause(): void</sys:String>
+                  <sys:String>+ replaceFragment(Fragment): void</sys:String>
+                  <sys:String>+ handleOnBackPressed(): boolean</sys:String>
+                  <sys:String>+ onCreateView(LayoutInflater, ViewGroup, Bundle): View</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node3">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="246" Y="-15" Width="222" Height="277" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="WebScraper" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object">
+                  <sys:String>- ingredientText: StringBuilder</sys:String>
+                  <sys:String>- notReachable: boolean</sys:String>
+                  <sys:String>- recipeTitle: String</sys:String>
+                  <sys:String>- url: String</sys:String>
+                  <sys:String>- recipeText: StringBuilder</sys:String>
+                  <sys:String>- notConnected: boolean</sys:String>
+                  <sys:String>- notSupported: boolean</sys:String>
+                  <sys:String>- servings: int</sys:String>
+                  <sys:String>- ingredientTextList: List&lt;String&gt;</sys:String>
+                  <sys:String>- cookingTime: int</sys:String>
+                  <sys:String>- recipeTextList: List&lt;String&gt;</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ WebScraper(String):</sys:String>
+                  <sys:String>+ getRecipeTitle(): String</sys:String>
+                  <sys:String>+ isNotConnected(): boolean</sys:String>
+                  <sys:String>+ scrapeWebsite(): void</sys:String>
+                  <sys:String>+ getServings(): int</sys:String>
+                  <sys:String>+ getUrl(): String</sys:String>
+                  <sys:String>+ getRecipeText(): StringBuilder</sys:String>
+                  <sys:String>+ isNotReachable(): boolean</sys:String>
+                  <sys:String>+ isNotSupported(): boolean</sys:String>
+                  <sys:String>+ getCookingTime(): int</sys:String>
+                  <sys:String>+ getDocument(String): Document</sys:String>
+                  <sys:String>+ getIngredientText(): StringBuilder</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node4">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="565" Y="953" Width="173" Height="195" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="WebScraperTest" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object" />
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ WebScraperTest():</sys:String>
+                  <sys:String>~ getUrl(): void</sys:String>
+                  <sys:String>~ isNotSupported(): void</sys:String>
+                  <sys:String>~ getServings(): void</sys:String>
+                  <sys:String>~ getCookingTime(): void</sys:String>
+                  <sys:String>~ isNotReachable(): void</sys:String>
+                  <sys:String>~ getRecipeTitle(): void</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+    <node id="node9">
+      <data key="d0">0</data>
+      <data key="d5">
+        <y:RectD X="1171" Y="1227" Width="152" Height="117" />
+      </data>
+      <data key="d7">
+        <uml:UMLNodeStyle fill="#FF607D8B" highlightFill="#FFA3F1BB">
+          <uml:UMLNodeStyle.model>
+            <uml:UMLClassModel stereotype="" constraint="" className="build" attributesOpen="true" operationsOpen="true">
+              <uml:UMLClassModel.attributes>
+                <x:Array Type="sys:Object" />
+              </uml:UMLClassModel.attributes>
+              <uml:UMLClassModel.operations>
+                <x:Array Type="sys:Object">
+                  <sys:String>+ build():</sys:String>
+                  <sys:String>+ main(String[]): void</sys:String>
+                  <sys:String>+ run(): Object</sys:String>
+                </x:Array>
+              </uml:UMLClassModel.operations>
+            </uml:UMLClassModel>
+          </uml:UMLNodeStyle.model>
+        </uml:UMLNodeStyle>
+      </data>
+    </node>
+  </graph>
+</graphml>
