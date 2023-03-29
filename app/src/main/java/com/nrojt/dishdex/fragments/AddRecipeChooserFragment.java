@@ -89,8 +89,8 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
         emptyRecipeButton = view.findViewById(R.id.emptyRecipeButton);
 
         //setting the visibility of the bing search button and input to invisible, because they're not at a working state yet
-        bingSearchButton.setVisibility(View.INVISIBLE);
-        bingSearchInput.setVisibility(View.INVISIBLE);
+        bingSearchButton.setVisibility(View.GONE);
+        bingSearchInput.setVisibility(View.GONE);
 
         //When the user clicks the button, the url is passed to the WebScraper class which checks if the site is supported and if the site is reachable
         getRecipeFromUrlButton.setOnClickListener(new View.OnClickListener() {

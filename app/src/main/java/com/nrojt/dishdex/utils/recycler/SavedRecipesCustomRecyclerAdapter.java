@@ -47,7 +47,7 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.recipeTitleText.setText(recipeTitles.get(position));
-        holder.recipeCookingTimeText.setText(recipeCookingTimes.get(position) + " mins");
+        holder.recipeCookingTimeText.setText(recipeCookingTimes.get(position) + " minutes");
         holder.recipeServingsText.setText(recipeServings.get(position) + " servings");
     }
 

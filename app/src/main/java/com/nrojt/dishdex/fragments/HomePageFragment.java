@@ -119,7 +119,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
 
         recipeTimeTitleTextView.setText(recipeName);
-        recipeTimeCookingTimeTextView.setText("Cooking time: " + recipeCookingTime + " minutes");
+        recipeTimeCookingTimeTextView.setText( recipeCookingTime + " minutes");
         recipeTimeServingsTextView.setText("Servings: " + recipeServings);
 
 
