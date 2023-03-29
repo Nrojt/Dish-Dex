@@ -28,7 +28,8 @@ public class AddCategoryFragmentTest {
         // Get a Context object from the activity
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        // Replacing the current fragment with AddCategoryFragment
+
+        // Replacing the current fragment with AddCategoryFragment. Espresso doesn't seem to work nice with FAB buttons
         activityScenario.onActivity(activity -> {
             FragmentTransaction fragmentTransaction = activity.getSupportFragmentManager().beginTransaction();
             AddCategoryFragment fragment = new AddCategoryFragment();
@@ -36,6 +37,8 @@ public class AddCategoryFragmentTest {
             fragmentTransaction.replace(R.id.frame_layout, fragment);
             fragmentTransaction.commit();
         });
+
+
 
         // Enter a category name and click the saveCategoryButton
         onView(withId(R.id.categoryNameEditText)).perform(typeText("Test Category"));

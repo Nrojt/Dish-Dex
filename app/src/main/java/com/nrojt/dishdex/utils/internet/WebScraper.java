@@ -164,20 +164,45 @@ public class WebScraper implements Serializable {
                 }
 
                 // setting the cooking time, but some websites report time in hours and minutes, so we need to convert that to minutes. But for now it just adds all the numbers it can find together.
-                //TODO convert hours to minutes
                 if (cookingTimeElement != null) {
-                    String text = cookingTimeElement.text();
-                    Pattern pattern = Pattern.compile("\\d+");
-                    Matcher matcher = pattern.matcher(text);
-                    int totalTime = 0;
+                    String text = cookingTimeElement.text().toLowerCase();
+                    Pattern pattern = Pattern.compile("(\\d+)(?:\\s*(hour|uur|min)?)"); // Create a regex pattern to match numbers followed by an optional unit (hour, uur, or min)
+                    Matcher matcher = pattern.matcher(text); // Matcher to find the numbers and the words in the text
 
+                    int totalTime;
+                    int hours = 0;
+                    int minutes = 0;
+
+                    // Iterate through all matches found
                     while (matcher.find()) {
-                        int value = Integer.parseInt(matcher.group());
-                        totalTime += value;
+                        int value = Integer.parseInt(matcher.group(1));
+                        // Get the unit (uur, hour, min) (if any) from the match
+                        String unit = matcher.group(2);
+
+                        if (unit == null || unit.isEmpty()) {
+                            minutes = value;
+                        } else {
+                            if (unit.contains("hour") || unit.contains("uur")) {
+                                hours = value;
+                                text = text.replaceFirst("\\d+", ""); // Remove the parsed number from the text
+                                matcher = pattern.matcher(text); // Update the matcher with the new text
+                            }
+                            if (unit.contains("min")) {
+                                minutes = value;
+                            }
+                        }
                     }
 
+                    totalTime = hours * 60 + minutes;
                     cookingTime = totalTime;
                 }
+
+
+
+
+
+
+
 
                 if (recipeTitleElement != null) {
                     recipeTitle = recipeTitleElement.text();

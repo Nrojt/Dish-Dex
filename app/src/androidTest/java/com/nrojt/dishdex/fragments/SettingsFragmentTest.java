@@ -1,5 +1,8 @@
 package com.nrojt.dishdex.fragments;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -25,6 +28,8 @@ public class SettingsFragmentTest {
         // Get a Context object from the activity
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
+        // Code for switching to the correct fragment, not needed anymore since just clicking the settings button also works.
+        /*
         // Replacing the current fragment with SettingsFragment
         activityScenario.onActivity(activity -> {
             FragmentTransaction fragmentTransaction = activity.getSupportFragmentManager().beginTransaction();
@@ -33,18 +38,25 @@ public class SettingsFragmentTest {
             fragmentTransaction.replace(R.id.frame_layout, fragment);
             fragmentTransaction.commit();
         });
+         */
 
-        // Get the shared preferences object from the context
+        // Going to the settings fragment
+        onView(withId(R.id.settingsButton)).perform(ViewActions.click());
+
+        // Get the shared preferences object from the context and saving the value
         SharedPreferences sharedPreferences = context.getSharedPreferences(SettingsFragment.SHARED_PREFS, Context.MODE_PRIVATE);
+        boolean savedIsProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
 
         // Click the proUserToggleButton
-        Espresso.onView(ViewMatchers.withId(R.id.proUserToggleButton)).perform(ViewActions.click());
-        Espresso.onView(ViewMatchers.withId(R.id.saveSettingsButton)).perform(ViewActions.click());
+        onView(withId(R.id.proUserToggleButton)).perform(ViewActions.click());
+        onView(withId(R.id.saveSettingsButton)).perform(ViewActions.click());
 
 
         // Check that the value was saved correctly
         boolean isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
-        Assert.assertTrue(isProUser);
+
+        // Assert that the value was saved correctly
+        Assert.assertEquals(!savedIsProUser,isProUser);
 
         // Close the fragment scenario
         activityScenario.close();

@@ -10,42 +10,51 @@ class WebScraperTest {
 
     @Test
     void isNotSupported() {
-        WebScraper webScraper = new WebScraper("https://www.tasteofhome.com/recipes/fontina-asparagus-tart/");
+        String url = "https://www.tasteofhome.com/recipes/fontina-asparagus-tart/";
+        WebScraper webScraper = new WebScraper(url);
         webScraper.scrapeWebsite();
         assertTrue(webScraper.isNotSupported());
     }
 
     @Test
     void isNotReachable() {
-        WebScraper webScraper = new WebScraper("AAAAA");
+        String url = "AAAA";
+        WebScraper webScraper = new WebScraper(url);
         webScraper.scrapeWebsite();
         assertTrue(webScraper.isNotReachable());
     }
 
     @Test
     void getUrl() {
-        WebScraper webScraper = new WebScraper("https://www.google.com");
-        assertEquals("https://www.google.com", webScraper.getUrl());
+        String url = "https://www.google.com";
+        WebScraper webScraper = new WebScraper(url);
+        assertEquals(url, webScraper.getUrl());
     }
 
     @Test
     void getServings() {
-        WebScraper webScraper = new WebScraper("https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren");
+        String url = "https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren";
+        int expectedServings = 8;
+        WebScraper webScraper = new WebScraper(url);
         webScraper.scrapeWebsite();
-        assertEquals(8, webScraper.getServings());
+        assertEquals(expectedServings, webScraper.getServings());
     }
 
     @Test
     void getCookingTime() {
-        WebScraper webScraper = new WebScraper("https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren");
+        String url = "https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren";
+        int expectedCookingTime = 75;
+        WebScraper webScraper = new WebScraper(url);
         webScraper.scrapeWebsite();
-        assertEquals(75, webScraper.getCookingTime());
+        assertEquals(expectedCookingTime, webScraper.getCookingTime());
     }
 
     @Test
     void getRecipeTitle() {
-        WebScraper webScraper = new WebScraper("https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren");
+        String url = "https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren";
+        String expectedTitle = "Kleurig gevulde eieren";
+        WebScraper webScraper = new WebScraper(url);
         webScraper.scrapeWebsite();
-        assertEquals("Kleurig gevulde eieren", webScraper.getRecipeTitle());
+        assertEquals(expectedTitle, webScraper.getRecipeTitle());
     }
 }
