@@ -136,28 +136,38 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
-                handledByFragment = false;
-
-                //If the current fragment is an instance of OnBackPressedListener, then call the handleOnBackPressed method.
-                //Used to handle the back button in the WebBrowserFragment to allow the user to go back in the webview.
-                if (currentFragment instanceof OnBackPressedListener) {
-                    handledByFragment = true;
-                    OnBackPressedListener listener = (OnBackPressedListener) currentFragment;
-                    handledByFragment = listener.handleOnBackPressed();
+                // Get the fragment manager and the number of entries in the backstack
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                int backStackEntryCount = fragmentManager.getBackStackEntryCount();
+                // If there is more than one fragment in the backstack, pop the backstack
+                if (backStackEntryCount > 1) {
+                    // Get the current fragment and check if it implements OnBackPressedListener
+                    Fragment currentFragment = fragmentManager.findFragmentById(R.id.frame_layout);
+                    if (currentFragment instanceof OnBackPressedListener) {
+                        // If it does, call handleOnBackPressed() on the fragment
+                        OnBackPressedListener listener = (OnBackPressedListener) currentFragment;
+                        if (listener.handleOnBackPressed()) {
+                            // If the fragment handles the back button press, return without popping the backstack
+                            return;
+                        }
+                    }
+                    // Get the fragment to pop and check if it is null
+                    Fragment fragmentToPop = fragmentManager.findFragmentById(R.id.frame_layout);
+                    if (fragmentToPop != null) {
+                        // If it is not null, pop the backstack and update the selected item in the bottom navigation view
+                        fragmentManager.popBackStack();
+                        updateBottomNavigationItem(fragmentManager.findFragmentById(R.id.frame_layout));
+                    }
+                } else {
+                    // If there is only one fragment in the backstack, minimize the app
+                    moveTaskToBack(true);
                 }
-
-                if (!handledByFragment) {
-                    setEnabled(false);
-                    MainActivity.this.onBackPressed();
-                    setEnabled(true);
-                }
-
-                Log.d(TAG, "onBackPressedCallback: handleOnBackPressed");
             }
         };
 
+        // Add the callback to the OnBackPressedDispatcher
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+
     }
 
     //Method for replacing the fragment from the main activity
@@ -197,30 +207,38 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         updateBottomNavigationItem(currentFragment);
     }
 
+
+    //Updating the selected button based on the current fragment
     private void updateBottomNavigationItem(Fragment fragment) {
+        //if the fragment is null, return
+        if (fragment == null) {
+            return;
+        }
+
         int selectedItemId = -1;
-        switch (fragment.getClass().getName()) {
-            case "com.nrojt.dishdex.fragments.HomePageFragment":
+        switch (fragment.getClass().getSimpleName()) {
+            case "HomePageFragment":
                 selectedItemId = R.id.homeButton;
                 break;
-            case "com.nrojt.dishdex.fragments.AddRecipeChooserFragment":
-            case "com.nrojt.dishdex.fragments.BingFragment":
-            case "com.nrojt.dishdex.fragments.ShowAndEditRecipeFragment":
-            case "com.nrojt.dishdex.fragments.WebBrowserFragment":
+            case "AddRecipeChooserFragment":
+            case "BingFragment":
+            case "ShowAndEditRecipeFragment":
+            case "WebBrowserFragment":
                 selectedItemId = R.id.addRecipeButton;
                 break;
-            case "com.nrojt.dishdex.fragments.SettingsFragment":
+            case "SettingsFragment":
                 selectedItemId = R.id.settingsButton;
                 break;
-            case "com.nrojt.dishdex.fragments.SavedRecipesFragment":
-            case "com.nrojt.dishdex.fragments.AddCategoryFragment":
+            case "SavedRecipesFragment":
+            case "AddCategoryFragment":
                 selectedItemId = R.id.recipesButton;
                 break;
             default:
                 break;
         }
+
         // Check if the selected item in the bottom navigation view is already the same as the item you are going to set
-        if (selectedItemId != -1 && binding.bottomNavigationView.getSelectedItemId() != selectedItemId) {
+        if (selectedItemId != -1 && binding.bottomNavigationView != null && binding.bottomNavigationView.getSelectedItemId() != selectedItemId) {
             binding.bottomNavigationView.setOnItemSelectedListener(null);
             binding.bottomNavigationView.setSelectedItemId(selectedItemId);
             binding.bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -229,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             });
         }
     }
+
 
 
     //Method for navigating to the correct fragment when the user taps on a bottom navigation item
