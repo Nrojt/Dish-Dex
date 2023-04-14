@@ -1,15 +1,7 @@
 package com.nrojt.dishdex.fragments;
 
-import android.content.Context;
 import android.net.http.SslError;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -29,11 +21,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import com.nrojt.dishdex.MainActivity;
+import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
 import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
-import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 
 import java.util.ArrayList;
@@ -111,17 +107,9 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         Handler handler = new Handler(Looper.getMainLooper());
 
         //running the LoadBlockList in another thread
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                loadWebsiteBlockList.loadBlockList();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        blockedUrls = loadWebsiteBlockList.getAdUrls();
-                    }
-                });
-            }
+        service.execute(() -> {
+            loadWebsiteBlockList.loadBlockList();
+            handler.post(() -> blockedUrls = loadWebsiteBlockList.getAdUrls());
         });
         service.shutdown();
 
@@ -158,12 +146,6 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
                 }
             }
 
-            //overriding onReceivedSslError to ignore SSL certificate errors
-            @Override
-            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                handler.proceed(); // Ignore SSL certificate errors
-            }
-
             //overriding onReceivedError to log the error
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
@@ -176,67 +158,56 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
 
 
         //searching the web if the user presses the enter key in the edittext
-        currentBrowserUrl.setOnKeyListener( new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+        currentBrowserUrl.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
 
-                    //checking to see if the user input is an actual url, if not it will perform a google search
-                    String userInput = currentBrowserUrl.getText().toString();
-                    if (URLUtil.isValidUrl(userInput)) {
-                        urlBrowser.loadUrl(userInput); //updating the WebView
-                    } else {
-                        String googleSearchQuery = "https://www.google.com/search?q=" + userInput;
-                        urlBrowser.loadUrl(googleSearchQuery);
-                    }
-                    return true;
+                //checking to see if the user input is an actual url, if not it will perform a google search
+                String userInput = currentBrowserUrl.getText().toString();
+                if (URLUtil.isValidUrl(userInput)) {
+                    urlBrowser.loadUrl(userInput); //updating the WebView
+                } else {
+                    String googleSearchQuery = "https://www.google.com/search?q=" + userInput;
+                    urlBrowser.loadUrl(googleSearchQuery);
                 }
-                return false;
+                return true;
             }
+            return false;
         });
 
         //the button that will get the url and send it to the ScrapeFromUrlFragment
-        scrapeThisUrlButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = currentBrowserUrl.getText().toString();
-                if (!url.isBlank()){
-                    if(URLUtil.isValidUrl(url)){
-                        WebScraper wb = new WebScraper(url);
-                        ExecutorService service = Executors.newSingleThreadExecutor();
-                        Handler handler = new Handler(Looper.getMainLooper());
-                        service.execute(new Runnable() { //running the WebScraper on a separate thread, so the ui thread doesn't lock
-                            @Override
-                            public void run() {
-                                wb.scrapeWebsite();
+        scrapeThisUrlButton.setOnClickListener(view1 -> {
+            String url = currentBrowserUrl.getText().toString();
+            if (!url.isBlank()) {
+                if (URLUtil.isValidUrl(url)) {
+                    WebScraper wb = new WebScraper(url);
+                    ExecutorService service1 = Executors.newSingleThreadExecutor();
+                    Handler handler1 = new Handler(Looper.getMainLooper());
+                    //running the WebScraper on a separate thread, so the ui thread doesn't lock
+                    service1.execute(() -> {
+                        wb.scrapeWebsite();
 
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //checking if the website is supported
-                                        if (wb.isNotConnected()) { //checking if the user is connected to the internet. This cannot be done on main thread, cause this will throw an error
-                                            Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
-                                        } else if (wb.isNotReachable()) {
-                                            Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            if (wb.isNotSupported()) {
-                                                Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
-                                            }
-                                            //switching to the showAndEditRecipeFragment
-                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
-                                            replaceFragment(showAndEditRecipeFragment);
-                                        }
-                                    }
-                                });
+                        handler1.post(() -> {
+                            //checking if the website is supported
+                            if (wb.isNotConnected()) { //checking if the user is connected to the internet. This cannot be done on main thread, cause this will throw an error
+                                Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
+                            } else if (wb.isNotReachable()) {
+                                Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
+                            } else {
+                                if (wb.isNotSupported()) {
+                                    Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
+                                }
+                                //switching to the showAndEditRecipeFragment
+                                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
+                                replaceFragment(showAndEditRecipeFragment);
                             }
                         });
-                        service.shutdown();
-                    } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "This site is blocked", Toast.LENGTH_SHORT).show();
-                    }
+                    });
+                    service1.shutdown();
                 } else {
-                    Toast.makeText(getActivity().getApplicationContext(), "No url given", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity().getApplicationContext(), "This site is blocked", Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                Toast.makeText(getActivity().getApplicationContext(), "No url given", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -257,8 +228,8 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
 
     //trying to see if it is possible to block ads
     private boolean isBlocked(String url) {
-        for(int i = 0; i < blockedUrls.size(); i++){
-            if(url.contains(blockedUrls.get(i))){
+        for (int i = 0; i < blockedUrls.size(); i++) {
+            if (url.contains(blockedUrls.get(i))) {
                 return true;
             }
         }
@@ -268,7 +239,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
 
     //replacing the fragment
     @Override
-    public void replaceFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment);
         }

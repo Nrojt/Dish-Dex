@@ -15,7 +15,7 @@ import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 
 import java.util.ArrayList;
 
-public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<SavedRecipesCustomRecyclerAdapter.MyViewHolder>{
+public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<SavedRecipesCustomRecyclerAdapter.MyViewHolder> {
     //Interface (polymorphism)
     private final RecyclerViewInterface listener;
     private final Context context;
@@ -60,6 +60,7 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView recipeServingsText, recipeTitleText, recipeCookingTimeText;
         CardView savedRecipesCardView;
+
         public MyViewHolder(@NonNull View itemView, final RecyclerViewInterface recyclerViewInterface) {
             super(itemView);
             recipeTitleText = itemView.findViewById(R.id.recipeTitleText);

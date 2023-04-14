@@ -101,7 +101,7 @@
                     android:text="Choose categories"
                     android:background="@android:drawable/editbox_background"
                     android:layout_centerInParent="true"
-                    android:drawableRight="@android:drawable/arrow_down_float"/>
+                    android:drawableRight="@android:drawable/arrow_down_float" />
 
                 <TextView
                     android:layout_width="match_parent"

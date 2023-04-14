@@ -2,21 +2,18 @@ package com.nrojt.dishdex.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.MainActivity;
@@ -24,9 +21,8 @@ import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
-import com.nrojt.dishdex.utils.recycler.SavedCategoriesCustomRecyclerAdapter;
-import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
 import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
+import com.nrojt.dishdex.utils.recycler.SavedCategoriesCustomRecyclerAdapter;
 
 import java.util.ArrayList;
 
@@ -120,38 +116,35 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
                 //Remove swiped item from list and notify the RecyclerView
                 int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.RIGHT) {
-                    if(categoryIDs.get(position) > 6) {
-                    deletedCategoryName = categoryNames.get(position);
-                    deletedCategoryID = categoryIDs.get(position);
+                    if (categoryIDs.get(position) > 6) {
+                        deletedCategoryName = categoryNames.get(position);
+                        deletedCategoryID = categoryIDs.get(position);
 
-                    categoryNames.remove(position);
-                    categoryIDs.remove(position);
+                        categoryNames.remove(position);
+                        categoryIDs.remove(position);
 
-                    savedCategoriesCustomRecyclerAdapter.notifyItemRemoved(position);
+                        savedCategoriesCustomRecyclerAdapter.notifyItemRemoved(position);
 
-                    //This snackbar allows the user to undo the deletion
-                    Snackbar snackbar = Snackbar.make(savedCategoriesRecyclerView, deletedCategoryName, Snackbar.LENGTH_LONG)
-                            .setAction("Undo", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                        //This snackbar allows the user to undo the deletion
+                        Snackbar snackbar = Snackbar.make(savedCategoriesRecyclerView, deletedCategoryName, Snackbar.LENGTH_LONG)
+                                .setAction("Undo", v -> {
                                     //recipeTitles.add(position, deletedRecipe);
                                     categoryNames.add(position, deletedCategoryName);
                                     categoryIDs.add(position, deletedCategoryID);
                                     savedCategoriesCustomRecyclerAdapter.notifyItemInserted(position);
-                                }
-                            });
+                                });
 
-                    //This callback is called when the snackbar is dismissed
-                    snackbar.addCallback(new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar transientBottomBar, int event) {
-                            if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                                db.deleteCategory(deletedCategoryID);
+                        //This callback is called when the snackbar is dismissed
+                        snackbar.addCallback(new Snackbar.Callback() {
+                            @Override
+                            public void onDismissed(Snackbar transientBottomBar, int event) {
+                                if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                                    db.deleteCategory(deletedCategoryID);
+                                }
                             }
-                        }
-                    });
-                    snackbar.show();
-                } else {
+                        });
+                        snackbar.show();
+                    } else {
                         Toast.makeText(getContext(), "You can't delete this category", Toast.LENGTH_SHORT).show();
                         savedCategoriesCustomRecyclerAdapter.notifyItemChanged(position);
                     }
@@ -202,7 +195,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
     }
 
     @Override
-    public void replaceFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment);
         }

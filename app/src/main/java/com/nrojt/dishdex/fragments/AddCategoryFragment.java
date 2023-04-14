@@ -1,18 +1,15 @@
 package com.nrojt.dishdex.fragments;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
@@ -68,28 +65,25 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
 
         fragmentManager = getActivity().getSupportFragmentManager();
 
-        saveCategoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String categoryName = categoryNameEditText.getText().toString().trim();
-                if (categoryName.isBlank()) {
-                    categoryNameEditText.setError("Category name is required");
-                    return;
-                }
-
-                MyDatabaseHelper db = new MyDatabaseHelper(getContext());
-                if(db.addCategory(categoryName)){
-                    fragmentManager.popBackStack();
-                }
-
+        saveCategoryButton.setOnClickListener(v -> {
+            String categoryName = categoryNameEditText.getText().toString().trim();
+            if (categoryName.isBlank()) {
+                categoryNameEditText.setError("Category name is required");
+                return;
             }
+
+            MyDatabaseHelper db = new MyDatabaseHelper(getContext());
+            if (db.addCategory(categoryName)) {
+                fragmentManager.popBackStack();
+            }
+
         });
         return view;
     }
 
 
     @Override
-    public void replaceFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment);
         }

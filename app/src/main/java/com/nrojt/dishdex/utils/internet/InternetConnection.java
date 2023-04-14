@@ -18,6 +18,8 @@ public class InternetConnection {
             sock.close();
 
             return true;
-        } catch (IOException e) { return false; }
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

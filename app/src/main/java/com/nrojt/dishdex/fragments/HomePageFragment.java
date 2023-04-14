@@ -94,7 +94,6 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         recipeTimeServingsTextView = view.findViewById(R.id.recipeTimeServingsTextView);
 
 
-
         fragmentManager = getActivity().getSupportFragmentManager();
 
         //Get the current day of the week and display it
@@ -108,7 +107,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         String currentTime = formatter.format(LocalTime.now());
 
 
-        dateTextView.setText("Today is "+ currentDay);
+        dateTextView.setText("Today is " + currentDay);
         timeTextView.setText("And the time is " + currentTime);
 
         //Getting a random recipeID based on the time of day
@@ -119,20 +118,17 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
 
         recipeTimeTitleTextView.setText(recipeName);
-        recipeTimeCookingTimeTextView.setText( recipeCookingTime + " minutes");
+        recipeTimeCookingTimeTextView.setText(recipeCookingTime + " minutes");
         recipeTimeServingsTextView.setText("Servings: " + recipeServings);
 
 
-        if(timeRecipeID == -1){
+        if (timeRecipeID == -1) {
             recipeTimeCardView.setVisibility(View.GONE);
         } else {
             recipeTimeCardView.setVisibility(View.VISIBLE);
-            recipeTimeCardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, timeRecipeID, null, null);
-                    replaceFragment(showAndEditRecipeFragment);
-                }
+            recipeTimeCardView.setOnClickListener(v -> {
+                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, timeRecipeID, null, null);
+                replaceFragment(showAndEditRecipeFragment);
             });
         }
 
@@ -141,20 +137,20 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     }
 
     //getting a random recipeID based on the time of day
-    private void getRandomRecipeIDBasedOnTime(){
+    private void getRandomRecipeIDBasedOnTime() {
         LocalTime currentTime = LocalTime.now();
         LocalTime breakfastTime = LocalTime.of(9, 0);
         LocalTime lunchTime = LocalTime.of(12, 0);
         LocalTime dinnerTime = LocalTime.of(18, 0);
         LocalTime lateNightTime = LocalTime.of(22, 0);
 
-        if (currentTime.isBefore(breakfastTime)){
+        if (currentTime.isBefore(breakfastTime)) {
             timeCategoryID = 1;
-        } else if (currentTime.isBefore(lunchTime)){
+        } else if (currentTime.isBefore(lunchTime)) {
             timeCategoryID = 2;
-        } else if (currentTime.isBefore(dinnerTime)){
+        } else if (currentTime.isBefore(dinnerTime)) {
             timeCategoryID = 3;
-        } else if (currentTime.isBefore(lateNightTime)){
+        } else if (currentTime.isBefore(lateNightTime)) {
             timeCategoryID = 5;
         } else {
             timeCategoryID = 5;
@@ -166,11 +162,11 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     }
 
     //Getting the recipe information from the database
-    private void getInformationFromRecipe(){
+    private void getInformationFromRecipe() {
         MyDatabaseHelper db = new MyDatabaseHelper(getContext());
         System.out.println("timeRecipeID: " + timeRecipeID);
 
-        if(timeRecipeID != -1) {
+        if (timeRecipeID != -1) {
             Cursor cursor = db.readAllDataFromSavedRecipesWhereRecipeID(timeRecipeID);
             cursor.moveToFirst();
             recipeName = cursor.getString(1);
@@ -183,7 +179,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     }
 
     @Override
-    public void replaceFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment);
         }

@@ -31,9 +31,9 @@ public class WebScraper implements Serializable {
     //constructor
     public WebScraper(String url) {
         //if the url doesn't contain http or https, add https. This is to prevent the app from crashing.
-        if(!(url.contains("http://") || url.contains("https://"))){
-            this.url = "https://"+url;
-        } else{
+        if (!(url.contains("http://") || url.contains("https://"))) {
+            this.url = "https://" + url;
+        } else {
             this.url = url;
         }
     }
@@ -45,7 +45,10 @@ public class WebScraper implements Serializable {
     public boolean isNotSupported() {
         return notSupported;
     }
-    public boolean isNotReachable(){return notReachable;}
+
+    public boolean isNotReachable() {
+        return notReachable;
+    }
 
     public String getUrl() {
         return url;
@@ -132,7 +135,7 @@ public class WebScraper implements Serializable {
                     servingsElement = document.getElementsByClass("adjust svelte-1o10zxc").first();
                     cookingTimeElement = document.getElementsByClass("facts__item svelte-ovaflp").first();
                     recipeTitleElement = document.getElementsByClass("layout__item title svelte-ovaflp").first();
-                } else if (url.contains("bellyfull.net")){
+                } else if (url.contains("bellyfull.net")) {
                     instructionElements = document.getElementsByClass("wprm-recipe-instruction-text");
                     ingredientElements = document.getElementsByClass("wprm-recipe-ingredient");
 
@@ -198,12 +201,6 @@ public class WebScraper implements Serializable {
                 }
 
 
-
-
-
-
-
-
                 if (recipeTitleElement != null) {
                     recipeTitle = recipeTitleElement.text();
                 }
@@ -229,7 +226,8 @@ public class WebScraper implements Serializable {
         conn.followRedirects(true);
         try {
             document = conn.get();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         return document;
     }
 }

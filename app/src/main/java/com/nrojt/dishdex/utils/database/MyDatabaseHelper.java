@@ -256,7 +256,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public void deleteRecipeCategories(int recipeID) {
         SQLiteDatabase db = this.getWritableDatabase();
         String whereClause = "recipeID = ?";
-        String[] whereArgs = { String.valueOf(recipeID) };
+        String[] whereArgs = {String.valueOf(recipeID)};
         db.delete("recipe_categories", whereClause, whereArgs);
         db.close();
     }
@@ -323,7 +323,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT recipeID FROM recipe_categories WHERE categoryID = ? ORDER BY RANDOM() LIMIT 1";
         SQLiteDatabase db = this.getReadableDatabase();
         if (db != null) {
-            cursor = db.rawQuery(query, new String[] {String.valueOf(categoryID)});
+            cursor = db.rawQuery(query, new String[]{String.valueOf(categoryID)});
         } else {
             Log.e("Database", "Database is null");
         }

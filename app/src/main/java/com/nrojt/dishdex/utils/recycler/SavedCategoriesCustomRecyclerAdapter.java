@@ -15,13 +15,13 @@ import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 
 import java.util.ArrayList;
 
-public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<SavedCategoriesCustomRecyclerAdapter.MyViewHolder>{
+public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<SavedCategoriesCustomRecyclerAdapter.MyViewHolder> {
     private final RecyclerViewInterface listener;
     private final Context context;
     private final ArrayList<String> categoryNames;
     private final ArrayList<Integer> categoryIDs;
 
-    public SavedCategoriesCustomRecyclerAdapter(Context context, ArrayList<Integer> categoryIDs,  ArrayList<String> categoryNames,  RecyclerViewInterface listener) {
+    public SavedCategoriesCustomRecyclerAdapter(Context context, ArrayList<Integer> categoryIDs, ArrayList<String> categoryNames, RecyclerViewInterface listener) {
         this.listener = listener;
         this.context = context;
         this.categoryNames = categoryNames;
@@ -44,7 +44,8 @@ public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<S
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView categoryTitleText;
         CardView savedCategoriesCardView;
-        public MyViewHolder(@NonNull View itemView, RecyclerViewInterface recyclerViewInterface){
+
+        public MyViewHolder(@NonNull View itemView, RecyclerViewInterface recyclerViewInterface) {
             super(itemView);
             categoryTitleText = itemView.findViewById(R.id.categoryTitleText);
             savedCategoriesCardView = itemView.findViewById(R.id.savedCategoriesCardView);

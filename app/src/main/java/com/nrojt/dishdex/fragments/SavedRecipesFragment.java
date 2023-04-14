@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,12 +24,14 @@ import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
-import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
 import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
+import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-public class SavedRecipesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer, FragmentManager.OnBackStackChangedListener{
+public class SavedRecipesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer, FragmentManager.OnBackStackChangedListener {
 
     private FloatingActionButton savedRecipesFab;
 
@@ -104,12 +105,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);
         savedRecipesFab = view.findViewById(R.id.savedRecipesFab);
 
-        savedRecipesFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showFabMenu();
-            }
-        });
+        savedRecipesFab.setOnClickListener(v -> showFabMenu());
 
         //Adding padding to the recyclerView and setting the adapter and layout manager
         savedRecipesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
@@ -130,7 +126,6 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
                 return true;
             }
         });
-
 
 
         //Adding swipe to delete functionality
@@ -159,16 +154,13 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
                     //This snackbar allows the user to undo the deletion
                     Snackbar snackbar = Snackbar.make(savedRecipesRecyclerView, deletedRecipeTitle, Snackbar.LENGTH_LONG)
-                            .setAction("Undo", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    //recipeTitles.add(position, deletedRecipe);
-                                    recipeTitles.add(position, deletedRecipeTitle);
-                                    recipeIDs.add(position, deletedRecipeID);
-                                    recipeCookingTimes.add(position, deletedRecipeCookingTime);
-                                    recipeServings.add(position, deletedRecipeServings);
-                                    savedRecipesCustomRecyclerAdapter.notifyItemInserted(position);
-                                }
+                            .setAction("Undo", v -> {
+                                //recipeTitles.add(position, deletedRecipe);
+                                recipeTitles.add(position, deletedRecipeTitle);
+                                recipeIDs.add(position, deletedRecipeID);
+                                recipeCookingTimes.add(position, deletedRecipeCookingTime);
+                                recipeServings.add(position, deletedRecipeServings);
+                                savedRecipesCustomRecyclerAdapter.notifyItemInserted(position);
                             });
 
                     //This callback is called when the snackbar is dismissed
@@ -246,40 +238,32 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         PopupMenu popupMenu = new PopupMenu(requireContext(), savedRecipesFab);
         popupMenu.getMenuInflater().inflate(R.menu.saved_recipes_fab_menu, popupMenu.getMenu());
 
-        // Add click listeners for your menu items, if needed
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.savedRecipesFabAddCategory:
-                        Fragment addCategoryFragment = new AddCategoryFragment();
-                        //checking the amount of categories already created
-                        if (!MainActivity.isProUser && db.getCategoryCount() >= MainActivity.MAX_CATEGORIES_FREE) {
-                            Toast.makeText(getContext(), "You have reached the maximum amount of categories for the free version of the app. Please upgrade to the pro version to create more categories.", Toast.LENGTH_LONG).show();
-                            return false;
-                        } else {
-                            replaceFragment(addCategoryFragment);
-                        }
-                        return true;
-                    case R.id.savedRecipesFabBrowser:
-                        Fragment browserFragment = new WebBrowserFragment();
-                        replaceFragment(browserFragment);
-                        return true;
-                    case R.id.savedRecipesFabAddEmptyRecipe:
-                        Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, null, null);
-                        replaceFragment(showAndEditRecipeFragment);
-                        return true;
-                    case R.id.savedRecipesFabAllCategories:
-                        Fragment allCategoriesFragment = new SavedCategoriesFragment();
-                        replaceFragment(allCategoriesFragment);
-                        return true;
-                }
-                return false;
+        // Create a HashMap mapping menu item IDs to Runnables
+        Map<Integer, Runnable> actionMap = new HashMap<>();
+        actionMap.put(R.id.savedRecipesFabAddCategory, () -> {
+            if (!MainActivity.isProUser && db.getCategoryCount() >= MainActivity.MAX_CATEGORIES_FREE) {
+                Toast.makeText(getContext(), "You have reached the maximum amount of categories for the free version of the app. Please upgrade to the pro version to create more categories.", Toast.LENGTH_LONG).show();
+            } else {
+                replaceFragment(new AddCategoryFragment());
             }
+        });
+        actionMap.put(R.id.savedRecipesFabBrowser, () -> replaceFragment(new WebBrowserFragment()));
+        actionMap.put(R.id.savedRecipesFabAddEmptyRecipe, () -> replaceFragment(ShowAndEditRecipeFragment.newInstance(2, -1, null, null)));
+        actionMap.put(R.id.savedRecipesFabAllCategories, () -> replaceFragment(new SavedCategoriesFragment()));
+
+        // Set the click listener for menu items
+        popupMenu.setOnMenuItemClickListener(item -> {
+            Runnable action = actionMap.get(item.getItemId());
+            if (action != null) {
+                action.run();
+                return true;
+            }
+            return false;
         });
 
         popupMenu.show();
     }
+
 
     //This code runs when a recipe is clicked
     @Override
@@ -290,7 +274,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     //replacing the fragment
     @Override
-    public void replaceFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment);
         }

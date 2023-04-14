@@ -1,7 +1,5 @@
 package com.nrojt.dishdex;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +28,9 @@ import com.nrojt.dishdex.fragments.HomePageFragment;
 import com.nrojt.dishdex.fragments.SavedRecipesFragment;
 import com.nrojt.dishdex.fragments.SettingsFragment;
 import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     //Method for replacing the fragment from the main activity
-    public void replaceFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment) {
         Log.d("MainActivity", "replaceFragment called with fragment: " + fragment.getClass().getName());
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -249,22 +250,18 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
 
-
     //Method for navigating to the correct fragment when the user taps on a bottom navigation item
+    //using a hash map, since switch statements aren't supported starting gradle 8.0. Hash maps are better than if else statements
     private void navigateToFragment(int itemId) {
-        switch (itemId) {
-            case R.id.homeButton:
-                replaceFragment(new HomePageFragment());
-                break;
-            case R.id.addRecipeButton:
-                replaceFragment(new AddRecipeChooserFragment());
-                break;
-            case R.id.settingsButton:
-                replaceFragment(new SettingsFragment());
-                break;
-            case R.id.recipesButton:
-                replaceFragment(new SavedRecipesFragment());
-                break;
+        Map<Integer, Fragment> fragmentMap = new HashMap<>();
+        fragmentMap.put(R.id.homeButton, new HomePageFragment());
+        fragmentMap.put(R.id.addRecipeButton, new AddRecipeChooserFragment());
+        fragmentMap.put(R.id.settingsButton, new SettingsFragment());
+        fragmentMap.put(R.id.recipesButton, new SavedRecipesFragment());
+
+        Fragment fragment = fragmentMap.get(itemId);
+        if (fragment != null) {
+            replaceFragment(fragment);
         }
     }
 

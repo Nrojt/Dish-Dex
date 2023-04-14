@@ -1,19 +1,16 @@
 package com.nrojt.dishdex.fragments;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.nrojt.dishdex.MainActivity;
@@ -29,7 +26,7 @@ import java.util.concurrent.Executors;
  * Use the {@link AddRecipeChooserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddRecipeChooserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener{
+public class AddRecipeChooserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private TextInputEditText urlInput;
     private Button getRecipeFromUrlButton;
     private Button browseWebButton;
@@ -90,77 +87,56 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
 
 
         //When the user clicks the button, the url is passed to the WebScraper class which checks if the site is supported and if the site is reachable
-        getRecipeFromUrlButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                    System.out.println("Button clicked");
-                    String url = urlInput.getText().toString();
-                    if (!url.isBlank()) {
-                        WebScraper wb = new WebScraper(url);
-                        //creating a new thread for the WebScraper
-                        ExecutorService service = Executors.newSingleThreadExecutor();
-                        Handler handler = new Handler(Looper.getMainLooper());
-                        service.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                wb.scrapeWebsite();
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        System.out.println("Scraping done");
-                                        //checking to see if the site is supported and if the site is reachable
-                                        if (wb.isNotConnected()) {
-                                            Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
-                                        } else if(wb.isNotReachable()){
-                                            Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
-                                        }
-                                        else {
-                                            if (wb.isNotSupported()) {
-                                                Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
-                                            }
-                                            //switching to the ShowAndEditRecipeFragment
-                                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
-                                            replaceFragment(showAndEditRecipeFragment);
-                                        }
-                                    }
-                                });
+        getRecipeFromUrlButton.setOnClickListener(v -> {
+            System.out.println("Button clicked");
+            String url = urlInput.getText().toString();
+            if (!url.isBlank()) {
+                WebScraper wb = new WebScraper(url);
+                //creating a new thread for the WebScraper
+                ExecutorService service = Executors.newSingleThreadExecutor();
+                Handler handler = new Handler(Looper.getMainLooper());
+                service.execute(() -> {
+                    wb.scrapeWebsite();
+                    handler.post(() -> {
+                        System.out.println("Scraping done");
+                        //checking to see if the site is supported and if the site is reachable
+                        if (wb.isNotConnected()) {
+                            Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
+                        } else if (wb.isNotReachable()) {
+                            Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
+                        } else {
+                            if (wb.isNotSupported()) {
+                                Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
                             }
-                        });
-                        service.shutdown();
-                    } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "No url given", Toast.LENGTH_SHORT).show();
-                    }
+                            //switching to the ShowAndEditRecipeFragment
+                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
+                            replaceFragment(showAndEditRecipeFragment);
+                        }
+                    });
+                });
+                service.shutdown();
+            } else {
+                Toast.makeText(getActivity().getApplicationContext(), "No url given", Toast.LENGTH_SHORT).show();
             }
         });
 
         //When the user clicks this button, an in app browser is going to open in the WebBrowserFragment
-        browseWebButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                replaceFragment(new WebBrowserFragment());
-            }
-        });
+        browseWebButton.setOnClickListener(view1 -> replaceFragment(new WebBrowserFragment()));
 
         //When the user clicks this button, the search query is passed to the BingSearch class
-        bingSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String bingSearchQuery = bingSearchInput.getText().toString();
-                if(!bingSearchQuery.isBlank()){
-                    Fragment bingFragment = BingFragment.newInstance(bingSearchQuery);
-                    replaceFragment(bingFragment);
-                } else{
-                    Toast.makeText(getActivity().getApplicationContext(), "No search query given", Toast.LENGTH_SHORT).show();
-                }
+        bingSearchButton.setOnClickListener(v -> {
+            String bingSearchQuery = bingSearchInput.getText().toString();
+            if (!bingSearchQuery.isBlank()) {
+                Fragment bingFragment = BingFragment.newInstance(bingSearchQuery);
+                replaceFragment(bingFragment);
+            } else {
+                Toast.makeText(getActivity().getApplicationContext(), "No search query given", Toast.LENGTH_SHORT).show();
             }
         });
 
-        emptyRecipeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, null, null);
-                replaceFragment(showAndEditRecipeFragment);
-            }
+        emptyRecipeButton.setOnClickListener(v -> {
+            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, null, null);
+            replaceFragment(showAndEditRecipeFragment);
         });
 
         return view;
@@ -169,7 +145,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
 
     //This method is used to replace the current fragment with a new fragment
     @Override
-    public void replaceFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment);
         }

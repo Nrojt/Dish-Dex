@@ -58,7 +58,7 @@
         android:minHeight="48dp"
         ads:layout_constraintEnd_toEndOf="parent"
         ads:layout_constraintStart_toStartOf="parent"
-        ads:layout_constraintTop_toBottomOf="@+id/timeTextView" >
+        ads:layout_constraintTop_toBottomOf="@+id/timeTextView">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -92,7 +92,7 @@
                 android:layout_marginEnd="10dp"
                 android:text="0"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recipeTimeTitleTextView"  />
+                app:layout_constraintTop_toBottomOf="@+id/recipeTimeTitleTextView" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

@@ -3,9 +3,6 @@ package com.nrojt.dishdex.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +10,10 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.textfield.TextInputLayout;
 import com.nrojt.dishdex.R;
-
 
 
 public class SettingsFragment extends Fragment {
@@ -74,19 +72,16 @@ public class SettingsFragment extends Fragment {
         proUserToggleButton = view.findViewById(R.id.proUserToggleButton);
 
         //Saving the settings to shared preferences (local storage) when the save button is clicked
-        saveSettingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isProUser = proUserToggleButton.isChecked();
-                bingApiKey = bingApiKeyTextInput.getEditText().getText().toString();
-                if(!bingApiKey.isBlank()){
-                    if (bingApiKey.length() != 32) {
-                        Toast.makeText(getActivity().getApplicationContext(), "Invalid Bing Search API key", Toast.LENGTH_SHORT).show();
-                    }
+        saveSettingsButton.setOnClickListener(v -> {
+            isProUser = proUserToggleButton.isChecked();
+            bingApiKey = bingApiKeyTextInput.getEditText().getText().toString();
+            if (!bingApiKey.isBlank()) {
+                if (bingApiKey.length() != 32) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Invalid Bing Search API key", Toast.LENGTH_SHORT).show();
                 }
-                //Saving the data
-                saveData();
             }
+            //Saving the data
+            saveData();
         });
 
         //Loading the settings from shared preferences (local storage) when the fragment is created
@@ -100,7 +95,7 @@ public class SettingsFragment extends Fragment {
     }
 
     //Saving the data to shared preferences
-    public void saveData(){
+    public void saveData() {
         //Creating a shared preferences object
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -112,7 +107,7 @@ public class SettingsFragment extends Fragment {
     }
 
     //Loading the data from shared preferences
-    public void loadData(){
+    public void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         //If the key doesn't exist, the default value is an empty string
         loadedApiKey = sharedPreferences.getString(BING_API_KEY, "");

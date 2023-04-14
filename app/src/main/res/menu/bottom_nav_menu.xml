@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Home"
+    <item
+        android:title="Home"
         android:icon="@drawable/baseline_home_24"
-        android:id="@+id/homeButton"/>
-    <item android:title="Add Recipe"
+        android:id="@+id/homeButton" />
+    <item
+        android:title="Add Recipe"
         android:icon="@drawable/baseline_add_24"
-        android:id="@+id/addRecipeButton"/>
-    <item android:title="Recipes"
+        android:id="@+id/addRecipeButton" />
+    <item
+        android:title="Recipes"
         android:icon="@drawable/baseline_dinner_dining_24"
-        android:id="@+id/recipesButton"/>
-    <item android:title="Settings"
+        android:id="@+id/recipesButton" />
+    <item
+        android:title="Settings"
         android:icon="@drawable/baseline_settings_24"
-        android:id="@+id/settingsButton"/>
+        android:id="@+id/settingsButton" />
 </menu>

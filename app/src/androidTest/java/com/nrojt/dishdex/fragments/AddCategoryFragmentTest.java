@@ -39,7 +39,6 @@ public class AddCategoryFragmentTest {
         });
 
 
-
         // Enter a category name and click the saveCategoryButton
         onView(withId(R.id.categoryNameEditText)).perform(typeText("Test Category"));
         onView(withId(R.id.saveCategoryButton)).perform(click());

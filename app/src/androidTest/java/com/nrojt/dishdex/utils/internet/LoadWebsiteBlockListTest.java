@@ -1,14 +1,16 @@
 package com.nrojt.dishdex.utils.internet;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import android.content.Context;
+
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-
-import static org.junit.Assert.*;
 
 public class LoadWebsiteBlockListTest {
 

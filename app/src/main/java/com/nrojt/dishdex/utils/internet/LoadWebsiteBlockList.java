@@ -14,7 +14,7 @@ public class LoadWebsiteBlockList {
     private final ArrayList<String> adUrls = new ArrayList<>();
     private final Context context;
 
-    public LoadWebsiteBlockList(Context context){
+    public LoadWebsiteBlockList(Context context) {
         this.context = context;
     }
 
@@ -24,7 +24,7 @@ public class LoadWebsiteBlockList {
 
     //Loading in a list of ads and other unwanted websites from a local text file
     //downloaded from https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-    public void loadBlockList(){
+    public void loadBlockList() {
         try {
             InputStream inputStream = context.getResources().openRawResource(R.raw.adblocklist);
             BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));

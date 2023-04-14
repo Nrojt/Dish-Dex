@@ -6,11 +6,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.fragment.app.FragmentTransaction;
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
-import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.nrojt.dishdex.MainActivity;
@@ -56,7 +53,7 @@ public class SettingsFragmentTest {
         boolean isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
 
         // Assert that the value was saved correctly
-        Assert.assertEquals(!savedIsProUser,isProUser);
+        Assert.assertEquals(!savedIsProUser, isProUser);
 
         // Close the fragment scenario
         activityScenario.close();

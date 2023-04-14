@@ -17,7 +17,6 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.nrojt.dishdex.R;
-import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.SearchResults;
 
 import org.json.JSONArray;
@@ -100,30 +99,24 @@ public class BingFragment extends Fragment {
 
         ExecutorService service = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                runTheSearch();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        StringBuilder sb = new StringBuilder();
-                        System.out.println(bingReturnUrls);
-                        for(String url : bingReturnUrls){
-                            sb.append(url);
-                            sb.append("\n");
-                        }
-                        bingUrlTextOnScreen.setText(sb.toString());
-                    }
-                });
-            }
+        service.execute(() -> {
+            runTheSearch();
+            handler.post(() -> {
+                StringBuilder sb = new StringBuilder();
+                System.out.println(bingReturnUrls);
+                for (String url : bingReturnUrls) {
+                    sb.append(url);
+                    sb.append("\n");
+                }
+                bingUrlTextOnScreen.setText(sb.toString());
+            });
         });
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bing, container, false);
     }
 
-    private void runTheSearch(){
+    private void runTheSearch() {
         JSONObject jsonObject;
         SearchResults results;
         JSONArray jsonArray;
@@ -139,21 +132,11 @@ public class BingFragment extends Fragment {
                     bingReturnUrls.add(jsonArray.getJSONObject(i).getString("url"));
                 }
             } else {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), "Error: No results found.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Error: No results found.", Toast.LENGTH_SHORT).show());
             }
 
         } catch (FileNotFoundException e) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getContext(), "Error: API key is invalid or the API endpoint is unreachable.", Toast.LENGTH_SHORT).show();
-                }
-            });
+            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Error: API key is invalid or the API endpoint is unreachable.", Toast.LENGTH_SHORT).show());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -162,7 +145,7 @@ public class BingFragment extends Fragment {
     //SearchWeb was provided on the Microsoft bing api v7 website
     public SearchResults SearchWeb(String searchQuery) throws Exception {
         // Construct the URL.
-        URL url = new URL(host + path + "?q=" +  URLEncoder.encode(searchQuery, "UTF-8") + "&responseFilter=webpages&safeSearch=strict");
+        URL url = new URL(host + path + "?q=" + URLEncoder.encode(searchQuery, "UTF-8") + "&responseFilter=webpages&safeSearch=strict");
 
         // Open the connection.
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -173,7 +156,7 @@ public class BingFragment extends Fragment {
         String response = new Scanner(stream).useDelimiter("\\A").next();
 
         // Construct the result object.
-        SearchResults results = new SearchResults(new HashMap<String, String>(), response);
+        SearchResults results = new SearchResults(new HashMap<>(), response);
 
         // Extract Bing-related HTTP headers.
         Map<String, List<String>> headers = connection.getHeaderFields();
