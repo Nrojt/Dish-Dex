@@ -14,10 +14,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
@@ -33,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
     private AdView adView;
 
     private OnBackPressedCallback onBackPressedCallback;
@@ -77,41 +75,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         adView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
-
-        adView.setAdListener(new AdListener() {
-            @Override
-            public void onAdClicked() {
-                // Code to be executed when the user clicks on an ad.
-            }
-
-            @Override
-            public void onAdClosed() {
-                // Code to be executed when the user is about to return
-                // to the app after tapping on an ad.
-            }
-
-            @Override
-            public void onAdFailedToLoad(LoadAdError adError) {
-                // Code to be executed when an ad request fails.
-            }
-
-            @Override
-            public void onAdImpression() {
-                // Code to be executed when an impression is recorded
-                // for an ad.
-            }
-
-            @Override
-            public void onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-            }
-
-            @Override
-            public void onAdOpened() {
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
-            }
-        });
 
         //Setting onclicklistener for the bottom navigation bar
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -222,29 +185,18 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         int selectedItemId = -1;
         switch (fragment.getClass().getSimpleName()) {
-            case "HomePageFragment":
-                selectedItemId = R.id.homeButton;
-                break;
-            case "AddRecipeChooserFragment":
-            case "BingFragment":
-            case "ShowAndEditRecipeFragment":
-            case "WebBrowserFragment":
-                selectedItemId = R.id.addRecipeButton;
-                break;
-            case "SettingsFragment":
-                selectedItemId = R.id.settingsButton;
-                break;
-            case "SavedRecipesFragment":
-            case "AddCategoryFragment":
-                selectedItemId = R.id.recipesButton;
-                break;
-            default:
-                break;
+            case "HomePageFragment" -> selectedItemId = R.id.homeButton;
+            case "AddRecipeChooserFragment", "BingFragment", "ShowAndEditRecipeFragment", "WebBrowserFragment" ->
+                    selectedItemId = R.id.addRecipeButton;
+            case "SettingsFragment" -> selectedItemId = R.id.settingsButton;
+            case "SavedRecipesFragment", "AddCategoryFragment" ->
+                    selectedItemId = R.id.recipesButton;
+            default -> {
+            }
         }
 
         // Check if the selected item in the bottom navigation view is already the same as the item you are going to set
-        if (selectedItemId != -1 && binding.bottomNavigationView != null && binding.bottomNavigationView.getSelectedItemId() != selectedItemId) {
-            binding.bottomNavigationView.setOnItemSelectedListener(null);
+        if (selectedItemId != -1 && binding.bottomNavigationView.getSelectedItemId() != selectedItemId) {
             binding.bottomNavigationView.setSelectedItemId(selectedItemId);
             binding.bottomNavigationView.setOnItemSelectedListener(item -> {
                 navigateToFragment(item.getItemId());
@@ -268,14 +220,4 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             replaceFragment(fragment);
         }
     }
-
-
-    @Override
-    public boolean handleOnBackPressed() {
-        //This method needs to be implemented because of the interface, but it is not used in this class
-        //The method is implemented in the fragments (currently only in the WebBrowserFragment)
-        return false;
-    }
-
-
 }

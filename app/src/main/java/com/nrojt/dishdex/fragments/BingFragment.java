@@ -110,7 +110,10 @@ public class BingFragment extends Fragment implements FragmentReplacer {
                 runTheSearch();
                 handler.post(() -> {
                     if(bingReturnUrls.size() > 0){
-                        scrapeLink();
+                        for(int i = 0; i < bingReturnUrls.size(); i++){
+                            scrapeLink(bingReturnUrls.get(i));
+                        }
+                        System.out.println("All titles: " + recipeTitles);
                     } else {
                         Toast.makeText(getContext(), "No results found", Toast.LENGTH_SHORT).show();
                     }
@@ -127,8 +130,36 @@ public class BingFragment extends Fragment implements FragmentReplacer {
         return view;
     }
 
+    //getting the titles, cooking times and servings from the links
+    //TODO: make this work
+    private void scrapeLink(String url){
+        WebScraper wb = new WebScraper(url);
+        //creating a new thread for the WebScraper
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        service.execute(() -> {
+            wb.scrapeWebsite();
+            handler.post(() -> {
+                //checking to see if the site is supported and if the site is reachable
+                if (wb.isNotConnected()) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
+                } else if (wb.isNotReachable()) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (wb.isNotSupported()) {
+                        Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
+                    }
+                    recipeTitles.add(wb.getRecipeTitle());
+                    recipeCookingTimes.add(wb.getCookingTime());
+                    recipeServings.add(wb.getServings());
+                }
+            });
+        });
+        service.shutdown();
+    }
+
     //Just a proof of concept, should use a recyclerview instead to show all the results
-    private void scrapeLink(){
+    private void openLink(){
         //TODO: recyclerview in stead of just using the first url
         String url = bingReturnUrls.get(0);
         WebScraper wb = new WebScraper(url);
@@ -154,7 +185,6 @@ public class BingFragment extends Fragment implements FragmentReplacer {
             });
         });
         service.shutdown();
-
     }
 
     private void runTheSearch() {
