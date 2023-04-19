@@ -18,10 +18,10 @@ public class WebScraper implements Serializable {
     private boolean notConnected = false;
     private boolean notSupported = false;
     private boolean notReachable = false;
-    private String url;
+    private final String url;
     private int servings = 0;
     private int cookingTime = 0;
-    private String recipeTitle = "Unknown";
+    private String recipeTitle;
     private final List<String> recipeTextList = new ArrayList<>();
     private final List<String> ingredientTextList = new ArrayList<>();
 
@@ -82,11 +82,11 @@ public class WebScraper implements Serializable {
             if (document == null) {
                 notReachable = true;
             } else {
-                Elements instructionElements = null;
+                Elements instructionElements;
                 Elements ingredientElements = null;
-                Element servingsElement = null;
-                Element cookingTimeElement = null;
-                Element recipeTitleElement = null;
+                Element servingsElement;
+                Element cookingTimeElement;
+                Element recipeTitleElement;
 
                 //checking the url to see what classes need to be scraped, don't think this can be done in a switch
                 if (url.contains("ah.nl/allerhande/recept")) {
@@ -131,7 +131,6 @@ public class WebScraper implements Serializable {
                         }
                     }
 
-
                     servingsElement = document.getElementsByClass("adjust svelte-1o10zxc").first();
                     cookingTimeElement = document.getElementsByClass("facts__item svelte-ovaflp").first();
                     recipeTitleElement = document.getElementsByClass("layout__item title svelte-ovaflp").first();
@@ -143,7 +142,27 @@ public class WebScraper implements Serializable {
                     cookingTimeElement = document.getElementsByClass("wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes").get(0);
                     recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").first();
                 } else {
-                    recipeTitleElement = document.head().getElementsByTag("title").first();
+                    //General recipe scraper
+                    //Selectors are used to find the elements on the page
+
+                    // Selectors for recipe instructions and ingredients
+                    String instructionSelector = ".recipe-instructions, .instructions, .recipe-steps";
+                    String ingredientSelector = ".recipe-ingredients, .ingredients, .recipe-ings";
+
+                    // Selectors for recipe title, servings, and cooking time
+                    String titleSelector = "h1, h2, .recipe-title, .title";
+                    String servingsSelector = ".servings, .yield, .recipe-servings";
+                    String cookingTimeSelector = ".time, .duration, .cook-time, .minutes";
+
+                    // Find the recipe instructions and ingredients on the page
+                    instructionElements = document.select(instructionSelector);
+                    ingredientElements = document.select(ingredientSelector);
+
+                    // Find the recipe title, servings, and cooking time on the page
+                    recipeTitleElement = document.selectFirst(titleSelector);
+                    servingsElement = document.selectFirst(servingsSelector);
+                    cookingTimeElement = document.selectFirst(cookingTimeSelector);
+
                     notSupported = true;
                 }
 

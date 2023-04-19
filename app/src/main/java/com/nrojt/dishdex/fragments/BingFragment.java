@@ -56,10 +56,6 @@ public class BingFragment extends Fragment {
     static String path = "/v7.0/search";
     static String searchTerm;
 
-    private EditText bingUrlTextOnScreen;
-    //TODO fix issue where the on screen text doesn't update
-
-
     // the fragment initialization parameters
     private static final String SEARCH_QUERY = "param1";
 
@@ -67,7 +63,6 @@ public class BingFragment extends Fragment {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static BingFragment newInstance(String searchTerm) {
         BingFragment fragment = new BingFragment();
         Bundle args = new Bundle();
@@ -88,14 +83,9 @@ public class BingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bing, container, false);
-        bingUrlTextOnScreen = view.findViewById(R.id.bingUrlTextOnScreen);
-        bingUrlTextOnScreen.setText("Loading...");
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
-
-        Bundle bundle = getArguments();
-        searchTerm = bundle.getString("SearchQuery", "");
 
         ExecutorService service = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
@@ -103,17 +93,15 @@ public class BingFragment extends Fragment {
             runTheSearch();
             handler.post(() -> {
                 StringBuilder sb = new StringBuilder();
-                System.out.println(bingReturnUrls);
                 for (String url : bingReturnUrls) {
                     sb.append(url);
                     sb.append("\n");
                 }
-                bingUrlTextOnScreen.setText(sb.toString());
             });
         });
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_bing, container, false);
+        return view;
     }
 
     private void runTheSearch() {
