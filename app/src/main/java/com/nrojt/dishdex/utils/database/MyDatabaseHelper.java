@@ -238,7 +238,6 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query("recipe_categories", columns, selection, selectionArgs, null, null, null);
 
         if (cursor.getCount() > 0) {
-            System.out.println("The combination of recipeID and categoryID already exists in the recipe_categories table");
             // The combination of recipeID and categoryID already exists in the recipe_categories table, so don't insert a new row
             cursor.close();
             db.close();

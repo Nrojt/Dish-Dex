@@ -227,7 +227,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                     case 0, 2 -> {
                         // Add recipe to database
                         recipeIDFromDatabase = db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
-                        db.deleteRecipeCategories(recipeIDFromDatabase); //TODO remove this, just check in the database helper if the recipecategory combination already exists
                         for (int i = 0; i < selectedCategories.length; i++) {
                             if (selectedCategories[i]) {
                                 db.addRecipeCategory(recipeIDFromDatabase, categoryIDs.get(i));
