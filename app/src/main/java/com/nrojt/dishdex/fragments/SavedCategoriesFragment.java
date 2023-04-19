@@ -213,6 +213,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         }
     }
 
+    //This method is called when the fragment is visible to the user and actively running.
     @Override
     public void onPause() {
         super.onPause();

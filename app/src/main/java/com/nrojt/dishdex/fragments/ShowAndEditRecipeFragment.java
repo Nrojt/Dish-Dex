@@ -181,6 +181,12 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
 
         //setting the onClickListener for the saveOrEditRecipeButton
         saveOrEditRecipeButton.setOnClickListener(v -> {
+            if(recipeTitleTextOnScreen.getText().toString().isBlank()){
+                recipeTitleTextOnScreen.setError("Recipe title is required");
+                Toast.makeText(getActivity().getApplicationContext(), "Recipe title is required", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
 
                 String recipeTitle = recipeTitleTextOnScreen.getText().toString().trim();
@@ -218,29 +224,23 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 }
 
                 switch (mode) {
-                    case 0:
-                    case 2:
+                    case 0, 2 -> {
                         // Add recipe to database
                         recipeIDFromDatabase = db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
-                        db.deleteRecipeCategories(recipeIDFromDatabase);
-
+                        db.deleteRecipeCategories(recipeIDFromDatabase); //TODO remove this, just check in the database helper if the recipecategory combination already exists
                         for (int i = 0; i < selectedCategories.length; i++) {
                             if (selectedCategories[i]) {
-                                System.out.println("Adding category " + categoryIDs.get(i));
                                 db.addRecipeCategory(recipeIDFromDatabase, categoryIDs.get(i));
                             }
                         }
-
                         if (recipeIDFromDatabase != -1) {
                             fragmentManager.popBackStack();
                         }
-
-                        break;
-                    default:
+                    }
+                    default -> {
                         // Update recipe in database
                         db.updateRecipe(recipeId, recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
                         db.deleteRecipeCategories(recipeId);
-
                         for (int i = 0; i < selectedCategories.length; i++) {
                             if (selectedCategories[i]) {
                                 // The category is selected, so add it to the recipe
@@ -250,11 +250,10 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                                 db.removeRecipeCategory(recipeId, categoryIDs.get(i));
                             }
                         }
-
                         if (recipeIDFromDatabase != -1) {
                             fragmentManager.popBackStack();
                         }
-                        break;
+                    }
                 }
             }
         });
