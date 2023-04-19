@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 
@@ -39,6 +40,7 @@ public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<S
     @Override
     public void onBindViewHolder(@NonNull SavedCategoriesCustomRecyclerAdapter.MyViewHolder holder, int position) {
         holder.categoryTitleText.setText(categoryNames.get(position));
+        holder.categoryTitleText.setTextSize(MainActivity.fontSizeTitles);
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {

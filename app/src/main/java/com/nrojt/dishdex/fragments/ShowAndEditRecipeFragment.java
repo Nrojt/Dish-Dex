@@ -107,6 +107,16 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         urlTextOnScreen = view.findViewById(R.id.urlTextOnScreen);
         chooseCategoriesTextView = view.findViewById(R.id.chooseCategoriesTextView);
 
+        //setting the text size of the on screen elements
+        recipeTextOnScreen.setTextSize(MainActivity.fontSize);
+        ingredientTextOnScreen.setTextSize(MainActivity.fontSize);
+        cookingTimeTextOnScreen.setTextSize(MainActivity.fontSize);
+        servingsTextOnScreen.setTextSize(MainActivity.fontSize);
+        recipeTitleTextOnScreen.setTextSize(MainActivity.fontSizeTitles);
+        noteTextOnScreen.setTextSize(MainActivity.fontSize);
+        urlTextOnScreen.setTextSize(MainActivity.fontSize);
+        chooseCategoriesTextView.setTextSize(MainActivity.fontSize);
+
         getCategoriesFromDatabase();
 
         //Checking if the mode is 0, 1 or 2. 0 is for when the user is adding a recipe from a website, 1 is for when the user is editing a recipe and 2 is for when the user is adding a recipe from scratch.

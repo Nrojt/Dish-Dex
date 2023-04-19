@@ -88,7 +88,6 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
 
         //When the user clicks the button, the url is passed to the WebScraper class which checks if the site is supported and if the site is reachable
         getRecipeFromUrlButton.setOnClickListener(v -> {
-            System.out.println("Button clicked");
             String url = urlInput.getText().toString();
             if (!url.isBlank()) {
                 WebScraper wb = new WebScraper(url);

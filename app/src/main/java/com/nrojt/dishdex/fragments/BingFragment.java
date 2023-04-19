@@ -49,6 +49,9 @@ public class BingFragment extends Fragment implements FragmentReplacer {
     private static String subscriptionKey;
 
     private static final ArrayList<String> bingReturnUrls = new ArrayList<>();
+    private static final ArrayList<String> recipeTitles = new ArrayList<>();
+    private static final ArrayList<Integer> recipeCookingTimes = new ArrayList<>();
+    private static final ArrayList<Integer> recipeServings = new ArrayList<>();
 
     private RecyclerView bingRecyclerView;
 
@@ -96,6 +99,10 @@ public class BingFragment extends Fragment implements FragmentReplacer {
 
         if(searchTerm != null) {
             bingReturnUrls.clear();
+            recipeTitles.clear();
+            recipeCookingTimes.clear();
+            recipeServings.clear();
+
             ExecutorService service = Executors.newSingleThreadExecutor();
             Handler handler = new Handler(Looper.getMainLooper());
             // Run the search on a background thread.
@@ -103,7 +110,7 @@ public class BingFragment extends Fragment implements FragmentReplacer {
                 runTheSearch();
                 handler.post(() -> {
                     if(bingReturnUrls.size() > 0){
-                        goToFirstLink();
+                        scrapeLink();
                     } else {
                         Toast.makeText(getContext(), "No results found", Toast.LENGTH_SHORT).show();
                     }
@@ -121,7 +128,7 @@ public class BingFragment extends Fragment implements FragmentReplacer {
     }
 
     //Just a proof of concept, should use a recyclerview instead to show all the results
-    private void goToFirstLink(){
+    private void scrapeLink(){
         //TODO: recyclerview in stead of just using the first url
         String url = bingReturnUrls.get(0);
         WebScraper wb = new WebScraper(url);

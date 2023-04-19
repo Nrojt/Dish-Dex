@@ -38,10 +38,12 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     private OnBackPressedCallback onBackPressedCallback;
 
+    //Global variables basically
     public static boolean isProUser;
     public static final int MAX_CATEGORIES_FREE = 16;
+    public static float fontSize;
+    public static float fontSizeTitles;
 
-    public boolean handledByFragment = false;
 
     ActivityMainBinding binding;
 
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         SharedPreferences sharedPreferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
         isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
+        fontSize = sharedPreferences.getInt(SettingsFragment.FONT_SIZE, 14);
+        fontSizeTitles = sharedPreferences.getInt(SettingsFragment.FONT_SIZE_TITLES, 20);
 
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);

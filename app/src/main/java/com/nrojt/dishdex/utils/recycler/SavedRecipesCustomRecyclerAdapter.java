@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 
@@ -49,6 +50,10 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
         holder.recipeTitleText.setText(recipeTitles.get(position));
         holder.recipeCookingTimeText.setText(recipeCookingTimes.get(position) + " minutes");
         holder.recipeServingsText.setText(recipeServings.get(position) + " servings");
+
+        holder.recipeTitleText.setTextSize(MainActivity.fontSizeTitles);
+        holder.recipeCookingTimeText.setTextSize(MainActivity.fontSize);
+        holder.recipeServingsText.setTextSize(MainActivity.fontSize);
     }
 
     @Override

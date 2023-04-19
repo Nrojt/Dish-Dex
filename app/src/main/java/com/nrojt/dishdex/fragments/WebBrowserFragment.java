@@ -101,6 +101,8 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         currentBrowserUrl = view.findViewById(R.id.currentBrowserUrl);
         scrapeThisUrlButton = view.findViewById(R.id.scrapeThisUrlButton);
 
+        currentBrowserUrl.setTextSize(MainActivity.fontSizeTitles);
+
         LoadWebsiteBlockList loadWebsiteBlockList = new LoadWebsiteBlockList(getContext());
         //creating a new thread for getting the blocked urls
         ExecutorService service = Executors.newSingleThreadExecutor();
@@ -259,6 +261,4 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
             fragmentManager.removeOnBackStackChangedListener(this);
         }
     }
-
-
 }

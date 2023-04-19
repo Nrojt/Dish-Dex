@@ -16,14 +16,47 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Bing Api Key" />
+            android:hint="Bing Api Key"
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/fontSizeTextInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bingKeyTextInput"
+        android:layout_marginBottom="10dp"
+        android:minHeight="48dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Font size (normal text)"
+            android:inputType="number"
+            android:maxLength="2" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/fontSizeTitleTextInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fontSizeTextInput"
+        android:layout_marginBottom="10dp"
+        android:minHeight="48dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Font size (titles)"
+            android:inputType="number"
+            android:maxLength="2" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <ToggleButton
         android:id="@+id/proUserToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bingKeyTextInput"
+        android:layout_below="@id/fontSizeTitleTextInput"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
         android:text="ToggleButton"

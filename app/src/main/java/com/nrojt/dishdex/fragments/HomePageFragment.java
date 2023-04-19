@@ -108,7 +108,9 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
 
         dateTextView.setText("Today is " + currentDay);
+        dateTextView.setTextSize(MainActivity.fontSize);
         timeTextView.setText("And the time is " + currentTime);
+        timeTextView.setTextSize(MainActivity.fontSize);
 
         //Getting a random recipeID based on the time of day
         getRandomRecipeIDBasedOnTime();
@@ -118,8 +120,12 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
 
         recipeTimeTitleTextView.setText(recipeName);
+        recipeTimeTitleTextView.setTextSize(MainActivity.fontSizeTitles);
+
         recipeTimeCookingTimeTextView.setText(recipeCookingTime + " minutes");
+        recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSize);
         recipeTimeServingsTextView.setText("Servings: " + recipeServings);
+        recipeTimeServingsTextView.setTextSize(MainActivity.fontSize);
 
 
         if (timeRecipeID == -1) {
