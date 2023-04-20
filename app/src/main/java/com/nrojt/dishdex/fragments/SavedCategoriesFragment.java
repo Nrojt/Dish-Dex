@@ -155,8 +155,8 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(savedCategoriesRecyclerView);
 
-        //This method displays the categories in the recycler view
-        displayCategories();
+        //This method gets the categories in the recycler view
+        getCategoriesFromDatabase();
 
         return view;
     }
@@ -179,7 +179,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         savedCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
-    private void displayCategories() {
+    private void getCategoriesFromDatabase() {
         //Getting the data from the database
         Cursor cursor = db.readDataForSavedCategoriesRecyclerView();
 

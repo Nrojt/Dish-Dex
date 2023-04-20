@@ -177,8 +177,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(savedRecipesRecyclerView);
 
-        //This method displays the recipes in the database
-        displayRecipes();
+        //This method gets the recipes in the database
+        getRecipesFromDatabase();
 
         return view;
     }
@@ -204,7 +204,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     }
 
     //Adding the recipes to a recyclerView
-    private void displayRecipes() {
+    private void getRecipesFromDatabase() {
 
         //Clearing the lists so that the data is not duplicated
         recipeIDs.clear();

@@ -12,16 +12,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
+import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 import com.nrojt.dishdex.utils.internet.SearchResults;
 import com.nrojt.dishdex.utils.internet.WebScraper;
+import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
+import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,7 +52,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Use the {@link BingFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BingFragment extends Fragment implements FragmentReplacer {
+public class BingFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer {
     // Enter a valid subscription key.
     private static String subscriptionKey;
 
@@ -57,6 +64,9 @@ public class BingFragment extends Fragment implements FragmentReplacer {
     private static final ArrayList<Boolean> recipeUrlSupported = new ArrayList<>();
 
     private RecyclerView bingRecyclerView;
+
+    private TextView bingNotificationTextView;
+
 
     /*
      * If you encounter unexpected authorization errors, double-check these values
@@ -95,10 +105,21 @@ public class BingFragment extends Fragment implements FragmentReplacer {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bing, container, false);
 
+        bingNotificationTextView = view.findViewById(R.id.bingNotificationTextView);
+        bingNotificationTextView.setTextSize(MainActivity.fontSizeTitles);
+
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
 
+        bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
+        bingRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
+        SavedRecipesCustomRecyclerAdapter adapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipeTitles, recipeCookingTimes, recipeServings, this);
+        bingRecyclerView.setAdapter(adapter);
+        bingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+
         if(searchTerm != null) {
+            bingNotificationTextView.setText("Searching for " + searchTerm + "...");
             bingReturnUrls.clear();
             recipeTitles.clear();
             recipeCookingTimes.clear();
@@ -121,13 +142,33 @@ public class BingFragment extends Fragment implements FragmentReplacer {
                 handler.post(() -> {
                     //setting the search term back to null so that the search doesn't run again when the fragment is recreated
                     searchTerm = null;
+                    adapter.notifyDataSetChanged();
+                    bingNotificationTextView.setText("Swipe to the right to open the recipe in the browser");
                 });
             });
             service.shutdown();
         }
 
-        //TODO show all the results in a recyclerview
-        bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
+        //swipe to the right to open the recipe in the browser
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                if(recipeUrlSupported.get(position)){
+                    replaceFragment(WebBrowserFragment.newInstance(recipeAccessibleUrl.get(position)));
+                } else {
+                    Toast.makeText(getContext(), "This site is not supported", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(bingRecyclerView);
 
         return view;
     }
@@ -150,7 +191,6 @@ public class BingFragment extends Fragment implements FragmentReplacer {
 
     //Just a proof of concept, should use a recyclerview instead to show all the results
     private void openLink(String url){
-        //TODO: recyclerview in stead of just using the first url
         WebScraper wb = new WebScraper(url);
         //creating a new thread for the WebScraper
         ExecutorService service = Executors.newSingleThreadExecutor();
@@ -232,5 +272,10 @@ public class BingFragment extends Fragment implements FragmentReplacer {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        openLink(recipeAccessibleUrl.get(position));
     }
 }
