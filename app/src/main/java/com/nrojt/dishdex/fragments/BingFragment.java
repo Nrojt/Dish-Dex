@@ -53,6 +53,8 @@ public class BingFragment extends Fragment implements FragmentReplacer {
     private static final ArrayList<String> recipeTitles = new ArrayList<>();
     private static final ArrayList<Integer> recipeCookingTimes = new ArrayList<>();
     private static final ArrayList<Integer> recipeServings = new ArrayList<>();
+    private static final ArrayList<String> recipeAccessibleUrl = new ArrayList<>();
+    private static final ArrayList<Boolean> recipeUrlSupported = new ArrayList<>();
 
     private RecyclerView bingRecyclerView;
 
@@ -93,8 +95,6 @@ public class BingFragment extends Fragment implements FragmentReplacer {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bing, container, false);
 
-        bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
-
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
 
@@ -103,6 +103,8 @@ public class BingFragment extends Fragment implements FragmentReplacer {
             recipeTitles.clear();
             recipeCookingTimes.clear();
             recipeServings.clear();
+            recipeAccessibleUrl.clear();
+            recipeUrlSupported.clear();
 
             ExecutorService service = Executors.newSingleThreadExecutor();
             Handler handler = new Handler(Looper.getMainLooper());
@@ -113,44 +115,42 @@ public class BingFragment extends Fragment implements FragmentReplacer {
                     for(int i = 0; i < bingReturnUrls.size(); i++){
                         scrapeLink(bingReturnUrls.get(i));
                     }
-                    System.out.println("All titles: " + recipeTitles);
                 } else {
                     Toast.makeText(getContext(), "No results found", Toast.LENGTH_SHORT).show();
                 }
                 handler.post(() -> {
                     //setting the search term back to null so that the search doesn't run again when the fragment is recreated
                     searchTerm = null;
-                    openLink();
                 });
             });
             service.shutdown();
-
-
         }
 
-        // Inflate the layout for this fragment
+        //TODO show all the results in a recyclerview
+        bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
+
         return view;
     }
 
     //getting the titles, cooking times and servings from the links
-    //TODO: make this work
     private void scrapeLink(String url){
         WebScraper wb = new WebScraper(url);
         wb.scrapeWebsite();
         //checking to see if the site is supported and if the site is reachable
         if (wb.isNotConnected() || wb.isNotReachable()) {
-            Log.e("BingFragment", "Not connected to the internet or cannot reach this site");
+            Log.e("BingFragment", "Not connected to the internet or cannot reach this site: " + url);
         } else {
             recipeTitles.add(wb.getRecipeTitle());
             recipeCookingTimes.add(wb.getCookingTime());
             recipeServings.add(wb.getServings());
+            recipeAccessibleUrl.add(wb.getUrl());
+            recipeUrlSupported.add(!wb.isNotSupported()); //if the site is supported, isNotSupported will return false. Here we need to know if the site is supported, so we invert the boolean
         }
     }
 
     //Just a proof of concept, should use a recyclerview instead to show all the results
-    private void openLink(){
+    private void openLink(String url){
         //TODO: recyclerview in stead of just using the first url
-        String url = bingReturnUrls.get(0);
         WebScraper wb = new WebScraper(url);
         //creating a new thread for the WebScraper
         ExecutorService service = Executors.newSingleThreadExecutor();
@@ -158,15 +158,12 @@ public class BingFragment extends Fragment implements FragmentReplacer {
         service.execute(() -> {
             wb.scrapeWebsite();
             handler.post(() -> {
-                //checking to see if the site is supported and if the site is reachable
+                //checking again to see if the site is reachable
                 if (wb.isNotConnected()) {
                     Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
                 } else if (wb.isNotReachable()) {
                     Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
                 } else {
-                    if (wb.isNotSupported()) {
-                        Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
-                    }
                     //switching to the ShowAndEditRecipeFragment
                     Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
                     replaceFragment(showAndEditRecipeFragment);

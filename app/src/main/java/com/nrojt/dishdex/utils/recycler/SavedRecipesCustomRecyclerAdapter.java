@@ -21,18 +21,16 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
     private final RecyclerViewInterface listener;
     private final Context context;
     private final ArrayList<String> recipeTitles;
-    private final ArrayList<Integer> recipeIDs;
     private final ArrayList<Integer> recipeCookingTimes;
     private final ArrayList<Integer> recipeServings;
 
     //Constructor
-    public SavedRecipesCustomRecyclerAdapter(Context context, ArrayList<Integer> recipeIDs, ArrayList<String> recipeTitles, ArrayList<Integer> recipeCookingTimes, ArrayList<Integer> recipeServings, RecyclerViewInterface listener) {
+    public SavedRecipesCustomRecyclerAdapter(Context context, ArrayList<String> recipeTitles, ArrayList<Integer> recipeCookingTimes, ArrayList<Integer> recipeServings, RecyclerViewInterface listener) {
         this.listener = listener;
         this.context = context;
         this.recipeTitles = recipeTitles;
         this.recipeCookingTimes = recipeCookingTimes;
         this.recipeServings = recipeServings;
-        this.recipeIDs = recipeIDs;
     }
 
     //Inflate the view

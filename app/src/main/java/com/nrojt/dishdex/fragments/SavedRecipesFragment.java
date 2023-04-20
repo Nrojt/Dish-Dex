@@ -106,7 +106,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         //Adding padding to the recyclerView and setting the adapter and layout manager
         savedRecipesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipeIDs, recipeTitles, recipeCookingTimes, recipeServings, this);
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipeTitles, recipeCookingTimes, recipeServings, this);
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -189,18 +189,16 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         ArrayList<String> filteredRecipeTitles = new ArrayList<>();
         ArrayList<Integer> filteredRecipeCookingTimes = new ArrayList<>();
         ArrayList<Integer> filteredRecipeServings = new ArrayList<>();
-        ArrayList<Integer> filteredRecipeIDs = new ArrayList<>();
 
         for (String recipeTitle : recipeTitles) {
             if (recipeTitle.toLowerCase().contains(newText.toLowerCase())) {
                 filteredRecipeTitles.add(recipeTitle);
                 filteredRecipeCookingTimes.add(recipeCookingTimes.get(recipeTitles.indexOf(recipeTitle)));
                 filteredRecipeServings.add(recipeServings.get(recipeTitles.indexOf(recipeTitle)));
-                filteredRecipeIDs.add(recipeIDs.get(recipeTitles.indexOf(recipeTitle)));
             }
         }
 
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipeIDs, filteredRecipeTitles, filteredRecipeCookingTimes, filteredRecipeServings, this);
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipeTitles, filteredRecipeCookingTimes, filteredRecipeServings, this);
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
