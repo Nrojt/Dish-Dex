@@ -91,9 +91,9 @@ public class SettingsFragment extends Fragment {
             fontSize = Integer.parseInt(fontSizeTextInput.getEditText().getText().toString());
             fontSizeTitles = Integer.parseInt(fontSizeTitleTextInput.getEditText().getText().toString());
 
-            if(fontSize > 48){
+            if(fontSize > 32){
                 Toast.makeText(getActivity().getApplicationContext(), "Font size too large", Toast.LENGTH_SHORT).show();
-                fontSizeTextInput.getEditText().setText("48");
+                fontSizeTextInput.getEditText().setText("32");
                 return;
             }
             if(fontSizeTitles > 48){

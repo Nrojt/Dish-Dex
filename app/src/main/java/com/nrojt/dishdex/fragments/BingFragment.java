@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,17 +109,18 @@ public class BingFragment extends Fragment implements FragmentReplacer {
             // Run the search on a background thread.
             service.execute(() -> {
                 runTheSearch();
-                handler.post(() -> {
-                    if(bingReturnUrls.size() > 0){
-                        for(int i = 0; i < bingReturnUrls.size(); i++){
-                            scrapeLink(bingReturnUrls.get(i));
-                        }
-                        System.out.println("All titles: " + recipeTitles);
-                    } else {
-                        Toast.makeText(getContext(), "No results found", Toast.LENGTH_SHORT).show();
+                if(bingReturnUrls.size() > 0){
+                    for(int i = 0; i < bingReturnUrls.size(); i++){
+                        scrapeLink(bingReturnUrls.get(i));
                     }
+                    System.out.println("All titles: " + recipeTitles);
+                } else {
+                    Toast.makeText(getContext(), "No results found", Toast.LENGTH_SHORT).show();
+                }
+                handler.post(() -> {
                     //setting the search term back to null so that the search doesn't run again when the fragment is recreated
                     searchTerm = null;
+                    openLink();
                 });
             });
             service.shutdown();
@@ -134,28 +136,15 @@ public class BingFragment extends Fragment implements FragmentReplacer {
     //TODO: make this work
     private void scrapeLink(String url){
         WebScraper wb = new WebScraper(url);
-        //creating a new thread for the WebScraper
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-        service.execute(() -> {
-            wb.scrapeWebsite();
-            handler.post(() -> {
-                //checking to see if the site is supported and if the site is reachable
-                if (wb.isNotConnected()) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
-                } else if (wb.isNotReachable()) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
-                } else {
-                    if (wb.isNotSupported()) {
-                        Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
-                    }
-                    recipeTitles.add(wb.getRecipeTitle());
-                    recipeCookingTimes.add(wb.getCookingTime());
-                    recipeServings.add(wb.getServings());
-                }
-            });
-        });
-        service.shutdown();
+        wb.scrapeWebsite();
+        //checking to see if the site is supported and if the site is reachable
+        if (wb.isNotConnected() || wb.isNotReachable()) {
+            Log.e("BingFragment", "Not connected to the internet or cannot reach this site");
+        } else {
+            recipeTitles.add(wb.getRecipeTitle());
+            recipeCookingTimes.add(wb.getCookingTime());
+            recipeServings.add(wb.getServings());
+        }
     }
 
     //Just a proof of concept, should use a recyclerview instead to show all the results
@@ -244,7 +233,7 @@ public class BingFragment extends Fragment implements FragmentReplacer {
     @Override
     public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment);
+            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
     }
 }

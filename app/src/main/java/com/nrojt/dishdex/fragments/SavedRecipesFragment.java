@@ -34,8 +34,6 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     private FloatingActionButton savedRecipesFab;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -275,7 +273,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     @Override
     public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment);
+            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
     }
 

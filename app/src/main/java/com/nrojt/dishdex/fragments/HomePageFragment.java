@@ -187,7 +187,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     @Override
     public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment);
+            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
     }
 

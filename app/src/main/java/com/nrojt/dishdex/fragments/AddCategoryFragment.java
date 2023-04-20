@@ -85,7 +85,7 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
     @Override
     public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment);
+            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
 
     }

@@ -146,7 +146,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
     @Override
     public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment);
+            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
     }
 

@@ -197,7 +197,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
     @Override
     public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment);
+            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
     }
 

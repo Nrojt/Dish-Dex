@@ -91,7 +91,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("ShowAndEditRecipes", "onCreateView");
         fragmentManager = getActivity().getSupportFragmentManager();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_show_and_edit_recipe, container, false);
@@ -121,7 +120,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
 
         //Checking if the mode is 0, 1 or 2. 0 is for when the user is adding a recipe from a website, 1 is for when the user is editing a recipe and 2 is for when the user is adding a recipe from scratch.
         switch (mode) {
-            case 0:
+            case 0 -> {
                 saveOrEditRecipeButton.setText("Save Recipe");
                 if (wb != null) {
                     //setting the on screen elements to the values scraped from the url
@@ -134,8 +133,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 } else {
                     Toast.makeText(getContext(), "No data on website", Toast.LENGTH_SHORT).show();
                 }
-                break;
-            case 1:
+            }
+            case 1 -> {
                 saveOrEditRecipeButton.setText("Change Recipe");
                 Cursor cursor;
                 try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
@@ -158,15 +157,15 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 cursor.close();
                 //getting the categories from the database and setting the selectedCategories array to the correct values;
                 getSavedCategoryNamesFromDatabase();
-                break;
-            case 2:
+            }
+            case 2 -> {
                 saveOrEditRecipeButton.setText("Save Recipe");
                 getSavedCategoryNamesFromDatabase();
-                break;
-            default:
+            }
+            default -> {
                 saveOrEditRecipeButton.setText("Change Recipe");
                 getSavedCategoryNamesFromDatabase();
-                break;
+            }
         }
 
         //setting the saveRecipeButton to be invisible when the keyboard is up. It does this by checking the height of the screen and the height of the keyboard and if the difference is greater than a certain threshold, it hides the button.

@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     public static float fontSize;
     public static float fontSizeTitles;
 
+    private int selectedItemId = -1;
+
 
     ActivityMainBinding binding;
 
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         //Setting the fragment that will show on app startup
         binding.bottomNavigationView.setSelectedItemId(R.id.homeButton);
-        replaceFragment(new HomePageFragment());
+        replaceFragment(new HomePageFragment(), getClass());
 
         SharedPreferences sharedPreferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
         isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
@@ -111,9 +113,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 if (backStackEntryCount > 1) {
                     // Get the current fragment and check if it implements OnBackPressedListener
                     Fragment currentFragment = fragmentManager.findFragmentById(R.id.frame_layout);
-                    if (currentFragment instanceof OnBackPressedListener) {
+                    if (currentFragment instanceof OnBackPressedListener listener) {
                         // If it does, call handleOnBackPressed() on the fragment
-                        OnBackPressedListener listener = (OnBackPressedListener) currentFragment;
                         if (listener.handleOnBackPressed()) {
                             // If the fragment handles the back button press, return without popping the backstack
                             return;
@@ -139,8 +140,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     //Method for replacing the fragment from the main activity
-    public void replaceFragment(Fragment fragment) {
-        Log.d("MainActivity", "replaceFragment called with fragment: " + fragment.getClass().getName());
+    public void replaceFragment(Fragment fragment, Class<?> callingClass) {
+        Log.d("MainActivity", "replaceFragment called from " + callingClass.getName() + " with fragment: " + fragment.getClass().getName());
+
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.addToBackStack(fragment.getClass().getName());
@@ -183,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             return;
         }
 
-        int selectedItemId = -1;
+        selectedItemId = -1;
         switch (fragment.getClass().getSimpleName()) {
             case "HomePageFragment" -> selectedItemId = R.id.homeButton;
             case "AddRecipeChooserFragment", "BingFragment", "ShowAndEditRecipeFragment", "WebBrowserFragment" ->
@@ -197,6 +200,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         // Check if the selected item in the bottom navigation view is already the same as the item you are going to set
         if (selectedItemId != -1 && binding.bottomNavigationView.getSelectedItemId() != selectedItemId) {
+            //temporarily remove the listener from the bottom navigation view so that the listener doesn't get called when I set the selected item (to update the ui)
+            binding.bottomNavigationView.setOnItemSelectedListener(null);
             binding.bottomNavigationView.setSelectedItemId(selectedItemId);
             binding.bottomNavigationView.setOnItemSelectedListener(item -> {
                 navigateToFragment(item.getItemId());
@@ -216,8 +221,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         fragmentMap.put(R.id.recipesButton, new SavedRecipesFragment());
 
         Fragment fragment = fragmentMap.get(itemId);
+
         if (fragment != null) {
-            replaceFragment(fragment);
+            Log.d("Mainactivity", "navigateToFragment");
+            replaceFragment(fragment, getClass());
         }
     }
 }

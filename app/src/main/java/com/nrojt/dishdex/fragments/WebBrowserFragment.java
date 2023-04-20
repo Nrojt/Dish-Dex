@@ -241,7 +241,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
     @Override
     public void replaceFragment(Fragment fragment) {
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment);
+            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
     }
 
