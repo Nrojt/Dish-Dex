@@ -52,8 +52,10 @@ import javax.net.ssl.HttpsURLConnection;
  * Use the {@link BingFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+//TODO show which sites are supported
+
 public class BingFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer {
-    // Enter a valid subscription key.
     private static String subscriptionKey;
 
     private static final ArrayList<String> bingReturnUrls = new ArrayList<>();
