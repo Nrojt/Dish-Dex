@@ -64,6 +64,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
     private static final ArrayList<Integer> recipeServings = new ArrayList<>();
     private static final ArrayList<String> recipeAccessibleUrl = new ArrayList<>();
     private static final ArrayList<Boolean> recipeUrlSupported = new ArrayList<>();
+    private static final ArrayList<WebScraper> webScrapers = new ArrayList<>();
 
     private RecyclerView bingRecyclerView;
 
@@ -128,6 +129,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
             recipeServings.clear();
             recipeAccessibleUrl.clear();
             recipeUrlSupported.clear();
+            webScrapers.clear();
 
             ExecutorService service = Executors.newSingleThreadExecutor();
             Handler handler = new Handler(Looper.getMainLooper());
@@ -161,11 +163,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                if(recipeUrlSupported.get(position)){
-                    replaceFragment(WebBrowserFragment.newInstance(recipeAccessibleUrl.get(position)));
-                } else {
-                    Toast.makeText(getContext(), "This site is not supported", Toast.LENGTH_SHORT).show();
-                }
+                replaceFragment(WebBrowserFragment.newInstance(recipeAccessibleUrl.get(position)));
             }
         };
 
@@ -188,31 +186,15 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
             recipeServings.add(wb.getServings());
             recipeAccessibleUrl.add(wb.getUrl());
             recipeUrlSupported.add(!wb.isNotSupported()); //if the site is supported, isNotSupported will return false. Here we need to know if the site is supported, so we invert the boolean
+            webScrapers.add(wb);
         }
     }
 
     //Just a proof of concept, should use a recyclerview instead to show all the results
-    private void openLink(String url){
-        WebScraper wb = new WebScraper(url);
-        //creating a new thread for the WebScraper
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-        service.execute(() -> {
-            wb.scrapeWebsite();
-            handler.post(() -> {
-                //checking again to see if the site is reachable
-                if (wb.isNotConnected()) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
-                } else if (wb.isNotReachable()) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Cannot reach this site", Toast.LENGTH_SHORT).show();
-                } else {
-                    //switching to the ShowAndEditRecipeFragment
-                    Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
-                    replaceFragment(showAndEditRecipeFragment);
-                }
-            });
-        });
-        service.shutdown();
+    private void openLink(int position){
+        //switching to the ShowAndEditRecipeFragment
+        Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, webScrapers.get(position), recipeAccessibleUrl.get(position));
+        replaceFragment(showAndEditRecipeFragment);
     }
 
     private void runTheSearch() {
@@ -278,6 +260,6 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
 
     @Override
     public void onItemClick(int position) {
-        openLink(recipeAccessibleUrl.get(position));
+        openLink(position);
     }
 }
