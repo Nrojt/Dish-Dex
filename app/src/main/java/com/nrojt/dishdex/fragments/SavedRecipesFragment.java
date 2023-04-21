@@ -20,6 +20,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
@@ -43,18 +44,12 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     private MyDatabaseHelper db;
 
-    private final ArrayList<String> recipeTitles = new ArrayList<>();
-    private final ArrayList<Integer> recipeCookingTimes = new ArrayList<>();
-    private final ArrayList<Integer> recipeServings = new ArrayList<>();
-    private final ArrayList<Integer> recipeIDs = new ArrayList<>();
+    private final ArrayList<Recipe> recipes = new ArrayList<>();
 
     private SearchView savedRecipesSearchView;
     private RecyclerView savedRecipesRecyclerView;
 
-    private String deletedRecipeTitle = null;
-    private int deletedRecipeID = -1;
-    private int deletedRecipeCookingTime = -1;
-    private int deletedRecipeServings = -1;
+    private Recipe deletedRecipe;
 
     private FragmentManager fragmentManager;
 
@@ -106,7 +101,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         //Adding padding to the recyclerView and setting the adapter and layout manager
         savedRecipesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipeTitles, recipeCookingTimes, recipeServings, this);
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this);
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -137,26 +132,17 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
                 //Remove swiped item from list and notify the RecyclerView
                 int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.RIGHT) {
-                    deletedRecipeTitle = recipeTitles.get(position);
-                    deletedRecipeID = recipeIDs.get(position);
-                    deletedRecipeCookingTime = recipeCookingTimes.get(position);
-                    deletedRecipeServings = recipeServings.get(position);
+                    deletedRecipe = recipes.get(position);
+                    recipes.remove(position);
 
-                    recipeTitles.remove(position);
-                    recipeIDs.remove(position);
-                    recipeCookingTimes.remove(position);
-                    recipeServings.remove(position);
 
                     savedRecipesCustomRecyclerAdapter.notifyItemRemoved(position);
 
                     //This snackbar allows the user to undo the deletion
-                    Snackbar snackbar = Snackbar.make(savedRecipesRecyclerView, deletedRecipeTitle, Snackbar.LENGTH_LONG)
+                    Snackbar snackbar = Snackbar.make(savedRecipesRecyclerView, deletedRecipe.getRecipeTitle(), Snackbar.LENGTH_LONG)
                             .setAction("Undo", v -> {
                                 //recipeTitles.add(position, deletedRecipe);
-                                recipeTitles.add(position, deletedRecipeTitle);
-                                recipeIDs.add(position, deletedRecipeID);
-                                recipeCookingTimes.add(position, deletedRecipeCookingTime);
-                                recipeServings.add(position, deletedRecipeServings);
+                                recipes.add(position, deletedRecipe);
                                 savedRecipesCustomRecyclerAdapter.notifyItemInserted(position);
                             });
 
@@ -165,7 +151,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
                         @Override
                         public void onDismissed(Snackbar transientBottomBar, int event) {
                             if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                                db.deleteRecipe(deletedRecipeID);
+                                db.deleteRecipe(deletedRecipe.getRecipeID());
+                                db.deleteRecipeCategories(deletedRecipe.getRecipeID());
                             }
                         }
                     });
@@ -186,19 +173,15 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     //This method is called when the user enters text into the search bar and it filters the recipes based on their titles
     private void filter(String newText) {
         //TODO filter by category once that is implemented, not gonna make this before opt2 though
-        ArrayList<String> filteredRecipeTitles = new ArrayList<>();
-        ArrayList<Integer> filteredRecipeCookingTimes = new ArrayList<>();
-        ArrayList<Integer> filteredRecipeServings = new ArrayList<>();
+        ArrayList<Recipe> filteredRecipes = new ArrayList<>();
 
-        for (String recipeTitle : recipeTitles) {
-            if (recipeTitle.toLowerCase().contains(newText.toLowerCase())) {
-                filteredRecipeTitles.add(recipeTitle);
-                filteredRecipeCookingTimes.add(recipeCookingTimes.get(recipeTitles.indexOf(recipeTitle)));
-                filteredRecipeServings.add(recipeServings.get(recipeTitles.indexOf(recipeTitle)));
+        for (Recipe recipe : recipes) {
+            if (recipe.getRecipeTitle().toLowerCase().contains(newText.toLowerCase())) {
+                filteredRecipes.add(recipe);
             }
         }
 
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipeTitles, filteredRecipeCookingTimes, filteredRecipeServings, this);
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this);
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
@@ -207,22 +190,17 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     private void getRecipesFromDatabase() {
 
         //Clearing the lists so that the data is not duplicated
-        recipeIDs.clear();
-        recipeTitles.clear();
-        recipeCookingTimes.clear();
-        recipeServings.clear();
+        recipes.clear();
 
         //Getting the data from the database
-        Cursor cursor = db.readDataForSavedRecipesRecyclerView();
+        Cursor cursor = db.readAllDataFromSavedRecipes();
 
         if (cursor.getCount() == 0) {
             Toast.makeText(getContext(), "No saved recipes found.", Toast.LENGTH_SHORT).show();
         } else {
             while (cursor.moveToNext()) {
-                recipeIDs.add(cursor.getInt(0));
-                recipeTitles.add(cursor.getString(1));
-                recipeCookingTimes.add(cursor.getInt(2));
-                recipeServings.add(cursor.getInt(3));
+                Recipe recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true);
+                recipes.add(recipe);
             }
         }
         cursor.close();
@@ -243,7 +221,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
             }
         });
         actionMap.put(R.id.savedRecipesFabBrowser, () -> replaceFragment(new WebBrowserFragment()));
-        actionMap.put(R.id.savedRecipesFabAddEmptyRecipe, () -> replaceFragment(ShowAndEditRecipeFragment.newInstance(2, -1, null, null)));
+        actionMap.put(R.id.savedRecipesFabAddEmptyRecipe, () -> replaceFragment(ShowAndEditRecipeFragment.newInstance(2, new Recipe(), null, null)));
         actionMap.put(R.id.savedRecipesFabAllCategories, () -> replaceFragment(new SavedCategoriesFragment()));
 
         // Set the click listener for menu items
@@ -263,7 +241,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     //This code runs when a recipe is clicked
     @Override
     public void onItemClick(int position) {
-        Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipeIDs.get(position), null, null);
+        Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipes.get(position), null, null);
         replaceFragment(showAndEditRecipeFragment);
     }
 

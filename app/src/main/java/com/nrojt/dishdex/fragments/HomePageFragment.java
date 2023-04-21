@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 
@@ -36,9 +37,8 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     private int timeCategoryID;
     private int timeRecipeID;
 
-    private String recipeName;
-    private int recipeServings;
-    private int recipeCookingTime;
+    private Recipe recipe;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -87,6 +87,11 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
+        //Getting a random recipeID based on the time of day
+        getRandomRecipeIDBasedOnTime();
+
+        //Getting the recipe information from the database
+        getInformationFromRecipe();
 
         recipeTimeCardView = view.findViewById(R.id.recipeTimeCardView);
         recipeTimeTitleTextView = view.findViewById(R.id.recipeTimeTitleTextView);
@@ -112,20 +117,15 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         timeTextView.setText("And the time is " + currentTime);
         timeTextView.setTextSize(MainActivity.fontSize);
 
-        //Getting a random recipeID based on the time of day
-        getRandomRecipeIDBasedOnTime();
+        if(recipe != null) {
+            recipeTimeTitleTextView.setText(recipe.getRecipeTitle());
+            recipeTimeTitleTextView.setTextSize(MainActivity.fontSizeTitles);
 
-        //Getting the recipe information from the database
-        getInformationFromRecipe();
-
-
-        recipeTimeTitleTextView.setText(recipeName);
-        recipeTimeTitleTextView.setTextSize(MainActivity.fontSizeTitles);
-
-        recipeTimeCookingTimeTextView.setText(recipeCookingTime + " minutes");
-        recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSize);
-        recipeTimeServingsTextView.setText("Servings: " + recipeServings);
-        recipeTimeServingsTextView.setTextSize(MainActivity.fontSize);
+            recipeTimeCookingTimeTextView.setText(recipe.getRecipeCookingTime() + " minutes");
+            recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSize);
+            recipeTimeServingsTextView.setText("Servings: " + recipe.getRecipeServings());
+            recipeTimeServingsTextView.setTextSize(MainActivity.fontSize);
+        }
 
 
         if (timeRecipeID == -1) {
@@ -133,7 +133,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         } else {
             recipeTimeCardView.setVisibility(View.VISIBLE);
             recipeTimeCardView.setOnClickListener(v -> {
-                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, timeRecipeID, null, null);
+                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipe , null, null);
                 replaceFragment(showAndEditRecipeFragment);
             });
         }
@@ -159,7 +159,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         } else if (currentTime.isBefore(lateNightTime)) {
             timeCategoryID = 5;
         } else {
-            timeCategoryID = 5;
+            timeCategoryID = 0;
         }
 
         MyDatabaseHelper db = new MyDatabaseHelper(getContext());
@@ -175,9 +175,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         if (timeRecipeID != -1) {
             Cursor cursor = db.readAllDataFromSavedRecipesWhereRecipeID(timeRecipeID);
             cursor.moveToFirst();
-            recipeName = cursor.getString(1);
-            recipeCookingTime = cursor.getInt(2);
-            recipeServings = cursor.getInt(3);
+            recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true);
             cursor.close();
         }
 

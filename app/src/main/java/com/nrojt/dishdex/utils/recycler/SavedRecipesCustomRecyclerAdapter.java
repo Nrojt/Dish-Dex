@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 
 import java.util.ArrayList;
@@ -20,17 +21,14 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
     //Interface (polymorphism)
     private final RecyclerViewInterface listener;
     private final Context context;
-    private final ArrayList<String> recipeTitles;
-    private final ArrayList<Integer> recipeCookingTimes;
-    private final ArrayList<Integer> recipeServings;
+
+    private final ArrayList<Recipe> recipes;
 
     //Constructor
-    public SavedRecipesCustomRecyclerAdapter(Context context, ArrayList<String> recipeTitles, ArrayList<Integer> recipeCookingTimes, ArrayList<Integer> recipeServings, RecyclerViewInterface listener) {
+    public SavedRecipesCustomRecyclerAdapter(Context context, ArrayList<Recipe> recipes, RecyclerViewInterface listener) {
         this.listener = listener;
         this.context = context;
-        this.recipeTitles = recipeTitles;
-        this.recipeCookingTimes = recipeCookingTimes;
-        this.recipeServings = recipeServings;
+        this.recipes = recipes;
     }
 
     //Inflate the view
@@ -45,9 +43,9 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
     //Setting the text for each recipe card
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.recipeTitleText.setText(recipeTitles.get(position));
-        holder.recipeCookingTimeText.setText(recipeCookingTimes.get(position) + " minutes");
-        holder.recipeServingsText.setText(recipeServings.get(position) + " servings");
+        holder.recipeTitleText.setText(recipes.get(position).getRecipeTitle());
+        holder.recipeCookingTimeText.setText(recipes.get(position).getRecipeCookingTime() + " minutes");
+        holder.recipeServingsText.setText(recipes.get(position).getRecipeServings() + " servings");
 
         holder.recipeTitleText.setTextSize(MainActivity.fontSizeTitles);
         holder.recipeCookingTimeText.setTextSize(MainActivity.fontSize);
@@ -56,7 +54,7 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
 
     @Override
     public int getItemCount() {
-        return recipeTitles.size();
+        return recipes.size();
     }
 
     //Inflate the layout for each recipe card

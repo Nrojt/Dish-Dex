@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Category;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 
 import java.util.ArrayList;
@@ -19,14 +20,12 @@ import java.util.ArrayList;
 public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<SavedCategoriesCustomRecyclerAdapter.MyViewHolder> {
     private final RecyclerViewInterface listener;
     private final Context context;
-    private final ArrayList<String> categoryNames;
-    private final ArrayList<Integer> categoryIDs;
+    private final ArrayList<Category> categories;
 
-    public SavedCategoriesCustomRecyclerAdapter(Context context, ArrayList<Integer> categoryIDs, ArrayList<String> categoryNames, RecyclerViewInterface listener) {
+    public SavedCategoriesCustomRecyclerAdapter(Context context, ArrayList<Category> categories, RecyclerViewInterface listener) {
         this.listener = listener;
         this.context = context;
-        this.categoryNames = categoryNames;
-        this.categoryIDs = categoryIDs;
+        this.categories = categories;
     }
 
     @NonNull
@@ -39,7 +38,7 @@ public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<S
 
     @Override
     public void onBindViewHolder(@NonNull SavedCategoriesCustomRecyclerAdapter.MyViewHolder holder, int position) {
-        holder.categoryTitleText.setText(categoryNames.get(position));
+        holder.categoryTitleText.setText(categories.get(position).getCategoryName());
         holder.categoryTitleText.setTextSize(MainActivity.fontSizeTitles);
     }
 
@@ -66,6 +65,6 @@ public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<S
 
     @Override
     public int getItemCount() {
-        return categoryNames.size();
+        return categories.size();
     }
 }

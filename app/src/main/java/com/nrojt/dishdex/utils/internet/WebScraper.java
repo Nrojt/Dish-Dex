@@ -66,12 +66,12 @@ public class WebScraper implements Serializable {
         return recipeTitle;
     }
 
-    public StringBuilder getRecipeText() {
-        return recipeText;
+    public String getRecipeText() {
+        return recipeText.toString();
     }
 
-    public StringBuilder getIngredientText() {
-        return ingredientText;
+    public String getIngredientText() {
+        return ingredientText.toString();
     }
 
     //method to scrape the website

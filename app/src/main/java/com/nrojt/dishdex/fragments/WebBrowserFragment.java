@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
 import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
@@ -185,7 +186,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
                                     Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
                                 }
                                 //switching to the showAndEditRecipeFragment
-                                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
+                                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, new Recipe(), wb, url);
                                 replaceFragment(showAndEditRecipeFragment);
                             }
                         });

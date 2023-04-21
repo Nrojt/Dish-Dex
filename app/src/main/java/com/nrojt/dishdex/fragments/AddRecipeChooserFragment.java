@@ -108,7 +108,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
                                 Toast.makeText(getActivity().getApplicationContext(), "This site is unsupported", Toast.LENGTH_SHORT).show();
                             }
                             //switching to the ShowAndEditRecipeFragment
-                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, wb, url);
+                            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, null, wb, url);
                             replaceFragment(showAndEditRecipeFragment);
                         }
                     });
@@ -134,7 +134,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
         });
 
         emptyRecipeButton.setOnClickListener(v -> {
-            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, -1, null, null);
+            Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, null, null, null);
             replaceFragment(showAndEditRecipeFragment);
         });
 

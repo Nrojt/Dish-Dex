@@ -74,44 +74,19 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return recipeID;
     }
 
-    //Reading all data from a table
-    public Cursor readAllDataFromTable(String tableName) {
+    // Reading all data from the saved_recipes table
+    public Cursor readAllDataFromSavedRecipes() {
         Cursor cursor = null;
-        String query = "SELECT * FROM " + tableName;
+        String query = "SELECT * FROM saved_recipes";
         SQLiteDatabase db = this.getReadableDatabase();
         if (db != null) {
             cursor = db.rawQuery(query, null);
         } else {
-            Log.e("Database", "Database is null");
+            Log.e("Database", "Failed to read data from saved_recipes");
         }
         return cursor;
     }
 
-    //Getting the data from the database for the saved recipes recycler view
-    public Cursor readDataForSavedRecipesRecyclerView() {
-        Cursor cursor = null;
-        String query = "SELECT recipeID, recipeName, cookingTime, servings FROM saved_recipes";
-        SQLiteDatabase db = this.getReadableDatabase();
-        if (db != null) {
-            cursor = db.rawQuery(query, null);
-        } else {
-            Log.e("Database", "Database is null");
-        }
-        return cursor;
-    }
-
-    //Getting the data from the database for the saved categories recycler view
-    public Cursor readDataForSavedCategoriesRecyclerView() {
-        Cursor cursor = null;
-        String query = "SELECT categoryID, categoryName FROM category";
-        SQLiteDatabase db = this.getReadableDatabase();
-        if (db != null) {
-            cursor = db.rawQuery(query, null);
-        } else {
-            Log.e("Database", "Database is null");
-        }
-        return cursor;
-    }
 
     //Getting the data from a specific recipe for ShowAndEditRecipeActivity to show a saved recipe
     public Cursor readAllDataFromSavedRecipesWhereRecipeID(int recipeID) {
@@ -238,11 +213,13 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query("recipe_categories", columns, selection, selectionArgs, null, null, null);
 
         if (cursor.getCount() > 0) {
+            System.out.println("The combination of recipeID and categoryID already exists in the recipe_categories table, so don't insert a new row");
             // The combination of recipeID and categoryID already exists in the recipe_categories table, so don't insert a new row
             cursor.close();
             db.close();
             return false;
         } else {
+            System.out.println("The combination of recipeID and categoryID doesn't exist yet in the recipe_categories table, so insert a new row");
             // The combination of recipeID and categoryID doesn't exist yet in the recipe_categories table, so insert a new row
             long result = db.insert("recipe_categories", null, cv);
             cursor.close();

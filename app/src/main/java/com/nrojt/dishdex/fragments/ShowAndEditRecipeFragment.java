@@ -5,7 +5,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,8 @@ import androidx.fragment.app.FragmentManager;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Category;
+import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 
@@ -29,7 +30,7 @@ import java.util.Objects;
 
 public class ShowAndEditRecipeFragment extends Fragment implements FragmentManager.OnBackStackChangedListener {
     private Button saveOrEditRecipeButton;
-    private EditText recipeTextOnScreen;
+    private EditText instructionTextOnScreen;
     private EditText ingredientTextOnScreen;
     private TextView chooseCategoriesTextView;
     private EditText cookingTimeTextOnScreen;
@@ -42,34 +43,33 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     private FragmentManager fragmentManager;
 
     // for getting and selecting categories
-    private ArrayList<String> categoryNames = new ArrayList<>();
-    private ArrayList<Integer> categoryIDs = new ArrayList<>();
-    private ArrayList<Integer> savedCategoryIDs = new ArrayList<>();
+    private final ArrayList<Category> categories = new ArrayList<>();
     private boolean[] selectedCategories;
+    private final ArrayList<Integer> savedCategoryIDs = new ArrayList<>();
 
 
     // the fragment initialization parameters
     private static final String MODE = "mode";
-    private static final String RECIPE_ID = "recipeId";
+    private static final String RECIPE = "recipe";
     private static final String WEB_SCRAPER = "WebScraper";
     private static final String URL = "Url";
 
 
     private int mode;
-    private int recipeId;
     private String url = "";
     private WebScraper wb;
     private int recipeIDFromDatabase;
+    private Recipe recipe;
 
     public ShowAndEditRecipeFragment() {
         // Required empty public constructor
     }
 
-    public static ShowAndEditRecipeFragment newInstance(int mode, int recipeId, WebScraper wb, String url) {
+    public static ShowAndEditRecipeFragment newInstance(int mode, Recipe recipe, WebScraper wb, String url) {
         ShowAndEditRecipeFragment fragment = new ShowAndEditRecipeFragment();
         Bundle args = new Bundle();
         args.putInt(MODE, mode);
-        args.putInt(RECIPE_ID, recipeId);
+        args.putSerializable(RECIPE, recipe);
         args.putSerializable(WEB_SCRAPER, wb);
         args.putString(URL, url);
         fragment.setArguments(args);
@@ -81,7 +81,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mode = getArguments().getInt(MODE);
-            recipeId = getArguments().getInt(RECIPE_ID);
+            recipe = (Recipe) getArguments().getSerializable(RECIPE);
             wb = (WebScraper) getArguments().getSerializable("WebScraper");
             url = getArguments().getString("Url");
         }
@@ -96,7 +96,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         View view = inflater.inflate(R.layout.fragment_show_and_edit_recipe, container, false);
 
         //inflating the on screen elements
-        recipeTextOnScreen = view.findViewById(R.id.recipeTextOnScreen);
+        instructionTextOnScreen = view.findViewById(R.id.recipeTextOnScreen);
         ingredientTextOnScreen = view.findViewById(R.id.ingredientTextOnScreen);
         cookingTimeTextOnScreen = view.findViewById(R.id.cookingTimeTextOnScreen);
         servingsTextOnScreen = view.findViewById(R.id.servingsTextOnScreen);
@@ -107,7 +107,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         chooseCategoriesTextView = view.findViewById(R.id.chooseCategoriesTextView);
 
         //setting the text size of the on screen elements
-        recipeTextOnScreen.setTextSize(MainActivity.fontSize);
+        instructionTextOnScreen.setTextSize(MainActivity.fontSize);
         ingredientTextOnScreen.setTextSize(MainActivity.fontSize);
         cookingTimeTextOnScreen.setTextSize(MainActivity.fontSize);
         servingsTextOnScreen.setTextSize(MainActivity.fontSize);
@@ -124,7 +124,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 saveOrEditRecipeButton.setText("Save Recipe");
                 if (wb != null) {
                     //setting the on screen elements to the values scraped from the url
-                    recipeTextOnScreen.setText(wb.getRecipeText());
+                    instructionTextOnScreen.setText(wb.getRecipeText());
                     ingredientTextOnScreen.setText(wb.getIngredientText());
                     cookingTimeTextOnScreen.setText(String.valueOf(wb.getCookingTime()));
                     servingsTextOnScreen.setText(String.valueOf(wb.getServings()));
@@ -136,31 +136,30 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             }
             case 1 -> {
                 saveOrEditRecipeButton.setText("Change Recipe");
-                Cursor cursor;
-                try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
-                    cursor = db.readAllDataFromSavedRecipesWhereRecipeID(recipeId);
+                recipeTitleTextOnScreen.setText(recipe.getRecipeTitle());
+                cookingTimeTextOnScreen.setText(String.valueOf(recipe.getRecipeCookingTime()));
+                servingsTextOnScreen.setText(String.valueOf(recipe.getRecipeServings()));
+                ingredientTextOnScreen.setText(recipe.getRecipeIngredients());
+                instructionTextOnScreen.setText(recipe.getRecipeInstructions());
+                noteTextOnScreen.setText(recipe.getRecipeNotes());
+                urlTextOnScreen.setText(recipe.getRecipeUrl());
 
-                    if (cursor.getCount() == 0) {
-                        Toast.makeText(getContext(), "No data", Toast.LENGTH_SHORT).show();
-                    } else {
-                        while (cursor.moveToNext()) {
-                            recipeTitleTextOnScreen.setText(cursor.getString(1));
-                            cookingTimeTextOnScreen.setText(cursor.getString(2));
-                            servingsTextOnScreen.setText(cursor.getString(3));
-                            ingredientTextOnScreen.setText(cursor.getString(4));
-                            recipeTextOnScreen.setText(cursor.getString(5));
-                            noteTextOnScreen.setText(cursor.getString(6));
-                            urlTextOnScreen.setText(cursor.getString(7));
-                        }
-                    }
-                }
-                cursor.close();
                 //getting the categories from the database and setting the selectedCategories array to the correct values;
                 getSavedCategoryNamesFromDatabase();
             }
             case 2 -> {
                 saveOrEditRecipeButton.setText("Save Recipe");
                 getSavedCategoryNamesFromDatabase();
+            }
+            case 3 -> {
+                saveOrEditRecipeButton.setText("Save Recipe");
+                recipeTitleTextOnScreen.setText(recipe.getRecipeTitle());
+                cookingTimeTextOnScreen.setText(String.valueOf(recipe.getRecipeCookingTime()));
+                servingsTextOnScreen.setText(String.valueOf(recipe.getRecipeServings()));
+                ingredientTextOnScreen.setText(recipe.getRecipeIngredients());
+                instructionTextOnScreen.setText(recipe.getRecipeInstructions());
+                noteTextOnScreen.setText(recipe.getRecipeNotes());
+                urlTextOnScreen.setText(recipe.getRecipeUrl());
             }
             default -> {
                 saveOrEditRecipeButton.setText("Change Recipe");
@@ -200,7 +199,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
 
                 String recipeTitle = recipeTitleTextOnScreen.getText().toString().trim();
                 String ingredients = ingredientTextOnScreen.getText().toString().trim();
-                String recipeSteps = recipeTextOnScreen.getText().toString().trim();
+                String recipeSteps = instructionTextOnScreen.getText().toString().trim();
                 String notes = noteTextOnScreen.getText().toString().trim();
                 String url = urlTextOnScreen.getText().toString().trim();
 
@@ -233,12 +232,13 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 }
 
                 switch (mode) {
-                    case 0, 2 -> {
+                    case 0, 2, 3 -> {
                         // Add recipe to database
                         recipeIDFromDatabase = db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
                         for (int i = 0; i < selectedCategories.length; i++) {
+                            System.out.println("selectedCategories[" + i + "] = " + selectedCategories[i]);
                             if (selectedCategories[i]) {
-                                db.addRecipeCategory(recipeIDFromDatabase, categoryIDs.get(i));
+                                db.addRecipeCategory(recipeIDFromDatabase, categories.get(i).getCategoryID());
                             }
                         }
                         if (recipeIDFromDatabase != -1) {
@@ -247,15 +247,16 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                     }
                     default -> {
                         // Update recipe in database
-                        db.updateRecipe(recipeId, recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
-                        db.deleteRecipeCategories(recipeId);
+                        db.updateRecipe(recipe.getRecipeID(), recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
                         for (int i = 0; i < selectedCategories.length; i++) {
+                            System.out.println("selectedCategories[" + i + "] = " + selectedCategories[i] + " for " + recipe.getRecipeTitle() );
+
                             if (selectedCategories[i]) {
                                 // The category is selected, so add it to the recipe
-                                db.addRecipeCategory(recipeId, categoryIDs.get(i));
+                                db.addRecipeCategory(recipe.getRecipeID(), categories.get(i).getCategoryID());
                             } else {
                                 // The category is not selected, so remove it from the recipe
-                                db.removeRecipeCategory(recipeId, categoryIDs.get(i));
+                                db.removeRecipeCategory(recipe.getRecipeID(), categories.get(i).getCategoryID());
                             }
                         }
                         if (recipeIDFromDatabase != -1) {
@@ -272,24 +273,32 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle("Choose Categories");
 
-            //setting the multiChoiceItems to the categories in the database
-            builder.setMultiChoiceItems(categoryNames.toArray(new String[0]), selectedCategories, (dialog, which, isChecked) -> selectedCategories[which] = isChecked);
+            // Convert the categories ArrayList to an array of type CharSequence
+            CharSequence[] categoriesArray = new CharSequence[categories.size()];
+            for (int i = 0; i < categories.size(); i++) {
+                categoriesArray[i] = categories.get(i).getCategoryName(); // Assuming each Category object has a getName() method
+            }
+
+            // Set the multi-choice items in the dialog builder
+            builder.setMultiChoiceItems(categoriesArray, selectedCategories, (dialog, which, isChecked) -> selectedCategories[which] = isChecked);
+
 
             //setting the positive button to save the categories
             builder.setPositiveButton("Save", (dialog, which) -> {
                 //creating a new ArrayList to store the selected categories
-                ArrayList<String> selectedCategoriesList = new ArrayList<>();
+                ArrayList<Category> selectedCategoriesList = new ArrayList<>();
                 for (int i = 0; i < selectedCategories.length; i++) {
                     if (selectedCategories[i]) {
-                        selectedCategoriesList.add(categoryNames.get(i));
-                        selectedCategories[i] = true;
-                    } else {
-                        selectedCategories[i] = false;
+                        selectedCategoriesList.add(categories.get(i));
                     }
                 }
 
                 //setting the text of the chooseCategoriesTextView to the selected categories
-                chooseCategoriesTextView.setText(TextUtils.join(", ", selectedCategoriesList));
+                ArrayList<String> selectedCategoryNames = new ArrayList<>();
+                for (Category category : selectedCategoriesList) {
+                    selectedCategoryNames.add(category.getCategoryName());
+                }
+                chooseCategoriesTextView.setText(TextUtils.join(", ", selectedCategoryNames));
             });
 
             //setting the negative button to cancel the dialog
@@ -310,11 +319,11 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 Toast.makeText(getContext(), "No Categories", Toast.LENGTH_SHORT).show();
             } else {
                 while (cursor.moveToNext()) {
-                    categoryIDs.add(cursor.getInt(1));
-                    categoryNames.add(cursor.getString(0));
+                    Category category = new Category(cursor.getInt(1), cursor.getString(0));
+                    categories.add(category);
                 }
             }
-            selectedCategories = new boolean[categoryIDs.size()];
+            selectedCategories = new boolean[categories.size()];
             cursor.close();
         }
     }
@@ -322,7 +331,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     //Getting the saved categoryNames and categoryIDs from the database
     private void getSavedCategoryNamesFromDatabase() {
         try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
-            Cursor cursor = db.getAllCategoriesWhereRecipeID(recipeId);
+            Cursor cursor = db.getAllCategoriesWhereRecipeID(recipe.getRecipeID());
             while (cursor.moveToNext()) {
                 savedCategoryIDs.add(cursor.getInt(0));
             }
@@ -331,15 +340,14 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             e.printStackTrace();
         }
         //Setting the selectedCategories array to true for the categories that are already saved
-        for (int i = 0; i < categoryIDs.size(); i++) {
+        for (int i = 0; i < categories.size(); i++) {
             for (int j = 0; j < savedCategoryIDs.size(); j++) {
-                if (Objects.equals(categoryIDs.get(i), savedCategoryIDs.get(j))) {
+                if (Objects.equals(categories.get(i).getCategoryID(), savedCategoryIDs.get(j))) {
                     selectedCategories[i] = true;
                 }
             }
         }
     }
-
 
     @Override
     public void onBackStackChanged() {

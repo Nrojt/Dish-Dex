@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Category;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
@@ -37,11 +38,9 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
 
     private MyDatabaseHelper db;
 
-    private ArrayList<String> categoryNames = new ArrayList<>();
-    private ArrayList<Integer> categoryIDs = new ArrayList<>();
+    private ArrayList<Category> categories = new ArrayList<>();
 
-    private String deletedCategoryName = null;
-    private int deletedCategoryID = -1;
+    private Category deletedCategory;
 
     FragmentManager fragmentManager;
 
@@ -84,7 +83,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         savedCategoriesSearchView = view.findViewById(R.id.savedCategoriesSearchView);
 
         savedCategoriesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), categoryIDs, categoryNames, this);
+        SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), categories, this);
         savedCategoriesRecyclerView.setAdapter(savedCategoriesCustomRecyclerAdapter);
         savedCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -116,21 +115,17 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
                 //Remove swiped item from list and notify the RecyclerView
                 int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.RIGHT) {
-                    if (categoryIDs.get(position) > 6) {
-                        deletedCategoryName = categoryNames.get(position);
-                        deletedCategoryID = categoryIDs.get(position);
-
-                        categoryNames.remove(position);
-                        categoryIDs.remove(position);
+                    if (categories.get(position).getCategoryID() > 6) {
+                        deletedCategory = categories.get(position);
+                        categories.remove(deletedCategory);
 
                         savedCategoriesCustomRecyclerAdapter.notifyItemRemoved(position);
 
                         //This snackbar allows the user to undo the deletion
-                        Snackbar snackbar = Snackbar.make(savedCategoriesRecyclerView, deletedCategoryName, Snackbar.LENGTH_LONG)
+                        Snackbar snackbar = Snackbar.make(savedCategoriesRecyclerView, deletedCategory.getCategoryName(), Snackbar.LENGTH_LONG)
                                 .setAction("Undo", v -> {
                                     //recipeTitles.add(position, deletedRecipe);
-                                    categoryNames.add(position, deletedCategoryName);
-                                    categoryIDs.add(position, deletedCategoryID);
+                                    categories.add(position, deletedCategory);
                                     savedCategoriesCustomRecyclerAdapter.notifyItemInserted(position);
                                 });
 
@@ -139,7 +134,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
                             @Override
                             public void onDismissed(Snackbar transientBottomBar, int event) {
                                 if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                                    db.deleteCategory(deletedCategoryID);
+                                    db.deleteCategory(deletedCategory.getCategoryID());
                                 }
                             }
                         });
@@ -163,32 +158,31 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
 
     private void filter(String newText) {
         //TODO filter by category once that is implemented, not gonna make this before opt2 though
-        ArrayList<String> filteredCategoryTitles = new ArrayList<>();
-        ArrayList<Integer> filteredCategoryIDs = new ArrayList<>();
+        ArrayList<Category> filteredCategories = new ArrayList<>();
 
 
-        for (String categoryTitle : categoryNames) {
-            if (categoryTitle.toLowerCase().contains(newText.toLowerCase())) {
-                filteredCategoryTitles.add(categoryTitle);
-                filteredCategoryIDs.add(categoryIDs.get(categoryNames.indexOf(categoryTitle)));
+        for (Category category : categories) {
+            if (category.getCategoryName().toLowerCase().contains(newText.toLowerCase())) {
+                filteredCategories.add(category);
             }
         }
 
-        SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), filteredCategoryIDs, filteredCategoryTitles, this);
+        SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), filteredCategories, this);
         savedCategoriesRecyclerView.setAdapter(savedCategoriesCustomRecyclerAdapter);
         savedCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     private void getCategoriesFromDatabase() {
         //Getting the data from the database
-        Cursor cursor = db.readDataForSavedCategoriesRecyclerView();
+        Cursor cursor = db.readAllDataFromCategories();
 
         if (cursor.getCount() == 0) {
             Toast.makeText(getContext(), "No categories found.", Toast.LENGTH_SHORT).show();
         } else {
             while (cursor.moveToNext()) {
-                categoryIDs.add(cursor.getInt(0));
-                categoryNames.add(cursor.getString(1));
+                Category category = new Category(cursor.getInt(1), cursor.getString(0));
+                System.out.println("Category: " + cursor.getString(0));
+                categories.add(category);
             }
         }
         cursor.close();

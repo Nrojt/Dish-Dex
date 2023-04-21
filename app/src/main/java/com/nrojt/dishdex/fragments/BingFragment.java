@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 import com.nrojt.dishdex.utils.internet.SearchResults;
@@ -59,12 +60,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
     private static String subscriptionKey;
 
     private static final ArrayList<String> bingReturnUrls = new ArrayList<>();
-    private static final ArrayList<String> recipeTitles = new ArrayList<>();
-    private static final ArrayList<Integer> recipeCookingTimes = new ArrayList<>();
-    private static final ArrayList<Integer> recipeServings = new ArrayList<>();
-    private static final ArrayList<String> recipeAccessibleUrl = new ArrayList<>();
-    private static final ArrayList<Boolean> recipeUrlSupported = new ArrayList<>();
-    private static final ArrayList<WebScraper> webScrapers = new ArrayList<>();
+    private static final ArrayList<Recipe> recipes = new ArrayList<>();
 
     private RecyclerView bingRecyclerView;
 
@@ -116,7 +112,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
 
         bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
         bingRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedRecipesCustomRecyclerAdapter adapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipeTitles, recipeCookingTimes, recipeServings, this);
+        SavedRecipesCustomRecyclerAdapter adapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this);
         bingRecyclerView.setAdapter(adapter);
         bingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -124,12 +120,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         if(searchTerm != null) {
             bingNotificationTextView.setText("Searching for " + searchTerm + "...");
             bingReturnUrls.clear();
-            recipeTitles.clear();
-            recipeCookingTimes.clear();
-            recipeServings.clear();
-            recipeAccessibleUrl.clear();
-            recipeUrlSupported.clear();
-            webScrapers.clear();
+            recipes.clear();
 
             ExecutorService service = Executors.newSingleThreadExecutor();
             Handler handler = new Handler(Looper.getMainLooper());
@@ -163,7 +154,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                replaceFragment(WebBrowserFragment.newInstance(recipeAccessibleUrl.get(position)));
+                replaceFragment(WebBrowserFragment.newInstance(recipes.get(position).getRecipeUrl()));
             }
         };
 
@@ -181,19 +172,15 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         if (wb.isNotConnected() || wb.isNotReachable()) {
             Log.e("BingFragment", "Not connected to the internet or cannot reach this site: " + url);
         } else {
-            recipeTitles.add(wb.getRecipeTitle());
-            recipeCookingTimes.add(wb.getCookingTime());
-            recipeServings.add(wb.getServings());
-            recipeAccessibleUrl.add(wb.getUrl());
-            recipeUrlSupported.add(!wb.isNotSupported()); //if the site is supported, isNotSupported will return false. Here we need to know if the site is supported, so we invert the boolean
-            webScrapers.add(wb);
+            Recipe recipe = new Recipe(wb.getRecipeTitle(), wb.getIngredientText(), wb.getRecipeText(), "", wb.getUrl(), -1, wb.getCookingTime(), wb.getServings(), !wb.isNotSupported()); //if the site is supported, isNotSupported will return false. Here we need to know if the site is supported, so we invert the boolean
+            recipes.add(recipe);
         }
     }
 
     //Just a proof of concept, should use a recyclerview instead to show all the results
     private void openLink(int position){
         //switching to the ShowAndEditRecipeFragment
-        Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(0, -1, webScrapers.get(position), recipeAccessibleUrl.get(position));
+        Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(3, recipes.get(position), null, recipes.get(position).getRecipeUrl());
         replaceFragment(showAndEditRecipeFragment);
     }
 
