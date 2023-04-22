@@ -22,13 +22,14 @@ import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
+import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class ShowAndEditRecipeFragment extends Fragment implements FragmentManager.OnBackStackChangedListener {
+public class ShowAndEditRecipeFragment extends Fragment implements FragmentManager.OnBackStackChangedListener, FragmentReplacer {
     private Button saveOrEditRecipeButton;
     private EditText instructionTextOnScreen;
     private EditText ingredientTextOnScreen;
@@ -39,6 +40,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
 
     private EditText noteTextOnScreen;
     private EditText urlTextOnScreen;
+
+    private TextView isUrlSupportedTextView;
 
     private FragmentManager fragmentManager;
 
@@ -105,24 +108,27 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         saveOrEditRecipeButton = view.findViewById(R.id.saveOrEditRecipeButton);
         urlTextOnScreen = view.findViewById(R.id.urlTextOnScreen);
         chooseCategoriesTextView = view.findViewById(R.id.chooseCategoriesTextView);
+        isUrlSupportedTextView = view.findViewById(R.id.isUrlSupportedTextView);
 
         //setting the text size of the on screen elements
-        instructionTextOnScreen.setTextSize(MainActivity.fontSize);
-        ingredientTextOnScreen.setTextSize(MainActivity.fontSize);
-        cookingTimeTextOnScreen.setTextSize(MainActivity.fontSize);
-        servingsTextOnScreen.setTextSize(MainActivity.fontSize);
+        instructionTextOnScreen.setTextSize(MainActivity.fontSizeText);
+        ingredientTextOnScreen.setTextSize(MainActivity.fontSizeText);
+        cookingTimeTextOnScreen.setTextSize(MainActivity.fontSizeText);
+        servingsTextOnScreen.setTextSize(MainActivity.fontSizeText);
         recipeTitleTextOnScreen.setTextSize(MainActivity.fontSizeTitles);
-        noteTextOnScreen.setTextSize(MainActivity.fontSize);
-        urlTextOnScreen.setTextSize(MainActivity.fontSize);
-        chooseCategoriesTextView.setTextSize(MainActivity.fontSize);
+        noteTextOnScreen.setTextSize(MainActivity.fontSizeText);
+        urlTextOnScreen.setTextSize(MainActivity.fontSizeText);
+        chooseCategoriesTextView.setTextSize(MainActivity.fontSizeText);
+        isUrlSupportedTextView.setTextSize(MainActivity.fontSizeText);
 
         getCategoriesFromDatabase();
 
-        //Checking if the mode is 0, 1 or 2. 0 is for when the user is adding a recipe from a website, 1 is for when the user is editing a recipe and 2 is for when the user is adding a recipe from scratch.
+        //Checking the mode. 0 is for when the user is adding a recipe from a website, 1 is for when the user is editing a recipe and 2 is for when the user is adding a recipe from scratch. 3 is for adding a recipe via BingFragment
         switch (mode) {
             case 0 -> {
                 saveOrEditRecipeButton.setText("Save Recipe");
                 if (wb != null) {
+                    isUrlSupportedTextView.setVisibility(View.VISIBLE);
                     //setting the on screen elements to the values scraped from the url
                     instructionTextOnScreen.setText(wb.getRecipeText());
                     ingredientTextOnScreen.setText(wb.getIngredientText());
@@ -130,11 +136,17 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                     servingsTextOnScreen.setText(String.valueOf(wb.getServings()));
                     recipeTitleTextOnScreen.setText(wb.getRecipeTitle());
                     urlTextOnScreen.setText(url);
+                    if(wb.isNotSupported()){
+                        isUrlSupportedTextView.setText("This website is not supported");
+                    } else {
+                        isUrlSupportedTextView.setText("This website is supported");
+                    }
                 } else {
-                    Toast.makeText(getContext(), "No data on website", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error, no data on website", Toast.LENGTH_SHORT).show();
                 }
             }
             case 1 -> {
+                isUrlSupportedTextView.setVisibility(View.GONE);
                 saveOrEditRecipeButton.setText("Change Recipe");
                 recipeTitleTextOnScreen.setText(recipe.getRecipeTitle());
                 cookingTimeTextOnScreen.setText(String.valueOf(recipe.getRecipeCookingTime()));
@@ -145,13 +157,15 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 urlTextOnScreen.setText(recipe.getRecipeUrl());
 
                 //getting the categories from the database and setting the selectedCategories array to the correct values;
-                getSavedCategoryNamesFromDatabase();
+                getSavedCategoryForRecipeFromDatabase();
             }
             case 2 -> {
+                isUrlSupportedTextView.setVisibility(View.GONE);
                 saveOrEditRecipeButton.setText("Save Recipe");
-                getSavedCategoryNamesFromDatabase();
+                getSavedCategoryForRecipeFromDatabase();
             }
             case 3 -> {
+                isUrlSupportedTextView.setVisibility(View.VISIBLE);
                 saveOrEditRecipeButton.setText("Save Recipe");
                 recipeTitleTextOnScreen.setText(recipe.getRecipeTitle());
                 cookingTimeTextOnScreen.setText(String.valueOf(recipe.getRecipeCookingTime()));
@@ -160,10 +174,16 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 instructionTextOnScreen.setText(recipe.getRecipeInstructions());
                 noteTextOnScreen.setText(recipe.getRecipeNotes());
                 urlTextOnScreen.setText(recipe.getRecipeUrl());
+                if(recipe.isSupported()){
+                    isUrlSupportedTextView.setText("This website is supported");
+                } else {
+                    isUrlSupportedTextView.setText("This website is not supported");
+                }
             }
             default -> {
+                isUrlSupportedTextView.setVisibility(View.GONE);
                 saveOrEditRecipeButton.setText("Change Recipe");
-                getSavedCategoryNamesFromDatabase();
+                getSavedCategoryForRecipeFromDatabase();
             }
         }
 
@@ -308,6 +328,18 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             AlertDialog dialog = builder.create();
             dialog.show();
         });
+
+        urlTextOnScreen.setOnLongClickListener(v -> {
+            if (urlTextOnScreen.getText().toString().isBlank()) {
+                Toast.makeText(getContext(), "No URL to open", Toast.LENGTH_SHORT).show();
+            } else {
+                replaceFragment(WebBrowserFragment.newInstance(urlTextOnScreen.getText().toString()));
+            }
+            return true; // indicate that the event is consumed
+        });
+
+
+
         return view;
     }
 
@@ -328,8 +360,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         }
     }
 
-    //Getting the saved categoryNames and categoryIDs from the database
-    private void getSavedCategoryNamesFromDatabase() {
+    //Getting the saved categoryIDs from the database to show the user which categories are applied to the recipe
+    private void getSavedCategoryForRecipeFromDatabase() {
         try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
             Cursor cursor = db.getAllCategoriesWhereRecipeID(recipe.getRecipeID());
             while (cursor.moveToNext()) {
@@ -361,6 +393,13 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         super.onPause();
         if (getActivity() != null) {
             fragmentManager.removeOnBackStackChangedListener(this);
+        }
+    }
+
+    @Override
+    public void replaceFragment(Fragment fragment) {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
         }
     }
 }

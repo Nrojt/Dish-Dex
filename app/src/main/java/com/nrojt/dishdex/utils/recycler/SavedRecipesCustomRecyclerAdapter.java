@@ -48,8 +48,8 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
         holder.recipeServingsText.setText(recipes.get(position).getRecipeServings() + " servings");
 
         holder.recipeTitleText.setTextSize(MainActivity.fontSizeTitles);
-        holder.recipeCookingTimeText.setTextSize(MainActivity.fontSize);
-        holder.recipeServingsText.setTextSize(MainActivity.fontSize);
+        holder.recipeCookingTimeText.setTextSize(MainActivity.fontSizeText);
+        holder.recipeServingsText.setTextSize(MainActivity.fontSizeText);
     }
 
     @Override

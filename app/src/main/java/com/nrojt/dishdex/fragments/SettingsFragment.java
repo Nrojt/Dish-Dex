@@ -132,7 +132,7 @@ public class SettingsFragment extends Fragment {
         editor.apply();
 
         //Setting the static variables in MainActivity to the new values so the user doesn't have to restart the app to apply a different font size
-        MainActivity.fontSize = fontSize;
+        MainActivity.fontSizeText = fontSize;
         MainActivity.fontSizeTitles = fontSizeTitles;
     }
 

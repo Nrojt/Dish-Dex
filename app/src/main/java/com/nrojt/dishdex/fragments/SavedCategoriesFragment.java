@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 public class SavedCategoriesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private RecyclerView savedCategoriesRecyclerView;
     private SearchView savedCategoriesSearchView;
+    private ImageButton addCategoryButton;
 
     private MyDatabaseHelper db;
 
@@ -81,6 +83,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         View view = inflater.inflate(R.layout.fragment_saved_categories, container, false);
         savedCategoriesRecyclerView = view.findViewById(R.id.savedCategoriesRecyclerView);
         savedCategoriesSearchView = view.findViewById(R.id.savedCategoriesSearchView);
+        addCategoryButton = view.findViewById(R.id.addCategoryButton);
 
         savedCategoriesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
         SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), categories, this);
@@ -153,6 +156,11 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         //This method gets the categories in the recycler view
         getCategoriesFromDatabase();
 
+        addCategoryButton.setOnClickListener(v -> {
+            AddCategoryFragment addCategoryFragment = new AddCategoryFragment();
+            replaceFragment(addCategoryFragment);
+        });
+
         return view;
     }
 
@@ -173,6 +181,9 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
     }
 
     private void getCategoriesFromDatabase() {
+        //Clearing the arraylist to avoid duplicates
+        categories.clear();
+
         //Getting the data from the database
         Cursor cursor = db.readAllDataFromCategories();
 
@@ -181,7 +192,6 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         } else {
             while (cursor.moveToNext()) {
                 Category category = new Category(cursor.getInt(1), cursor.getString(0));
-                System.out.println("Category: " + cursor.getString(0));
                 categories.add(category);
             }
         }

@@ -66,12 +66,12 @@ public class WebScraper implements Serializable {
         return recipeTitle;
     }
 
-    public String getRecipeText() {
-        return recipeText.toString();
+    public StringBuilder getRecipeText() {
+        return recipeText;
     }
 
-    public String getIngredientText() {
-        return ingredientText.toString();
+    public StringBuilder getIngredientText() {
+        return ingredientText;
     }
 
     //method to scrape the website
@@ -188,7 +188,7 @@ public class WebScraper implements Serializable {
                 // setting the cooking time, but some websites report time in hours and minutes, so we need to convert that to minutes. But for now it just adds all the numbers it can find together.
                 if (cookingTimeElement != null) {
                     String text = cookingTimeElement.text().toLowerCase();
-                    Pattern pattern = Pattern.compile("(\\d+)(?:\\s*(hour|uur|min)?)"); // Create a regex pattern to match numbers followed by an optional unit (hour, uur, or min)
+                    Pattern pattern = Pattern.compile("(\\d+)\\s*(hour|uur|min)?"); // Create a regex pattern to match numbers followed by an optional unit (hour, uur, or min)
                     Matcher matcher = pattern.matcher(text); // Matcher to find the numbers and the words in the text
 
                     int totalTime;

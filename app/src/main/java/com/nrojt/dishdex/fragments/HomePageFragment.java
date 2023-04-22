@@ -113,18 +113,18 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
 
         dateTextView.setText("Today is " + currentDay);
-        dateTextView.setTextSize(MainActivity.fontSize);
+        dateTextView.setTextSize(MainActivity.fontSizeText);
         timeTextView.setText("And the time is " + currentTime);
-        timeTextView.setTextSize(MainActivity.fontSize);
+        timeTextView.setTextSize(MainActivity.fontSizeText);
 
         if(recipe != null) {
             recipeTimeTitleTextView.setText(recipe.getRecipeTitle());
             recipeTimeTitleTextView.setTextSize(MainActivity.fontSizeTitles);
 
             recipeTimeCookingTimeTextView.setText(recipe.getRecipeCookingTime() + " minutes");
-            recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSize);
+            recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSizeText);
             recipeTimeServingsTextView.setText("Servings: " + recipe.getRecipeServings());
-            recipeTimeServingsTextView.setTextSize(MainActivity.fontSize);
+            recipeTimeServingsTextView.setTextSize(MainActivity.fontSizeText);
         }
 
 

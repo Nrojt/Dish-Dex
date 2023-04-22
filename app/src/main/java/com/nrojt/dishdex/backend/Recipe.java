@@ -12,7 +12,7 @@ public class Recipe implements Serializable {
     private int recipeID = -1;
     private int recipeCookingTime = 0;
     private int recipeServings = 0;
-    private boolean isSupported;
+    private boolean isSupported = true;
 
     private ArrayList<Category> categories;
 

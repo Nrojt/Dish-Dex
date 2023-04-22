@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,177 +8,202 @@
     app:layout_constraintHeight_min="wrap"
     tools:context="com.nrojt.dishdex.fragments.ShowAndEditRecipeFragment">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <ScrollView
-            android:id="@+id/recipeScrollView"
+    <ScrollView
+        android:id="@+id/recipeScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/saveOrEditRecipeButton"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dp">
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true">
+            android:orientation="vertical">
 
-
-            <LinearLayout
+            <EditText
+                android:id="@+id/recipeTitleTextOnScreen"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:gravity="center"
+                android:inputType="text"
+                android:minHeight="50dp"
+                android:text="Title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold"
+                android:autofillHints="The title of the recipe" />
 
-                <EditText
-                    android:id="@+id/recipeTitleTextOnScreen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:gravity="center"
-                    android:minHeight="50dp"
-                    android:text="Title"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textStyle="bold" />
+            <TextView
+                android:id="@+id/isUrlSupportedTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="This link is unknown"
+                android:textStyle="italic"/>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/cookingTimeTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignStart="@id/cookingTimeTextOnScreen"
-                        android:text="Cooking Time (min):" />
-
-                    <EditText
-                        android:id="@+id/cookingTimeTextOnScreen"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/cookingTimeTextView"
-                        android:layout_alignParentStart="true"
-                        android:layout_marginStart="15dp"
-                        android:hint="0000"
-                        android:minWidth="48dp"
-                        android:minHeight="48dp" />
-
-                    <TextView
-                        android:id="@+id/servingsTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignEnd="@id/servingsTextOnScreen"
-                        android:text="Servings:" />
-
-                    <EditText
-                        android:id="@+id/servingsTextOnScreen"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/servingsTextView"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
-                        android:hint="0000"
-                        android:minWidth="48dp"
-                        android:minHeight="48dp" />
-                </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/cookingTimeTextView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:inputType="textPersonName"
-                    android:minHeight="48dp"
-                    android:text="Categories"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/chooseCategoriesTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginBottom="10dp"
-                    android:minHeight="48dp"
-                    android:text="Choose categories"
-                    android:background="@android:drawable/editbox_background"
-                    android:layout_centerInParent="true"
-                    android:drawableRight="@android:drawable/arrow_down_float" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:inputType="textPersonName"
-                    android:minHeight="48dp"
-                    android:text="Ingredients"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textStyle="bold" />
+                    android:layout_alignStart="@id/cookingTimeTextOnScreen"
+                    android:text="Cooking Time (min):" />
 
                 <EditText
-                    android:id="@+id/ingredientTextOnScreen"
-                    android:layout_width="match_parent"
+                    android:id="@+id/cookingTimeTextOnScreen"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/cookingTimeTextView"
+                    android:layout_alignParentStart="true"
                     android:layout_marginStart="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginBottom="10dp"
-                    android:hint="Ingredients"
-                    android:minHeight="48dp" />
+                    android:hint="0000"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:autofillHints="Amount of time it takes to prepare this recipe" />
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/servingsTextView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
+                    android:layout_alignEnd="@id/servingsTextOnScreen"
+                    android:text="Servings:" />
+
+                <EditText
+                    android:id="@+id/servingsTextOnScreen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/servingsTextView"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:hint="0000"
+                    android:inputType="number"
+                    android:maxLength="2"
+                    android:minWidth="48dp"
                     android:minHeight="48dp"
-                    android:text="Instructions"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textStyle="bold" />
+                    android:autofillHints="The amount of servings of this recipe"/>
+            </RelativeLayout>
 
-                <EditText
-                    android:id="@+id/recipeTextOnScreen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginBottom="10dp"
-                    android:hint="Instructions"
-                    android:minHeight="48dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:minHeight="48dp"
+                android:text="Categories"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:minHeight="48dp"
-                    android:text="Notes"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textStyle="bold" />
+            <TextView
+                android:id="@+id/chooseCategoriesTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="10dp"
+                android:background="@android:drawable/editbox_background"
+                android:drawableEnd="@android:drawable/arrow_down_float"
+                android:minHeight="48dp"
+                android:text="Choose categories" />
 
-                <EditText
-                    android:id="@+id/noteTextOnScreen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginBottom="10dp"
-                    android:hint="Notes"
-                    android:minHeight="48dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:inputType="textPersonName"
+                android:minHeight="48dp"
+                android:text="Ingredients"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/urlTextOnScreen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginBottom="10dp"
-                    android:hint="Url"
-                    android:minHeight="48dp" />
+            <EditText
+                android:id="@+id/ingredientTextOnScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="10dp"
+                android:hint="Ingredients"
+                android:minHeight="48dp"
+                android:inputType="text"
+                android:autofillHints="Ingredients (and tools) required for the recipe" />
 
-            </LinearLayout>
-        </ScrollView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:minHeight="48dp"
+                android:text="Instructions"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/recipeTextOnScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="10dp"
+                android:hint="Instructions"
+                android:minHeight="48dp"
+                android:inputType="text"
+                android:autofillHints="Instructions on how to prepare this recipe" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:minHeight="48dp"
+                android:text="Notes"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/noteTextOnScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="10dp"
+                android:hint="Notes"
+                android:minHeight="48dp"
+                android:inputType="text"
+                android:autofillHints="Room for extra notes" />
+
+            <EditText
+                android:id="@+id/urlTextOnScreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="10dp"
+                android:autofillHints="The url to the website this recipe is from"
+                android:hint="Url"
+                android:inputType="text|textNoSuggestions"
+                android:minHeight="48dp" />
+
+        </LinearLayout>
+    </ScrollView>
 
         <Button
             android:id="@+id/saveOrEditRecipeButton"
@@ -189,6 +214,4 @@
             android:layout_marginEnd="15dp"
             android:text="Save Or Edit" />
 
-    </RelativeLayout>
-
-</LinearLayout>
+</RelativeLayout>

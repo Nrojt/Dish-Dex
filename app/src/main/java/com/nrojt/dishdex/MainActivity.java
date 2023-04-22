@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     //Global variables basically
     public static boolean isProUser;
     public static final int MAX_CATEGORIES_FREE = 16;
-    public static float fontSize;
+    public static float fontSizeText;
     public static float fontSizeTitles;
 
     private int selectedItemId = -1;
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         SharedPreferences sharedPreferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
         isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
-        fontSize = sharedPreferences.getInt(SettingsFragment.FONT_SIZE, 14);
+        fontSizeText = sharedPreferences.getInt(SettingsFragment.FONT_SIZE, 14);
         fontSizeTitles = sharedPreferences.getInt(SettingsFragment.FONT_SIZE_TITLES, 20);
 
 
