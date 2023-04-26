@@ -41,8 +41,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     private EditText noteTextOnScreen;
     private EditText urlTextOnScreen;
 
-    private TextView isUrlSupportedTextView;
-
     private FragmentManager fragmentManager;
 
     // for getting and selecting categories
@@ -108,7 +106,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         saveOrEditRecipeButton = view.findViewById(R.id.saveOrEditRecipeButton);
         urlTextOnScreen = view.findViewById(R.id.urlTextOnScreen);
         chooseCategoriesTextView = view.findViewById(R.id.chooseCategoriesTextView);
-        isUrlSupportedTextView = view.findViewById(R.id.isUrlSupportedTextView);
+        TextView isUrlSupportedTextView = view.findViewById(R.id.isUrlSupportedTextView);
 
         //setting the text size of the on screen elements
         instructionTextOnScreen.setTextSize(MainActivity.fontSizeText);
@@ -215,7 +213,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 return;
             }
 
-            try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
+            try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
 
                 String recipeTitle = recipeTitleTextOnScreen.getText().toString().trim();
                 String ingredients = ingredientTextOnScreen.getText().toString().trim();
@@ -344,7 +342,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     }
 
     private void getCategoriesFromDatabase() {
-        try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
+        try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
             Cursor cursor = db.readAllDataFromCategories();
             if (cursor.getCount() == 0) {
                 //This should never happen, since the database is created with default categories
@@ -362,7 +360,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
 
     //Getting the saved categoryIDs from the database to show the user which categories are applied to the recipe
     private void getSavedCategoryForRecipeFromDatabase() {
-        try (MyDatabaseHelper db = new MyDatabaseHelper(getContext())) {
+        try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
             Cursor cursor = db.getAllCategoriesWhereRecipeID(recipe.getRecipeID());
             while (cursor.moveToNext()) {
                 savedCategoryIDs.add(cursor.getInt(0));

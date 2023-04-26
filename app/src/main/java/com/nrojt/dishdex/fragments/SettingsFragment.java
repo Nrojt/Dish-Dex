@@ -23,7 +23,6 @@ public class SettingsFragment extends Fragment {
     private TextInputLayout fontSizeTextInput;
     private TextInputLayout fontSizeTitleTextInput;
 
-    private Button saveSettingsButton;
     private ToggleButton proUserToggleButton;
 
     private String bingApiKey;
@@ -36,11 +35,6 @@ public class SettingsFragment extends Fragment {
     public static final String IS_PRO_USER = "isProUser";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_SIZE_TITLES = "fontSizeTitles";
-
-    private String loadedApiKey;
-    private boolean loadedIsProUser;
-    private int loadedFontSize;
-    private int loadedFontSizeTitles;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -78,7 +72,7 @@ public class SettingsFragment extends Fragment {
 
         //Getting the views
         bingApiKeyTextInput = view.findViewById(R.id.bingKeyTextInput);
-        saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
+        Button saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
         proUserToggleButton = view.findViewById(R.id.proUserToggleButton);
         fontSizeTextInput = view.findViewById(R.id.fontSizeTextInput);
         fontSizeTitleTextInput = view.findViewById(R.id.fontSizeTitleTextInput);
@@ -140,10 +134,10 @@ public class SettingsFragment extends Fragment {
     public void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         //If the key doesn't exist, the default value is an empty string
-        loadedApiKey = sharedPreferences.getString(BING_API_KEY, "");
-        loadedIsProUser = sharedPreferences.getBoolean(IS_PRO_USER, false);
-        loadedFontSize = sharedPreferences.getInt(FONT_SIZE, 14);
-        loadedFontSizeTitles = sharedPreferences.getInt(FONT_SIZE_TITLES, 20);
+        String loadedApiKey = sharedPreferences.getString(BING_API_KEY, "");
+        boolean loadedIsProUser = sharedPreferences.getBoolean(IS_PRO_USER, false);
+        int loadedFontSize = sharedPreferences.getInt(FONT_SIZE, 14);
+        int loadedFontSizeTitles = sharedPreferences.getInt(FONT_SIZE_TITLES, 20);
 
         //Setting the text in the text input to the api key that was loaded in
         bingApiKeyTextInput.getEditText().setText(loadedApiKey);

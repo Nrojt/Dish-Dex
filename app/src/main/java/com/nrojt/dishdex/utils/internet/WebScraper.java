@@ -101,6 +101,7 @@ public class WebScraper implements Serializable {
                         }
                     }
 
+
                     servingsElement = document.getElementsByClass("recipe-ingredients_servings__f8HXF").first();
                     cookingTimeElement = document.getElementsByClass("recipe-header-time_timeLine__nn84w").first();
                     recipeTitleElement = document.getElementsByClass("typography_root__Om3Wh typography_variant-superhero__239x3 typography_hasMargin__4EaQi recipe-header_title__tG0JE").first();
@@ -167,12 +168,13 @@ public class WebScraper implements Serializable {
                 }
 
                 //Converting the elements to text and adding them to the lists
-                for (int i = 0; i < (instructionElements != null ? instructionElements.size() : 0); i++) {
+                for (int i = 0; i < instructionElements.size(); i++) {
                     recipeTextList.add(instructionElements.eachText().get(i));
                     if (i != instructionElements.size() - 1) {
                         recipeTextList.add("\n\n");
                     }
                 }
+
                 for (int i = 0; i < (ingredientElements != null ? ingredientElements.size() : 0); i++) {
                     ingredientTextList.add(ingredientElements.eachText().get(i));
                     if (i != ingredientElements.size() - 1) {

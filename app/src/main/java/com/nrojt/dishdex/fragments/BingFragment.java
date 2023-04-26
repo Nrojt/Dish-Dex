@@ -62,8 +62,6 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
     private static final ArrayList<String> bingReturnUrls = new ArrayList<>();
     private static final ArrayList<Recipe> recipes = new ArrayList<>();
 
-    private RecyclerView bingRecyclerView;
-
     private TextView bingNotificationTextView;
 
 
@@ -72,8 +70,8 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
      * against the endpoint for your Bing Web search instance in your Azure
      * dashboard.
      */
-    private static String host = "https://api.bing.microsoft.com";
-    private static String path = "/v7.0/search";
+    private static final String host = "https://api.bing.microsoft.com";
+    private static final String path = "/v7.0/search";
     private String searchTerm = null;
 
     // the fragment initialization parameters
@@ -110,7 +108,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
 
-        bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
+        RecyclerView bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
         bingRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
         SavedRecipesCustomRecyclerAdapter adapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this);
         bingRecyclerView.setAdapter(adapter);

@@ -30,8 +30,6 @@ import java.util.Locale;
  * create an instance of this fragment.
  */
 public class HomePageFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
-    private TextView dateTextView, timeTextView, recipeTimeTitleTextView, recipeTimeCookingTimeTextView, recipeTimeServingsTextView;
-    private CardView recipeTimeCardView;
     private FragmentManager fragmentManager;
 
     private int timeCategoryID;
@@ -93,17 +91,17 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         //Getting the recipe information from the database
         getInformationFromRecipe();
 
-        recipeTimeCardView = view.findViewById(R.id.recipeTimeCardView);
-        recipeTimeTitleTextView = view.findViewById(R.id.recipeTimeTitleTextView);
-        recipeTimeCookingTimeTextView = view.findViewById(R.id.recipeTimeCookingTimeTextView);
-        recipeTimeServingsTextView = view.findViewById(R.id.recipeTimeServingsTextView);
+        CardView recipeTimeCardView = view.findViewById(R.id.recipeTimeCardView);
+        TextView recipeTimeTitleTextView = view.findViewById(R.id.recipeTimeTitleTextView);
+        TextView recipeTimeCookingTimeTextView = view.findViewById(R.id.recipeTimeCookingTimeTextView);
+        TextView recipeTimeServingsTextView = view.findViewById(R.id.recipeTimeServingsTextView);
 
 
         fragmentManager = getActivity().getSupportFragmentManager();
 
         //Get the current day of the week and display it
-        dateTextView = view.findViewById(R.id.dateTextView);
-        timeTextView = view.findViewById(R.id.timeTextView);
+        TextView dateTextView = view.findViewById(R.id.dateTextView);
+        TextView timeTextView = view.findViewById(R.id.timeTextView);
 
         DayOfWeek dow = LocalDate.now().getDayOfWeek();
         String currentDay = dow.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH);
@@ -162,14 +160,14 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
             timeCategoryID = 0;
         }
 
-        MyDatabaseHelper db = new MyDatabaseHelper(getContext());
+        MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext());
         timeRecipeID = db.getRandomRecipeIDWhereCategoryID(timeCategoryID);
         db.close();
     }
 
     //Getting the recipe information from the database
     private void getInformationFromRecipe() {
-        MyDatabaseHelper db = new MyDatabaseHelper(getContext());
+        MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext());
         System.out.println("timeRecipeID: " + timeRecipeID);
 
         if (timeRecipeID != -1) {

@@ -41,11 +41,9 @@ import java.util.concurrent.Executors;
  * create an instance of this fragment.
  */
 public class WebBrowserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
-    private OnBackPressedListener onBackPressedListener;
     private ArrayList<String> blockedUrls = new ArrayList<>();
     private WebView urlBrowser;
     private EditText currentBrowserUrl;
-    private Button scrapeThisUrlButton;
 
     private FragmentManager fragmentManager;
 
@@ -86,7 +84,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         View view = inflater.inflate(R.layout.fragment_web_browser, container, false);
         urlBrowser = view.findViewById(R.id.urlBrowser);
         currentBrowserUrl = view.findViewById(R.id.currentBrowserUrl);
-        scrapeThisUrlButton = view.findViewById(R.id.scrapeThisUrlButton);
+        Button scrapeThisUrlButton = view.findViewById(R.id.scrapeThisUrlButton);
 
         currentBrowserUrl.setTextSize(MainActivity.fontSizeTitles);
 
@@ -142,6 +140,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
             }
         });
 
+        //enabling javascript, since without it many websites won't work
         urlBrowser.getSettings().setJavaScriptEnabled(true);
         urlBrowser.loadUrl(openUrl);
 
@@ -169,10 +168,10 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
             if (!url.isBlank()) {
                 if (URLUtil.isValidUrl(url)) {
                     WebScraper wb = new WebScraper(url);
-                    ExecutorService service1 = Executors.newSingleThreadExecutor();
+                    ExecutorService webScraperService = Executors.newSingleThreadExecutor();
                     Handler handler1 = new Handler(Looper.getMainLooper());
                     //running the WebScraper on a separate thread, so the ui thread doesn't lock
-                    service1.execute(() -> {
+                    webScraperService.execute(() -> {
                         wb.scrapeWebsite();
 
                         handler1.post(() -> {
@@ -191,7 +190,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
                             }
                         });
                     });
-                    service1.shutdown();
+                    webScraperService.shutdown();
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), "This site is blocked", Toast.LENGTH_SHORT).show();
                 }

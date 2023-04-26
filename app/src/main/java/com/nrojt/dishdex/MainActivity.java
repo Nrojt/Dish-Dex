@@ -3,7 +3,6 @@ package com.nrojt.dishdex;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.activity.OnBackPressedCallback;
@@ -32,17 +31,12 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
-    private AdView adView;
-
-    private OnBackPressedCallback onBackPressedCallback;
 
     //Global variables basically
     public static boolean isProUser;
     public static final int MAX_CATEGORIES_FREE = 16;
     public static float fontSizeText;
     public static float fontSizeTitles;
-
-    private int selectedItemId = -1;
 
 
     ActivityMainBinding binding;
@@ -55,9 +49,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        //Setting the fragment that will show on app startup
-        binding.bottomNavigationView.setSelectedItemId(R.id.homeButton);
-        replaceFragment(new HomePageFragment(), getClass());
 
         SharedPreferences sharedPreferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
         isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
@@ -74,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             }
         });
 
-        adView = findViewById(R.id.adView);
+        AdView adView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
@@ -84,14 +75,13 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             return true;
         });
 
-        FrameLayout frameLayout = findViewById(R.id.frame_layout);
+        FrameLayout frameLayout = findViewById(R.id.fragmentContainer);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         // Set the top and bottom constraints of the FrameLayout and disabling adview if the user is a pro user.
         if (isProUser) {
             // Remove the ad view
             ConstraintLayout adContainer = findViewById(R.id.mainPageConstraintLayout);
-            View adView = findViewById(R.id.adView);
             adContainer.removeView(adView);
 
             // Set the top and bottom constraints of the FrameLayout
@@ -103,7 +93,15 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
 
         //Method for handling the back button
-        onBackPressedCallback = new OnBackPressedCallback(true) {
+        // Get the fragment manager and the number of entries in the backstack
+        // If there is more than one fragment in the backstack, pop the backstack
+        // Get the current fragment and check if it implements OnBackPressedListener
+        // If it does, call handleOnBackPressed() on the fragment
+        // If the fragment handles the back button press, return without popping the backstack
+        // Get the fragment to pop and check if it is null
+        // If it is not null, pop the backstack and update the selected item in the bottom navigation view
+        // If there is only one fragment in the backstack, minimize the app
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 // Get the fragment manager and the number of entries in the backstack
@@ -112,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 // If there is more than one fragment in the backstack, pop the backstack
                 if (backStackEntryCount > 1) {
                     // Get the current fragment and check if it implements OnBackPressedListener
-                    Fragment currentFragment = fragmentManager.findFragmentById(R.id.frame_layout);
+                    Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentContainer);
                     if (currentFragment instanceof OnBackPressedListener listener) {
                         // If it does, call handleOnBackPressed() on the fragment
                         if (listener.handleOnBackPressed()) {
@@ -121,11 +119,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                         }
                     }
                     // Get the fragment to pop and check if it is null
-                    Fragment fragmentToPop = fragmentManager.findFragmentById(R.id.frame_layout);
+                    Fragment fragmentToPop = fragmentManager.findFragmentById(R.id.fragmentContainer);
                     if (fragmentToPop != null) {
                         // If it is not null, pop the backstack and update the selected item in the bottom navigation view
                         fragmentManager.popBackStack();
-                        updateBottomNavigationItem(fragmentManager.findFragmentById(R.id.frame_layout));
+                        updateBottomNavigationItem(fragmentManager.findFragmentById(R.id.fragmentContainer));
                     }
                 } else {
                     // If there is only one fragment in the backstack, minimize the app
@@ -147,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.addToBackStack(fragment.getClass().getName());
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.replace(R.id.fragmentContainer, fragment);
         fragmentTransaction.commit();
     }
 
@@ -155,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     @Override
     public void onBackStackChanged() {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment currentFragment = fragmentManager.findFragmentById(R.id.frame_layout);
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentContainer);
 
         // Check if the current fragment is already in the back stack
         boolean isFragmentInBackStack = false;
@@ -186,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             return;
         }
 
-        selectedItemId = -1;
+        int selectedItemId = -1;
         switch (fragment.getClass().getSimpleName()) {
             case "HomePageFragment" -> selectedItemId = R.id.homeButton;
             case "AddRecipeChooserFragment", "BingFragment", "ShowAndEditRecipeFragment", "WebBrowserFragment" ->

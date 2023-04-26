@@ -28,10 +28,6 @@ import java.util.concurrent.Executors;
  */
 public class AddRecipeChooserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private TextInputEditText urlInput;
-    private Button getRecipeFromUrlButton;
-    private Button browseWebButton;
-    private Button emptyRecipeButton;
-    private Button bingSearchButton;
     private TextInputEditText bingSearchInput;
 
     private FragmentManager fragmentManager;
@@ -79,11 +75,11 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
 
         //initializing the variables, assigning them to the corresponding on screen views
         urlInput = view.findViewById(R.id.urlInput);
-        getRecipeFromUrlButton = view.findViewById(R.id.getRecipeFromUrlButton);
-        bingSearchButton = view.findViewById(R.id.bingSearchButton);
+        Button getRecipeFromUrlButton = view.findViewById(R.id.getRecipeFromUrlButton);
+        Button bingSearchButton = view.findViewById(R.id.bingSearchButton);
         bingSearchInput = view.findViewById(R.id.bingSearchInput);
-        browseWebButton = view.findViewById(R.id.browseWebButton);
-        emptyRecipeButton = view.findViewById(R.id.emptyRecipeButton);
+        Button browseWebButton = view.findViewById(R.id.browseWebButton);
+        Button emptyRecipeButton = view.findViewById(R.id.emptyRecipeButton);
 
 
         //When the user clicks the button, the url is passed to the WebScraper class which checks if the site is supported and if the site is reachable

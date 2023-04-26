@@ -34,7 +34,7 @@ public class AddCategoryFragmentTest {
             FragmentTransaction fragmentTransaction = activity.getSupportFragmentManager().beginTransaction();
             AddCategoryFragment fragment = new AddCategoryFragment();
             fragmentTransaction.addToBackStack(fragment.getClass().getName());
-            fragmentTransaction.replace(R.id.frame_layout, fragment);
+            fragmentTransaction.replace(R.id.fragmentContainer, fragment);
             fragmentTransaction.commit();
         });
 
@@ -44,7 +44,7 @@ public class AddCategoryFragmentTest {
         onView(withId(R.id.saveCategoryButton)).perform(click());
 
         // Check that the category was added to the database
-        MyDatabaseHelper db = new MyDatabaseHelper(context);
+        MyDatabaseHelper db = MyDatabaseHelper.getInstance(context);
         assertTrue(db.checkIfCategoryExists("Test Category"));
 
         // Close the activity scenario

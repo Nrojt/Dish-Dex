@@ -21,7 +21,6 @@ import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
  * create an instance of this fragment.
  */
 public class AddCategoryFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
-    private Button saveCategoryButton;
     private EditText categoryNameEditText;
     private FragmentManager fragmentManager;
 
@@ -60,7 +59,7 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_category, container, false);
-        saveCategoryButton = view.findViewById(R.id.saveCategoryButton);
+        Button saveCategoryButton = view.findViewById(R.id.saveCategoryButton);
         categoryNameEditText = view.findViewById(R.id.categoryNameEditText);
 
         fragmentManager = getActivity().getSupportFragmentManager();
@@ -72,7 +71,7 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
                 return;
             }
 
-            MyDatabaseHelper db = new MyDatabaseHelper(getContext());
+            MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext());
             if (db.addCategory(categoryName)) {
                 fragmentManager.popBackStack();
             }

@@ -17,9 +17,24 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "dishdex.db";
     private static final int DATABASE_VERSION = 1;
 
-    public MyDatabaseHelper(@Nullable Context context) {
+    // Declare a private static field of type MyDatabaseHelper and initialize it to null
+    private static MyDatabaseHelper instance = null;
+
+
+    // Declare a private constructor that takes a Context parameter and calls the super constructor with the database name and version
+    private MyDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
+    }
+
+    // Declare a public static method that takes a Context parameter and returns a MyDatabaseHelper instance
+    public static MyDatabaseHelper getInstance(Context context) {
+        // Check if the static field is null, and if so, create a new instance using the private constructor
+        if (instance == null) {
+            instance = new MyDatabaseHelper(context.getApplicationContext());
+        }
+        // Return the static field
+        return instance;
     }
 
 

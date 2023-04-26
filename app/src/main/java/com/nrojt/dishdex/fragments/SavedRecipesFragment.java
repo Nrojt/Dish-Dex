@@ -91,7 +91,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         fragmentManager = getActivity().getSupportFragmentManager();
         View view = inflater.inflate(R.layout.fragment_saved_recipes, container, false);
 
-        db = new MyDatabaseHelper(getContext());
+        db = MyDatabaseHelper.getInstance(getContext());
 
         savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
         savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);

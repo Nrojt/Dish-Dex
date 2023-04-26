@@ -90,7 +90,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         savedCategoriesRecyclerView.setAdapter(savedCategoriesCustomRecyclerAdapter);
         savedCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        db = new MyDatabaseHelper(getContext());
+        db = MyDatabaseHelper.getInstance(getContext());
 
 
         savedCategoriesSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
