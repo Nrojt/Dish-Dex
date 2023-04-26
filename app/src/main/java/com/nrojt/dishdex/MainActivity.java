@@ -31,6 +31,7 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+    //TODO figure out the backstack
 
     //Global variables basically
     public static boolean isProUser;
@@ -108,9 +109,17 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 int backStackEntryCount = fragmentManager.getBackStackEntryCount();
                 // If there is more than one fragment in the backstack, pop the backstack
-                if (backStackEntryCount > 1) {
+                if (backStackEntryCount > 0) {
                     // Get the current fragment and check if it implements OnBackPressedListener
                     Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentContainer);
+                    System.out.println(currentFragment.getClass().getSimpleName());
+
+                    //If the current fragment is the homepage fragment, minimize the app
+                    if(currentFragment.getClass().getSimpleName().equals("HomePageFragment")){
+                        moveTaskToBack(true);
+                        return;
+                    }
+
                     if (currentFragment instanceof OnBackPressedListener listener) {
                         // If it does, call handleOnBackPressed() on the fragment
                         if (listener.handleOnBackPressed()) {

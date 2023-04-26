@@ -8,7 +8,7 @@
     tools:context="com.nrojt.dishdex.fragments.HomePageFragment">
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/greetingsTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -17,6 +17,7 @@
         android:text="Hello"
         android:textColor="@color/black"
         android:textSize="48sp"
+        android:textStyle="bold"
         ads:layout_constraintEnd_toEndOf="parent"
         ads:layout_constraintStart_toStartOf="parent"
         ads:layout_constraintTop_toTopOf="parent" />
@@ -33,7 +34,7 @@
         ads:layout_constraintEnd_toEndOf="parent"
         ads:layout_constraintHorizontal_bias="0.0"
         ads:layout_constraintStart_toStartOf="parent"
-        ads:layout_constraintTop_toBottomOf="@+id/textView3" />
+        ads:layout_constraintTop_toBottomOf="@+id/greetingsTextView" />
 
     <TextView
         android:id="@+id/timeTextView"
@@ -48,6 +49,20 @@
         ads:layout_constraintStart_toStartOf="parent"
         ads:layout_constraintTop_toBottomOf="@+id/dateTextView" />
 
+    <TextView
+        android:id="@+id/recipeForTimeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="You do not have any saved recipes for this time of the day."
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        ads:layout_constraintEnd_toStartOf="parent"
+        ads:layout_constraintStart_toStartOf="parent"
+        ads:layout_constraintTop_toBottomOf="@id/timeTextView" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/recipeTimeCardView"
         android:layout_width="match_parent"
@@ -58,7 +73,7 @@
         android:minHeight="48dp"
         ads:layout_constraintEnd_toEndOf="parent"
         ads:layout_constraintStart_toStartOf="parent"
-        ads:layout_constraintTop_toBottomOf="@+id/timeTextView">
+        ads:layout_constraintTop_toBottomOf="@id/recipeForTimeTextView">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -96,6 +111,20 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/savedRecipesFragmentContainerView"
+        android:name="com.nrojt.dishdex.fragments.SavedRecipesFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        ads:layout_constraintBottom_toBottomOf="parent"
+        ads:layout_constraintEnd_toEndOf="parent"
+        ads:layout_constraintStart_toStartOf="parent"
+        ads:layout_constraintTop_toBottomOf="@+id/recipeTimeCardView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

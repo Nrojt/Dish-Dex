@@ -35,12 +35,10 @@ import java.util.ArrayList;
  */
 public class SavedCategoriesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private RecyclerView savedCategoriesRecyclerView;
-    private SearchView savedCategoriesSearchView;
-    private ImageButton addCategoryButton;
 
     private MyDatabaseHelper db;
 
-    private ArrayList<Category> categories = new ArrayList<>();
+    private final ArrayList<Category> categories = new ArrayList<>();
 
     private Category deletedCategory;
 
@@ -82,8 +80,8 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         fragmentManager = getActivity().getSupportFragmentManager();
         View view = inflater.inflate(R.layout.fragment_saved_categories, container, false);
         savedCategoriesRecyclerView = view.findViewById(R.id.savedCategoriesRecyclerView);
-        savedCategoriesSearchView = view.findViewById(R.id.savedCategoriesSearchView);
-        addCategoryButton = view.findViewById(R.id.addCategoryButton);
+        SearchView savedCategoriesSearchView = view.findViewById(R.id.savedCategoriesSearchView);
+        ImageButton addCategoryButton = view.findViewById(R.id.addCategoryButton);
 
         savedCategoriesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
         SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), categories, this);
@@ -200,9 +198,8 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
 
     @Override
     public void replaceFragment(Fragment fragment) {
-        if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
-        }
+
     }
 
     @Override
@@ -212,9 +209,8 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
 
     @Override
     public void onBackStackChanged() {
-        if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).onBackStackChanged();
-        }
+
     }
 
     //This method is called when the fragment is visible to the user and actively running.

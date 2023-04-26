@@ -238,9 +238,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
     // Method for replacing the fragment (redirecting to main activity)
     @Override
     public void replaceFragment(Fragment fragment) {
-        if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
-        }
     }
 
     @Override

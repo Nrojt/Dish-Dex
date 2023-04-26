@@ -90,8 +90,21 @@ public class SettingsFragment extends Fragment {
                 fontSizeTextInput.getEditText().setText("32");
                 return;
             }
+
+            if(fontSize <= 0){
+                Toast.makeText(getActivity().getApplicationContext(), "Font size too small", Toast.LENGTH_SHORT).show();
+                fontSizeTextInput.getEditText().setText("32");
+                return;
+            }
+
             if(fontSizeTitles > 48){
                 Toast.makeText(getActivity().getApplicationContext(), "Font size too large", Toast.LENGTH_SHORT).show();
+                fontSizeTitleTextInput.getEditText().setText("48");
+                return;
+            }
+
+            if(fontSizeTitles <= 0){
+                Toast.makeText(getActivity().getApplicationContext(), "Font size too small", Toast.LENGTH_SHORT).show();
                 fontSizeTitleTextInput.getEditText().setText("48");
                 return;
             }

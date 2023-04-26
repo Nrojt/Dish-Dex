@@ -9,7 +9,9 @@ import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
@@ -36,6 +38,9 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     private int timeRecipeID;
 
     private Recipe recipe;
+
+    private TextView greetingsTextView;
+    private TextView recipeForTimeTextView;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -85,24 +90,43 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
+        //inflating the views
+        CardView recipeTimeCardView = view.findViewById(R.id.recipeTimeCardView);
+        TextView recipeTimeTitleTextView = view.findViewById(R.id.recipeTimeTitleTextView);
+        TextView recipeTimeCookingTimeTextView = view.findViewById(R.id.recipeTimeCookingTimeTextView);
+        TextView recipeTimeServingsTextView = view.findViewById(R.id.recipeTimeServingsTextView);
+        TextView dateTextView = view.findViewById(R.id.dateTextView);
+        TextView timeTextView = view.findViewById(R.id.timeTextView);
+        FragmentContainerView fragmentContainerView = view.findViewById(R.id.savedRecipesFragmentContainerView);
+        greetingsTextView = view.findViewById(R.id.greetingsTextView);
+        recipeForTimeTextView = view.findViewById(R.id.recipeForTimeTextView);
+
+        //Replacing the fragment for the saved recipes, so I can hide the floating action button
+        SavedRecipesFragment savedRecipesFragment = SavedRecipesFragment.newInstance(true);
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.savedRecipesFragmentContainerView, savedRecipesFragment);
+        transaction.commit();
+
+
+
+        //Setting the text sizes
+        greetingsTextView.setTextSize(MainActivity.fontSizeTitles);
+        recipeForTimeTextView.setTextSize(MainActivity.fontSizeText);
+        dateTextView.setTextSize(MainActivity.fontSizeText);
+        timeTextView.setTextSize(MainActivity.fontSizeText);
+        recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSizeText);
+        recipeTimeServingsTextView.setTextSize(MainActivity.fontSizeText);
+
         //Getting a random recipeID based on the time of day
         getRandomRecipeIDBasedOnTime();
 
         //Getting the recipe information from the database
         getInformationFromRecipe();
 
-        CardView recipeTimeCardView = view.findViewById(R.id.recipeTimeCardView);
-        TextView recipeTimeTitleTextView = view.findViewById(R.id.recipeTimeTitleTextView);
-        TextView recipeTimeCookingTimeTextView = view.findViewById(R.id.recipeTimeCookingTimeTextView);
-        TextView recipeTimeServingsTextView = view.findViewById(R.id.recipeTimeServingsTextView);
 
-
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getChildFragmentManager();
 
         //Get the current day of the week and display it
-        TextView dateTextView = view.findViewById(R.id.dateTextView);
-        TextView timeTextView = view.findViewById(R.id.timeTextView);
-
         DayOfWeek dow = LocalDate.now().getDayOfWeek();
         String currentDay = dow.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH);
 
@@ -110,23 +134,23 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         String currentTime = formatter.format(LocalTime.now());
 
 
-        dateTextView.setText("Today is " + currentDay);
-        dateTextView.setTextSize(MainActivity.fontSizeText);
-        timeTextView.setText("And the time is " + currentTime);
-        timeTextView.setTextSize(MainActivity.fontSizeText);
+        dateTextView.setText("Today is: " + currentDay);
+
+        timeTextView.setText("It is currently: " + currentTime);
+
 
         if(recipe != null) {
             recipeTimeTitleTextView.setText(recipe.getRecipeTitle());
             recipeTimeTitleTextView.setTextSize(MainActivity.fontSizeTitles);
 
             recipeTimeCookingTimeTextView.setText(recipe.getRecipeCookingTime() + " minutes");
-            recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSizeText);
             recipeTimeServingsTextView.setText("Servings: " + recipe.getRecipeServings());
-            recipeTimeServingsTextView.setTextSize(MainActivity.fontSizeText);
+
         }
 
 
         if (timeRecipeID == -1) {
+            recipeForTimeTextView.setText("You do not have any saved recipes for this time of the day.");
             recipeTimeCardView.setVisibility(View.GONE);
         } else {
             recipeTimeCardView.setVisibility(View.VISIBLE);
@@ -135,7 +159,6 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
                 replaceFragment(showAndEditRecipeFragment);
             });
         }
-
 
         return view;
     }
@@ -147,17 +170,29 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         LocalTime lunchTime = LocalTime.of(12, 0);
         LocalTime dinnerTime = LocalTime.of(18, 0);
         LocalTime lateNightTime = LocalTime.of(22, 0);
+        LocalTime earlyMorningTime = LocalTime.of(5, 0); //We dont want to suggest breakfast recipes after 0:00 and before 5:00
 
-        if (currentTime.isBefore(breakfastTime)) {
+        if (currentTime.isBefore(breakfastTime) && currentTime.isAfter(earlyMorningTime)) {
             timeCategoryID = 1;
+            greetingsTextView.setText("Good morning!");
+            recipeForTimeTextView.setText("Let's try this breakfast recipe:");
         } else if (currentTime.isBefore(lunchTime)) {
             timeCategoryID = 2;
+            greetingsTextView.setText("Good morning!");
+            recipeForTimeTextView.setText("How about this for lunch:");
         } else if (currentTime.isBefore(dinnerTime)) {
             timeCategoryID = 3;
+            greetingsTextView.setText("Good afternoon!");
+            recipeForTimeTextView.setText("Your new favourite dinner:");
         } else if (currentTime.isBefore(lateNightTime)) {
             timeCategoryID = 5;
+            greetingsTextView.setText("Good evening!");
+            recipeForTimeTextView.setText("This is a great time for a snack:");
         } else {
-            timeCategoryID = 0;
+            //if the time is after 22:00
+            timeCategoryID = 5;
+            greetingsTextView.setText("Good night!");
+            recipeForTimeTextView.setText("Time for a little midnight snack:");
         }
 
         MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext());
@@ -176,7 +211,6 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
             recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true);
             cursor.close();
         }
-
         db.close();
     }
 
@@ -189,9 +223,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
     @Override
     public void onBackStackChanged() {
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).onBackStackChanged();
-        }
+        ((MainActivity) getActivity()).onBackStackChanged();
     }
 
     @Override

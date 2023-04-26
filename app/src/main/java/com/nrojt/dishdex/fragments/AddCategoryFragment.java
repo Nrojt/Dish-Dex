@@ -83,10 +83,7 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
 
     @Override
     public void replaceFragment(Fragment fragment) {
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
-        }
-
+        ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
     }
 
 
@@ -100,8 +97,7 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
 
     @Override
     public void onBackStackChanged() {
-        if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).onBackStackChanged();
-        }
+
     }
 }

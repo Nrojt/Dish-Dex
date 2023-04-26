@@ -141,16 +141,12 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
     //This method is used to replace the current fragment with a new fragment
     @Override
     public void replaceFragment(Fragment fragment) {
-        if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
-        }
     }
 
     @Override
     public void onBackStackChanged() {
-        if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).onBackStackChanged();
-        }
     }
 
     @Override

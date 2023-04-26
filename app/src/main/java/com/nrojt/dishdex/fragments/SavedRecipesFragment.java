@@ -35,18 +35,15 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     private FloatingActionButton savedRecipesFab;
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "hideFab";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private boolean hideFab;
 
     private MyDatabaseHelper db;
 
     private final ArrayList<Recipe> recipes = new ArrayList<>();
 
-    private SearchView savedRecipesSearchView;
     private RecyclerView savedRecipesRecyclerView;
 
     private Recipe deletedRecipe;
@@ -62,16 +59,14 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param hideFab Parameter 1.
      * @return A new instance of fragment SavedRecipesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SavedRecipesFragment newInstance(String param1, String param2) {
+    public static SavedRecipesFragment newInstance(boolean hideFab) {
         SavedRecipesFragment fragment = new SavedRecipesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putBoolean(ARG_PARAM1, hideFab);
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,8 +75,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            hideFab = getArguments().getBoolean(ARG_PARAM1, false);
         }
     }
 
@@ -94,7 +88,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         db = MyDatabaseHelper.getInstance(getContext());
 
         savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
-        savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);
+        SearchView savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);
         savedRecipesFab = view.findViewById(R.id.savedRecipesFab);
 
         savedRecipesFab.setOnClickListener(v -> showFabMenu());
@@ -104,6 +98,11 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this);
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        if(hideFab){
+            savedRecipesFab.setVisibility(View.GONE);
+            savedRecipesSearchView.setVisibility(View.GONE);
+        }
 
         //Adding the search functionality
         savedRecipesSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -248,16 +247,13 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     //replacing the fragment
     @Override
     public void replaceFragment(Fragment fragment) {
-        if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
-        }
     }
 
     @Override
     public void onBackStackChanged() {
-        if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).onBackStackChanged();
-        }
+
     }
 
     @Override

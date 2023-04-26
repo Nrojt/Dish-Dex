@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +26,8 @@ import com.nrojt.dishdex.utils.internet.WebScraper;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class ShowAndEditRecipeFragment extends Fragment implements FragmentManager.OnBackStackChangedListener, FragmentReplacer {
@@ -267,7 +268,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                         // Update recipe in database
                         db.updateRecipe(recipe.getRecipeID(), recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
                         for (int i = 0; i < selectedCategories.length; i++) {
-                            System.out.println("selectedCategories[" + i + "] = " + selectedCategories[i] + " for " + recipe.getRecipeTitle() );
 
                             if (selectedCategories[i]) {
                                 // The category is selected, so add it to the recipe
@@ -303,20 +303,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
 
             //setting the positive button to save the categories
             builder.setPositiveButton("Save", (dialog, which) -> {
-                //creating a new ArrayList to store the selected categories
-                ArrayList<Category> selectedCategoriesList = new ArrayList<>();
-                for (int i = 0; i < selectedCategories.length; i++) {
-                    if (selectedCategories[i]) {
-                        selectedCategoriesList.add(categories.get(i));
-                    }
-                }
+                updateSelectedCategories();
 
-                //setting the text of the chooseCategoriesTextView to the selected categories
-                ArrayList<String> selectedCategoryNames = new ArrayList<>();
-                for (Category category : selectedCategoriesList) {
-                    selectedCategoryNames.add(category.getCategoryName());
-                }
-                chooseCategoriesTextView.setText(TextUtils.join(", ", selectedCategoryNames));
             });
 
             //setting the negative button to cancel the dialog
@@ -377,27 +365,41 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 }
             }
         }
+
+        updateSelectedCategories();
+    }
+
+    //Updating the selected categories text view
+    private void updateSelectedCategories() {
+        // filter selected categories and map to their names
+        String selectedCategoryNames = IntStream.range(0, selectedCategories.length)
+                .filter(i -> selectedCategories[i])
+                .mapToObj(categories::get)
+                .map(Category::getCategoryName)
+                .collect(Collectors.joining(", "));
+
+        // set text of chooseCategoriesTextView to selected categories
+        if(selectedCategoryNames.isEmpty() || selectedCategoryNames.isBlank()) {
+            chooseCategoriesTextView.setText("Categories");
+        }
+        else {
+            chooseCategoriesTextView.setText(selectedCategoryNames);
+        }
     }
 
     @Override
     public void onBackStackChanged() {
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).onBackStackChanged();
-        }
+        ((MainActivity) getActivity()).onBackStackChanged();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (getActivity() != null) {
-            fragmentManager.removeOnBackStackChangedListener(this);
-        }
+        fragmentManager.removeOnBackStackChangedListener(this);
     }
 
     @Override
     public void replaceFragment(Fragment fragment) {
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
-        }
+        ((MainActivity) getActivity()).replaceFragment(fragment, getClass());
     }
 }
