@@ -50,6 +50,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     private FragmentManager fragmentManager;
 
+    public static boolean noSavedRecipes = false;
+
 
     public SavedRecipesFragment() {
         // Required empty public constructor
@@ -138,7 +140,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
                     savedRecipesCustomRecyclerAdapter.notifyItemRemoved(position);
 
                     //This snackbar allows the user to undo the deletion
-                    Snackbar snackbar = Snackbar.make(savedRecipesRecyclerView, deletedRecipe.getRecipeTitle(), Snackbar.LENGTH_LONG)
+                    Snackbar snackbar = Snackbar.make(savedRecipesRecyclerView, "Deleting "+deletedRecipe.getRecipeTitle(), Snackbar.LENGTH_LONG)
                             .setAction("Undo", v -> {
                                 //recipeTitles.add(position, deletedRecipe);
                                 recipes.add(position, deletedRecipe);
@@ -196,6 +198,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         if (cursor.getCount() == 0) {
             Toast.makeText(getContext(), "No saved recipes found.", Toast.LENGTH_SHORT).show();
+            noSavedRecipes = true;
         } else {
             while (cursor.moveToNext()) {
                 Recipe recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true);

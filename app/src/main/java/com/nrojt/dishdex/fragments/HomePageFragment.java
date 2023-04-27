@@ -97,6 +97,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         TextView recipeTimeServingsTextView = view.findViewById(R.id.recipeTimeServingsTextView);
         TextView dateTextView = view.findViewById(R.id.dateTextView);
         TextView timeTextView = view.findViewById(R.id.timeTextView);
+        TextView homePageFragmentContainerTextView = view.findViewById(R.id.homePageFragmentContainerTextView);
         FragmentContainerView fragmentContainerView = view.findViewById(R.id.savedRecipesFragmentContainerView);
         greetingsTextView = view.findViewById(R.id.greetingsTextView);
         recipeForTimeTextView = view.findViewById(R.id.recipeForTimeTextView);
@@ -116,6 +117,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         timeTextView.setTextSize(MainActivity.fontSizeText);
         recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSizeText);
         recipeTimeServingsTextView.setTextSize(MainActivity.fontSizeText);
+        homePageFragmentContainerTextView.setTextSize(MainActivity.fontSizeTitles);
 
         //Getting a random recipeID based on the time of day
         getRandomRecipeIDBasedOnTime();
@@ -149,15 +151,25 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         }
 
 
+
+        //Setting the visibility and onclick listener for the recipe card
         if (timeRecipeID == -1) {
             recipeForTimeTextView.setText("You do not have any saved recipes for this time of the day.");
+            homePageFragmentContainerTextView.setText("Maybe try one of your saved recipes:");
             recipeTimeCardView.setVisibility(View.GONE);
         } else {
             recipeTimeCardView.setVisibility(View.VISIBLE);
+            homePageFragmentContainerTextView.setText("Don't like this one? Try one of your saved recipes:");
             recipeTimeCardView.setOnClickListener(v -> {
                 Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipe , null, null);
                 replaceFragment(showAndEditRecipeFragment);
             });
+        }
+
+        //TODO hide containertextview when there are no saved recipes
+        if (savedRecipesFragment.noSavedRecipes) {
+            fragmentContainerView.setVisibility(View.GONE);
+            homePageFragmentContainerTextView.setVisibility(View.GONE);
         }
 
         return view;
