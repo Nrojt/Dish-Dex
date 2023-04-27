@@ -79,7 +79,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getChildFragmentManager();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_web_browser, container, false);
         urlBrowser = view.findViewById(R.id.urlBrowser);
@@ -205,7 +205,6 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
     //overriding the back button
     @Override
     public boolean handleOnBackPressed() {
-        System.out.println("back pressed");
         if (urlBrowser != null && urlBrowser.canGoBack()) {
             urlBrowser.goBack();
             return true;

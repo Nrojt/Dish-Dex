@@ -77,7 +77,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getChildFragmentManager();
         View view = inflater.inflate(R.layout.fragment_saved_categories, container, false);
         savedCategoriesRecyclerView = view.findViewById(R.id.savedCategoriesRecyclerView);
         SearchView savedCategoriesSearchView = view.findViewById(R.id.savedCategoriesSearchView);

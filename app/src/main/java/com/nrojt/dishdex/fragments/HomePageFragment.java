@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Category;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
@@ -24,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -215,15 +217,31 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     //Getting the recipe information from the database
     private void getInformationFromRecipe() {
         MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext());
-        System.out.println("timeRecipeID: " + timeRecipeID);
 
         if (timeRecipeID != -1) {
             Cursor cursor = db.readAllDataFromSavedRecipesWhereRecipeID(timeRecipeID);
             cursor.moveToFirst();
-            recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true);
+            ArrayList<Category> categories = getSavedCategoryForRecipeFromDatabase(timeRecipeID);
+            recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true, categories);
             cursor.close();
         }
         db.close();
+    }
+
+    //Getting the saved categoryIDs from the database to show the user which categories are applied to the recipe
+    private ArrayList<Category> getSavedCategoryForRecipeFromDatabase(int recipeID) {
+        ArrayList<Category> savedCategories = new ArrayList<>();
+        try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
+            Cursor cursor = db.getAllCategoriesWhereRecipeID(recipeID);
+            while (cursor.moveToNext()) {
+                Category category = new Category( cursor.getInt(0), cursor.getString(1));
+                savedCategories.add(category);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return savedCategories;
     }
 
     @Override

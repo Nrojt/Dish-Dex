@@ -62,7 +62,7 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
         Button saveCategoryButton = view.findViewById(R.id.saveCategoryButton);
         categoryNameEditText = view.findViewById(R.id.categoryNameEditText);
 
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getChildFragmentManager();
 
         saveCategoryButton.setOnClickListener(v -> {
             String categoryName = categoryNameEditText.getText().toString().trim();

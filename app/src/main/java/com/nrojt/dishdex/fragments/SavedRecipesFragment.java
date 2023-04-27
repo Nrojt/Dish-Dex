@@ -6,9 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -20,6 +23,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Category;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
@@ -28,8 +32,11 @@ import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
 import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class SavedRecipesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer, FragmentManager.OnBackStackChangedListener {
 
@@ -43,6 +50,10 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     private MyDatabaseHelper db;
 
     private final ArrayList<Recipe> recipes = new ArrayList<>();
+    private ArrayList<Category> allCategories = new ArrayList<>();
+    private boolean[] selectedCategories;
+
+    private TextView chooseCategoriesSavedRecipeTextView;
 
     private RecyclerView savedRecipesRecyclerView;
 
@@ -84,7 +95,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getChildFragmentManager();
         View view = inflater.inflate(R.layout.fragment_saved_recipes, container, false);
 
         db = MyDatabaseHelper.getInstance(getContext());
@@ -92,6 +103,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
         SearchView savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);
         savedRecipesFab = view.findViewById(R.id.savedRecipesFab);
+        chooseCategoriesSavedRecipeTextView = view.findViewById(R.id.chooseCategoriesSavedRecipeTextView);
+        RelativeLayout savedRecipesSearchRelativeLayout = view.findViewById(R.id.savedRecipesSearchRelativeLayout);
 
         savedRecipesFab.setOnClickListener(v -> showFabMenu());
 
@@ -103,7 +116,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         if(hideFab){
             savedRecipesFab.setVisibility(View.GONE);
-            savedRecipesSearchView.setVisibility(View.GONE);
+            savedRecipesSearchRelativeLayout.setVisibility(View.GONE);
         }
 
         //Adding the search functionality
@@ -168,20 +181,86 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         //This method gets the recipes in the database
         getRecipesFromDatabase();
 
+        //getting all the categories from the database
+        getCategoriesFromDatabase();
+
+        //setting the onClickListener for the chooseCategoriesTextView
+        chooseCategoriesSavedRecipeTextView.setOnClickListener(v -> {
+            //creating a new AlertDialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Choose Categories");
+
+            // Putting the category names to a String array
+            String[] categoriesArray = new String[allCategories.size()];
+
+            for (int i = 0; i < allCategories.size(); i++) {
+                categoriesArray[i] = allCategories.get(i).getCategoryName(); // Assuming each Category object has a getName() method
+            }
+
+            // Set the multi-choice items in the dialog builder
+            builder.setMultiChoiceItems(categoriesArray, selectedCategories, (dialog, which, isChecked) -> selectedCategories[which] = isChecked);
+
+
+            //setting the positive button to save the categories
+            builder.setPositiveButton("Save", (dialog, which) -> {
+                //TODO make a filter list or something
+                filter();
+            });
+
+            //setting the negative button to cancel the dialog
+            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+            //creating and showing the dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        });
+
         return view;
     }
 
+
     //This method is called when the user enters text into the search bar and it filters the recipes based on their titles
     private void filter(String newText) {
-        //TODO filter by category once that is implemented, not gonna make this before opt2 though
         ArrayList<Recipe> filteredRecipes = new ArrayList<>();
 
         for (Recipe recipe : recipes) {
-            if (recipe.getRecipeTitle().toLowerCase().contains(newText.toLowerCase())) {
+            if (recipe.getRecipeTitle().toLowerCase().contains(newText.toLowerCase()) && !filteredRecipes.contains(recipe)) {
                 filteredRecipes.add(recipe);
             }
         }
 
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this);
+        savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
+        savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+    }
+
+    private void filter(){
+        //TODO if multiple categories are selected only show recipes that have all of the selected categories
+        ArrayList<Recipe> filteredRecipes = new ArrayList<>();
+
+        boolean allFalse = IntStream.range (0, selectedCategories.length)
+                .mapToObj (i -> selectedCategories [i])
+                .noneMatch(value -> value);
+
+        if(allFalse){
+            filteredRecipes.addAll(recipes);
+        } else {
+            for (Recipe recipe : recipes) {
+                for (Category category : recipe.getCategories()) {
+                    int categoryIndex = -1;
+                    for (int i = 0; i < allCategories.size(); i++) {
+                        if (allCategories.get(i).getCategoryID() == category.getCategoryID()) {
+                            categoryIndex = i;
+                            break;
+                        }
+                    }
+                    if (categoryIndex >= 0 && categoryIndex < selectedCategories.length && selectedCategories[categoryIndex] && !filteredRecipes.contains(recipe)) {
+                        filteredRecipes.add(recipe);
+                    }
+                }
+            }
+        }
         SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this);
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -192,6 +271,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         //Clearing the lists so that the data is not duplicated
         recipes.clear();
+        allCategories.clear();
 
         //Getting the data from the database
         Cursor cursor = db.readAllDataFromSavedRecipes();
@@ -201,11 +281,49 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
             noSavedRecipes = true;
         } else {
             while (cursor.moveToNext()) {
-                Recipe recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true);
+                ArrayList<Category> categories = getSavedCategoryForRecipeFromDatabase(cursor.getInt(0));
+
+                Recipe recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true, categories);
                 recipes.add(recipe);
             }
         }
         cursor.close();
+    }
+
+    //getting all the categories from the database
+    private void getCategoriesFromDatabase() {
+        try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
+            Cursor cursor = db.readAllDataFromCategories();
+            if (cursor.getCount() == 0) {
+                //This should never happen, since the database is created with default categories
+                Toast.makeText(getContext(), "No Categories", Toast.LENGTH_SHORT).show();
+            } else {
+                while (cursor.moveToNext()) {
+                    Category category = new Category(cursor.getInt(1), cursor.getString(0));
+                    allCategories.add(category);
+                }
+            }
+            selectedCategories = new boolean[allCategories.size()];
+            Arrays.fill(selectedCategories, false);
+
+            cursor.close();
+        }
+    }
+
+    //Getting the saved categoryIDs from the database to show the user which categories are applied to the recipe
+    private ArrayList<Category> getSavedCategoryForRecipeFromDatabase(int recipeID) {
+        ArrayList<Category> savedCategories = new ArrayList<>();
+        try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
+            Cursor cursor = db.getAllCategoriesWhereRecipeID(recipeID);
+            while (cursor.moveToNext()) {
+                Category category = new Category(cursor.getInt(0), cursor.getString(1));
+                savedCategories.add(category);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return savedCategories;
     }
 
     //This method displays the FAB menu

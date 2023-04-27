@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 if (backStackEntryCount > 0) {
                     // Get the current fragment and check if it implements OnBackPressedListener
                     Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentContainer);
-                    System.out.println(currentFragment.getClass().getSimpleName());
 
                     //If the current fragment is the homepage fragment, minimize the app
                     if(currentFragment.getClass().getSimpleName().equals("HomePageFragment")){
@@ -215,6 +214,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 return true;
             });
         }
+    }
+
+    public void popBackStack() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack();
     }
 
 

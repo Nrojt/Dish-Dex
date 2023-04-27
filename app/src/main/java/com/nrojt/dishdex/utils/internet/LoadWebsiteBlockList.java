@@ -1,6 +1,7 @@
 package com.nrojt.dishdex.utils.internet;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.nrojt.dishdex.R;
 
@@ -40,7 +41,7 @@ public class LoadWebsiteBlockList {
             }
             in.close();
         } catch (IOException e) {
-            System.out.println("Failed to read the list file: " + e.getMessage());
+            Log.e("Failed to read blocklist", "Failed to read the list file: " + e.getMessage());
         }
     }
 

@@ -228,13 +228,11 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query("recipe_categories", columns, selection, selectionArgs, null, null, null);
 
         if (cursor.getCount() > 0) {
-            System.out.println("The combination of recipeID and categoryID already exists in the recipe_categories table, so don't insert a new row");
             // The combination of recipeID and categoryID already exists in the recipe_categories table, so don't insert a new row
             cursor.close();
             db.close();
             return false;
         } else {
-            System.out.println("The combination of recipeID and categoryID doesn't exist yet in the recipe_categories table, so insert a new row");
             // The combination of recipeID and categoryID doesn't exist yet in the recipe_categories table, so insert a new row
             long result = db.insert("recipe_categories", null, cv);
             cursor.close();
@@ -297,7 +295,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     //getting the categories from recipe_categories where recipeID = recipeID
     public Cursor getAllCategoriesWhereRecipeID(int recipeID) {
         Cursor cursor = null;
-        String query = "SELECT categoryID FROM recipe_categories WHERE recipeID = " + recipeID;
+        String query = "SELECT c.categoryID, c.categoryName " +
+                "FROM category c " +
+                "JOIN recipe_categories rc ON c.categoryID = rc.categoryID " +
+                "WHERE rc.recipeID = " + recipeID;
         SQLiteDatabase db = this.getReadableDatabase();
         if (db != null) {
             cursor = db.rawQuery(query, null);

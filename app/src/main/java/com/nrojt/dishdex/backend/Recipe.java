@@ -16,9 +16,9 @@ public class Recipe implements Serializable {
 
     private ArrayList<Category> categories;
 
-    //TODO: Add a list of categories to the recipe class
+    //TODO: favorite recipes system
 
-    public Recipe(String recipeTitle, String recipeIngredients, String recipeInstructions, String recipeNotes, String recipeUrl, int recipeID, int recipeCookingTime, int recipeServings, boolean isSupported) {
+    public Recipe(String recipeTitle, String recipeIngredients, String recipeInstructions, String recipeNotes, String recipeUrl, int recipeID, int recipeCookingTime, int recipeServings, boolean isSupported, ArrayList<Category> categories) {
         this.recipeTitle = recipeTitle;
         this.recipeIngredients = recipeIngredients;
         this.recipeInstructions = recipeInstructions;
@@ -28,6 +28,7 @@ public class Recipe implements Serializable {
         this.recipeCookingTime = recipeCookingTime;
         this.recipeServings = recipeServings;
         this.isSupported = isSupported;
+        this.categories = categories;
     }
 
     public Recipe(){}
@@ -66,5 +67,12 @@ public class Recipe implements Serializable {
 
     public boolean isSupported() {
         return isSupported;
+    }
+    public ArrayList<Category> getCategories() {
+        return categories;
+    }
+
+    public void addCategory(Category category){
+        categories.add(category);
     }
 }

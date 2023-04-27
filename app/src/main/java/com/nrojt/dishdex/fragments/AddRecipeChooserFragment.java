@@ -3,6 +3,7 @@ package com.nrojt.dishdex.fragments;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +70,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getChildFragmentManager();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_recipe_chooser, container, false);
 
@@ -93,7 +94,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
                 service.execute(() -> {
                     wb.scrapeWebsite();
                     handler.post(() -> {
-                        System.out.println("Scraping done");
+                        Log.d("Scraping","Scraping done");
                         //checking to see if the site is supported and if the site is reachable
                         if (wb.isNotConnected()) {
                             Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();

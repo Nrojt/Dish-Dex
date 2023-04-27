@@ -6,16 +6,39 @@
     android:layout_height="match_parent"
     tools:context=".fragments.SavedRecipesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/savedRecipesSearchView"
+    <RelativeLayout
+        android:id="@+id/savedRecipesSearchRelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/savedRecipesSearchView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            app:defaultQueryHint="Search by name" />
+
+        <TextView
+            android:id="@+id/chooseCategoriesSavedRecipeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/savedRecipesSearchView"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:background="@android:drawable/editbox_background"
+            android:minHeight="48dp"
+            android:text="Choose categories"
+            app:drawableEndCompat="@android:drawable/arrow_down_float" />
+
+    </RelativeLayout>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/savedRecipesFab"
@@ -40,7 +63,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/savedRecipesSearchView">
+        app:layout_constraintTop_toBottomOf="@+id/savedRecipesSearchRelativeLayout">
 
     </androidx.recyclerview.widget.RecyclerView>
 

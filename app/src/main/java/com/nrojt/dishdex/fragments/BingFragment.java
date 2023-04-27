@@ -170,7 +170,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         if (wb.isNotConnected() || wb.isNotReachable()) {
             Log.e("BingFragment", "Not connected to the internet or cannot reach this site: " + url);
         } else {
-            Recipe recipe = new Recipe(wb.getRecipeTitle(), wb.getIngredientText().toString(), wb.getRecipeText().toString(), "", wb.getUrl(), -1, wb.getCookingTime(), wb.getServings(), !wb.isNotSupported()); //if the site is supported, isNotSupported will return false. Here we need to know if the site is supported, so we invert the boolean
+            Recipe recipe = new Recipe(wb.getRecipeTitle(), wb.getIngredientText().toString(), wb.getRecipeText().toString(), "", wb.getUrl(), -1, wb.getCookingTime(), wb.getServings(), !wb.isNotSupported(), new ArrayList<>()); //if the site is supported, isNotSupported will return false. Here we need to know if the site is supported, so we invert the boolean
             recipes.add(recipe);
         }
     }

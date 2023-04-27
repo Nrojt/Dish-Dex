@@ -47,7 +47,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     // for getting and selecting categories
     private final ArrayList<Category> categories = new ArrayList<>();
     private boolean[] selectedCategories;
-    private final ArrayList<Integer> savedCategoryIDs = new ArrayList<>();
 
 
     // the fragment initialization parameters
@@ -93,7 +92,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = getChildFragmentManager();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_show_and_edit_recipe, container, false);
 
@@ -156,12 +155,12 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 urlTextOnScreen.setText(recipe.getRecipeUrl());
 
                 //getting the categories from the database and setting the selectedCategories array to the correct values;
-                getSavedCategoryForRecipeFromDatabase();
+                getSavedCategoryForRecipe();
             }
             case 2 -> {
                 isUrlSupportedTextView.setVisibility(View.GONE);
                 saveOrEditRecipeButton.setText("Save Recipe");
-                getSavedCategoryForRecipeFromDatabase();
+                getSavedCategoryForRecipe();
             }
             case 3 -> {
                 isUrlSupportedTextView.setVisibility(View.VISIBLE);
@@ -182,7 +181,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             default -> {
                 isUrlSupportedTextView.setVisibility(View.GONE);
                 saveOrEditRecipeButton.setText("Change Recipe");
-                getSavedCategoryForRecipeFromDatabase();
+                getSavedCategoryForRecipe();
             }
         }
 
@@ -255,13 +254,15 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                         // Add recipe to database
                         recipeIDFromDatabase = db.addRecipe(recipeTitle, ingredients, recipeSteps, cookingTime, servings, notes, url);
                         for (int i = 0; i < selectedCategories.length; i++) {
-                            System.out.println("selectedCategories[" + i + "] = " + selectedCategories[i]);
+
                             if (selectedCategories[i]) {
                                 db.addRecipeCategory(recipeIDFromDatabase, categories.get(i).getCategoryID());
                             }
                         }
                         if (recipeIDFromDatabase != -1) {
-                            fragmentManager.popBackStack();
+                            ((MainActivity) getActivity()).popBackStack();
+                        } else{
+                            Toast.makeText(getActivity().getApplicationContext(), "Error adding recipe", Toast.LENGTH_SHORT).show();
                         }
                     }
                     default -> {
@@ -278,7 +279,9 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                             }
                         }
                         if (recipeIDFromDatabase != -1) {
-                            fragmentManager.popBackStack();
+                            ((MainActivity) getActivity()).popBackStack();
+                        } else{
+                            Toast.makeText(getActivity().getApplicationContext(), "Error adding recipe", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -291,8 +294,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle("Choose Categories");
 
-            // Convert the categories ArrayList to an array of type CharSequence
-            CharSequence[] categoriesArray = new CharSequence[categories.size()];
+            // Putting the category names to a String array
+            String[] categoriesArray = new String[categories.size()];
             for (int i = 0; i < categories.size(); i++) {
                 categoriesArray[i] = categories.get(i).getCategoryName(); // Assuming each Category object has a getName() method
             }
@@ -304,7 +307,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             //setting the positive button to save the categories
             builder.setPositiveButton("Save", (dialog, which) -> {
                 updateSelectedCategories();
-
             });
 
             //setting the negative button to cancel the dialog
@@ -323,8 +325,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             }
             return true; // indicate that the event is consumed
         });
-
-
 
         return view;
     }
@@ -347,25 +347,16 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     }
 
     //Getting the saved categoryIDs from the database to show the user which categories are applied to the recipe
-    private void getSavedCategoryForRecipeFromDatabase() {
-        try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
-            Cursor cursor = db.getAllCategoriesWhereRecipeID(recipe.getRecipeID());
-            while (cursor.moveToNext()) {
-                savedCategoryIDs.add(cursor.getInt(0));
-            }
-            cursor.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void getSavedCategoryForRecipe() {
         //Setting the selectedCategories array to true for the categories that are already saved
+
         for (int i = 0; i < categories.size(); i++) {
-            for (int j = 0; j < savedCategoryIDs.size(); j++) {
-                if (Objects.equals(categories.get(i).getCategoryID(), savedCategoryIDs.get(j))) {
+            for (int j = 0; j < recipe.getCategories().size(); j++) {
+                if (categories.get(i).getCategoryID() == recipe.getCategories().get(j).getCategoryID()){
                     selectedCategories[i] = true;
                 }
             }
         }
-
         updateSelectedCategories();
     }
 
