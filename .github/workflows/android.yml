@@ -26,3 +26,7 @@ jobs:
       run: ./gradlew build
     - name: Run tests with Gradle
       run: ./gradlew test
+    - name: Run instrumented tests with Gradle
+      run: ./gradlew connectedCheck
+    - name: Build Project
+      run: ./gradlew assemble
