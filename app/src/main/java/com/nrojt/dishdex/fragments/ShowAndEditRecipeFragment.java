@@ -2,8 +2,10 @@ package com.nrojt.dishdex.fragments;
 
 import android.database.Cursor;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,21 +72,30 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         ShowAndEditRecipeFragment fragment = new ShowAndEditRecipeFragment();
         Bundle args = new Bundle();
         args.putInt(MODE, mode);
-        args.putSerializable(RECIPE, recipe);
-        args.putSerializable(WEB_SCRAPER, wb);
+        args.putParcelable(RECIPE, recipe);
+        args.putParcelable(WEB_SCRAPER, wb);
         args.putString(URL, url);
         fragment.setArguments(args);
         return fragment;
     }
 
+    @SuppressWarnings("DEPRECATION")
+    // getParcelable is deprecated in API 33 (Android 13) so we use getParcelableExtra for API 33 and above, but we still need getParcelable for API 32 and below. This is why we use @SuppressWarnings("DEPRECATION") to suppress the warning about getParcelable being deprecated.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mode = getArguments().getInt(MODE);
-            recipe = (Recipe) getArguments().getSerializable(RECIPE);
-            wb = (WebScraper) getArguments().getSerializable("WebScraper");
-            url = getArguments().getString("Url");
+            url = getArguments().getString(URL);
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                recipe = getActivity().getIntent().getParcelableExtra(RECIPE, Recipe.class);
+                wb = getActivity().getIntent().getParcelableExtra(WEB_SCRAPER, WebScraper.class);
+            } else {
+                recipe = getArguments().getParcelable(RECIPE);
+                wb = getArguments().getParcelable(WEB_SCRAPER);
+            }
+
         }
     }
 
@@ -190,7 +201,8 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             Rect r = new Rect();
             view.getWindowVisibleDisplayFrame(r);
             int screenHeight = view.getRootView().getHeight();
-            Handler handler = new Handler();
+
+            Handler handler = new Handler(Looper.getMainLooper());
 
             // Calculate the difference between the visible screen height and the total screen height
             int heightDifference = screenHeight - (r.bottom - r.top);

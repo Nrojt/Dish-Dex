@@ -2,7 +2,7 @@ package com.nrojt.dishdex.backend;
 
 import java.io.Serializable;
 
-public class Category implements Serializable {
+public class Category{
     private String categoryName;
     private int categoryID;
 

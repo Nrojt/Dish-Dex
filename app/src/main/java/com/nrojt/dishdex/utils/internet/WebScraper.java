@@ -1,5 +1,10 @@
 package com.nrojt.dishdex.utils.internet;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //Serializable allows the object to be passed between fragments
-public class WebScraper implements Serializable {
+public class WebScraper implements Parcelable {
     private boolean notConnected = false;
     private boolean notSupported = false;
     private boolean notReachable = false;
@@ -22,8 +27,8 @@ public class WebScraper implements Serializable {
     private int servings = 0;
     private int cookingTime = 0;
     private String recipeTitle;
-    private final List<String> recipeTextList = new ArrayList<>();
-    private final List<String> ingredientTextList = new ArrayList<>();
+    private List<String> recipeTextList = new ArrayList<>();
+    private List<String> ingredientTextList = new ArrayList<>();
 
     private final StringBuilder recipeText = new StringBuilder();
     private final StringBuilder ingredientText = new StringBuilder();
@@ -37,6 +42,30 @@ public class WebScraper implements Serializable {
             this.url = url;
         }
     }
+
+    protected WebScraper(Parcel in) {
+        notConnected = in.readByte() != 0;
+        notSupported = in.readByte() != 0;
+        notReachable = in.readByte() != 0;
+        url = in.readString();
+        servings = in.readInt();
+        cookingTime = in.readInt();
+        recipeTitle = in.readString();
+        recipeTextList = in.createStringArrayList();
+        ingredientTextList = in.createStringArrayList();
+    }
+
+    public static final Creator<WebScraper> CREATOR = new Creator<WebScraper>() {
+        @Override
+        public WebScraper createFromParcel(Parcel in) {
+            return new WebScraper(in);
+        }
+
+        @Override
+        public WebScraper[] newArray(int size) {
+            return new WebScraper[size];
+        }
+    };
 
     public boolean isNotConnected() {
         return notConnected;
@@ -250,5 +279,23 @@ public class WebScraper implements Serializable {
         } catch (IOException ignored) {
         }
         return document;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeByte((byte) (notConnected ? 1 : 0));
+        dest.writeByte((byte) (notSupported ? 1 : 0));
+        dest.writeByte((byte) (notReachable ? 1 : 0));
+        dest.writeString(url);
+        dest.writeInt(servings);
+        dest.writeInt(cookingTime);
+        dest.writeString(recipeTitle);
+        dest.writeStringList(recipeTextList);
+        dest.writeStringList(ingredientTextList);
     }
 }

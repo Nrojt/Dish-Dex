@@ -7,6 +7,14 @@ android {
     namespace 'com.nrojt.dishdex'
     compileSdk 33
 
+    allprojects {
+        gradle.projectsEvaluated {
+            tasks.withType(JavaCompile) {
+                options.compilerArgs << "-Xlint:deprecation"
+            }
+        }
+    }
+
     defaultConfig {
         applicationId "com.nrojt.dishdex"
         minSdk 28

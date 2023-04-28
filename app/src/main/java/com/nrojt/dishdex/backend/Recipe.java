@@ -1,9 +1,13 @@
 package com.nrojt.dishdex.backend;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
-public class Recipe implements Serializable {
+public class Recipe implements Parcelable {
     private String recipeTitle = "";
     private String recipeIngredients = "";
     private String recipeInstructions = "";
@@ -32,6 +36,30 @@ public class Recipe implements Serializable {
     }
 
     public Recipe(){}
+
+    protected Recipe(Parcel in) {
+        recipeTitle = in.readString();
+        recipeIngredients = in.readString();
+        recipeInstructions = in.readString();
+        recipeNotes = in.readString();
+        recipeUrl = in.readString();
+        recipeID = in.readInt();
+        recipeCookingTime = in.readInt();
+        recipeServings = in.readInt();
+        isSupported = in.readByte() != 0;
+    }
+
+    public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
+        @Override
+        public Recipe createFromParcel(Parcel in) {
+            return new Recipe(in);
+        }
+
+        @Override
+        public Recipe[] newArray(int size) {
+            return new Recipe[size];
+        }
+    };
 
     public String getRecipeTitle() {
         return recipeTitle;
@@ -74,5 +102,23 @@ public class Recipe implements Serializable {
 
     public void addCategory(Category category){
         categories.add(category);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(recipeTitle);
+        dest.writeString(recipeIngredients);
+        dest.writeString(recipeInstructions);
+        dest.writeString(recipeNotes);
+        dest.writeString(recipeUrl);
+        dest.writeInt(recipeID);
+        dest.writeInt(recipeCookingTime);
+        dest.writeInt(recipeServings);
+        dest.writeByte((byte) (isSupported ? 1 : 0));
     }
 }
