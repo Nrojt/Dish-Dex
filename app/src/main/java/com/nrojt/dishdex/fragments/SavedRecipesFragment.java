@@ -44,7 +44,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     private static final String ARG_PARAM1 = "hideFab";
 
-    // TODO: Rename and change types of parameters
+
     private boolean hideFab;
 
     private MyDatabaseHelper db;
@@ -75,7 +75,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
      * @param hideFab Parameter 1.
      * @return A new instance of fragment SavedRecipesFragment.
      */
-    // TODO: Rename and change types and number of parameters
+
     public static SavedRecipesFragment newInstance(boolean hideFab) {
         SavedRecipesFragment fragment = new SavedRecipesFragment();
         Bundle args = new Bundle();
@@ -127,8 +127,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                filter(newText);
+            public boolean onQueryTextChange(String stringToFilter) {
+                filter(stringToFilter);
                 return true;
             }
         });
@@ -203,8 +203,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
             //setting the positive button to save the categories
             builder.setPositiveButton("Save", (dialog, which) -> {
-                //TODO make a filter list or something
-                filter();
+                filter(savedRecipesSearchView.getQuery().toString());
             });
 
             //setting the negative button to cancel the dialog
@@ -220,33 +219,24 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
 
     //This method is called when the user enters text into the search bar and it filters the recipes based on their titles
-    private void filter(String newText) {
+    private void filter(String stringToFilter) {
         ArrayList<Recipe> filteredRecipes = new ArrayList<>();
+        ArrayList<Recipe> tempFilteredRecipes = new ArrayList<>();
 
         for (Recipe recipe : recipes) {
-            if (recipe.getRecipeTitle().toLowerCase().contains(newText.toLowerCase()) && !filteredRecipes.contains(recipe)) {
-                filteredRecipes.add(recipe);
+            if (recipe.getRecipeTitle().toLowerCase().contains(stringToFilter.toLowerCase()) && !filteredRecipes.contains(recipe)) {
+                tempFilteredRecipes.add(recipe);
             }
         }
 
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this);
-        savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
-        savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-    }
-
-    private void filter(){
-        //TODO if multiple categories are selected only show recipes that have all of the selected categories
-        ArrayList<Recipe> filteredRecipes = new ArrayList<>();
-
-        boolean allFalse = IntStream.range (0, selectedCategories.length)
-                .mapToObj (i -> selectedCategories [i])
+        boolean allFalse = IntStream.range(0, selectedCategories.length)
+                .mapToObj(i -> selectedCategories[i])
                 .noneMatch(value -> value);
 
         if(allFalse){
-            filteredRecipes.addAll(recipes);
+            filteredRecipes.addAll(tempFilteredRecipes);
         } else {
-            for (Recipe recipe : recipes) {
+            for (Recipe recipe : tempFilteredRecipes) {
                 for (Category category : recipe.getCategories()) {
                     int categoryIndex = -1;
                     for (int i = 0; i < allCategories.size(); i++) {
@@ -261,6 +251,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
                 }
             }
         }
+
         SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this);
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

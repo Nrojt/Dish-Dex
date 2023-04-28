@@ -31,7 +31,6 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
-    //TODO figure out the backstack
 
     //Global variables basically
     public static boolean isProUser;

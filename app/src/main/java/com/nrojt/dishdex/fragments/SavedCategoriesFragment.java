@@ -163,7 +163,6 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
     }
 
     private void filter(String newText) {
-        //TODO filter by category once that is implemented, not gonna make this before opt2 though
         ArrayList<Category> filteredCategories = new ArrayList<>();
 
 
