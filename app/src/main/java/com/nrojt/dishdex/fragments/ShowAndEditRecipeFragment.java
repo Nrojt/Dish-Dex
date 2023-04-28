@@ -17,17 +17,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.Recipe;
+import com.nrojt.dishdex.backend.viewmodels.ShowAndEditRecipeFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -64,6 +66,9 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     private int recipeIDFromDatabase;
     private Recipe recipe;
 
+    private ShowAndEditRecipeFragmentViewModel viewModel;
+    private MainActivityViewModel mainActivityViewModel;
+
     public ShowAndEditRecipeFragment() {
         // Required empty public constructor
     }
@@ -95,8 +100,9 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 recipe = getArguments().getParcelable(RECIPE);
                 wb = getArguments().getParcelable(WEB_SCRAPER);
             }
-
         }
+        viewModel = new ViewModelProvider(requireActivity()).get(ShowAndEditRecipeFragmentViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
 
@@ -120,15 +126,21 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         TextView isUrlSupportedTextView = view.findViewById(R.id.isUrlSupportedTextView);
 
         //setting the text size of the on screen elements
-        instructionTextOnScreen.setTextSize(MainActivity.fontSizeText);
-        ingredientTextOnScreen.setTextSize(MainActivity.fontSizeText);
-        cookingTimeTextOnScreen.setTextSize(MainActivity.fontSizeText);
-        servingsTextOnScreen.setTextSize(MainActivity.fontSizeText);
-        recipeTitleTextOnScreen.setTextSize(MainActivity.fontSizeTitles);
-        noteTextOnScreen.setTextSize(MainActivity.fontSizeText);
-        urlTextOnScreen.setTextSize(MainActivity.fontSizeText);
-        chooseCategoriesTextView.setTextSize(MainActivity.fontSizeText);
-        isUrlSupportedTextView.setTextSize(MainActivity.fontSizeText);
+        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> {
+            recipeTitleTextOnScreen.setTextSize(integer);
+        });
+
+        mainActivityViewModel.getFontSizeText().observe(getViewLifecycleOwner(), integer -> {
+            instructionTextOnScreen.setTextSize(integer);
+            ingredientTextOnScreen.setTextSize(integer);
+            cookingTimeTextOnScreen.setTextSize(integer);
+            servingsTextOnScreen.setTextSize(integer);
+            noteTextOnScreen.setTextSize(integer);
+            urlTextOnScreen.setTextSize(integer);
+            chooseCategoriesTextView.setTextSize(integer);
+            isUrlSupportedTextView.setTextSize(integer);
+        });
+
 
         getCategoriesFromDatabase();
 

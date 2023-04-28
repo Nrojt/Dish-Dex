@@ -22,10 +22,14 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Recipe;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
+import com.nrojt.dishdex.backend.viewmodels.WebBrowserFragmentViewModel;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
 import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
@@ -47,19 +51,22 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
 
     private FragmentManager fragmentManager;
 
+    private WebBrowserFragmentViewModel viewModel;
+    private MainActivityViewModel mainActivityViewModel;
 
-    // TODO: Rename parameter arguments, choose names that match
+
+
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String URL = "url";
 
-    // TODO: Rename and change types of parameters
+
     private String openUrl = "https://www.google.com";
 
     public WebBrowserFragment() {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
+
     public static WebBrowserFragment newInstance(String url) {
         WebBrowserFragment fragment = new WebBrowserFragment();
         Bundle args = new Bundle();
@@ -74,6 +81,8 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         if (getArguments() != null) {
             openUrl = getArguments().getString(URL);
         }
+        viewModel = new ViewModelProvider(requireActivity()).get(WebBrowserFragmentViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -86,7 +95,8 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         currentBrowserUrl = view.findViewById(R.id.currentBrowserUrl);
         Button scrapeThisUrlButton = view.findViewById(R.id.scrapeThisUrlButton);
 
-        currentBrowserUrl.setTextSize(MainActivity.fontSizeTitles);
+        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> currentBrowserUrl.setTextSize(integer));
+
 
         LoadWebsiteBlockList loadWebsiteBlockList = new LoadWebsiteBlockList(getContext());
         //creating a new thread for getting the blocked urls

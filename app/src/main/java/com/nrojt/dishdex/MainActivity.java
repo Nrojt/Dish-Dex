@@ -3,22 +3,15 @@ package com.nrojt.dishdex;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.FrameLayout;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.databinding.ActivityMainBinding;
 import com.nrojt.dishdex.fragments.AddRecipeChooserFragment;
 import com.nrojt.dishdex.fragments.HomePageFragment;
@@ -32,14 +25,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
-    //Global variables basically
-    public static boolean isProUser;
-    public static final int MAX_CATEGORIES_FREE = 16;
-    public static float fontSizeText;
-    public static float fontSizeTitles;
-
-
-    ActivityMainBinding binding;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,25 +35,16 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        MainActivityViewModel mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        Log.i("MainActivity", "MainActivityViewModel initialized");
 
         SharedPreferences sharedPreferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
-        isProUser = sharedPreferences.getBoolean(SettingsFragment.IS_PRO_USER, false);
-        fontSizeText = sharedPreferences.getInt(SettingsFragment.FONT_SIZE, 14);
-        fontSizeTitles = sharedPreferences.getInt(SettingsFragment.FONT_SIZE_TITLES, 20);
+        mainActivityViewModel.setFontSizeText(sharedPreferences.getInt(SettingsFragment.FONT_SIZE, 14));
+        mainActivityViewModel.setFontSizeTitle(sharedPreferences.getInt(SettingsFragment.FONT_SIZE_TITLES, 20));
 
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-        //Initialize the AdMob SDK
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
-        });
-
-        AdView adView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
 
         //Setting onclicklistener for the bottom navigation bar
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -75,22 +52,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             return true;
         });
 
-        FrameLayout frameLayout = findViewById(R.id.fragmentContainer);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
-        // Set the top and bottom constraints of the FrameLayout and disabling adview if the user is a pro user.
-        if (isProUser) {
-            // Remove the ad view
-            ConstraintLayout adContainer = findViewById(R.id.mainPageConstraintLayout);
-            adContainer.removeView(adView);
-
-            // Set the top and bottom constraints of the FrameLayout
-            ConstraintSet constraintSet = new ConstraintSet();
-            constraintSet.clone(adContainer);
-            constraintSet.connect(frameLayout.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-            constraintSet.connect(frameLayout.getId(), ConstraintSet.BOTTOM, bottomNavigationView.getId(), ConstraintSet.TOP, 0);
-            constraintSet.applyTo(adContainer);
-        }
 
         //Method for handling the back button
         // Get the fragment manager and the number of entries in the backstack

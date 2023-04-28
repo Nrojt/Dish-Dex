@@ -17,12 +17,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.viewmodels.BingFragmentViewModel;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
@@ -64,6 +67,9 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
 
     private TextView bingNotificationTextView;
 
+    private BingFragmentViewModel viewModel;
+    private MainActivityViewModel mainActivityViewModel;
+
 
     /*
      * If you encounter unexpected authorization errors, double-check these values
@@ -95,6 +101,8 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         if (getArguments() != null) {
             searchTerm = getArguments().getString(SEARCH_QUERY);
         }
+        viewModel = new ViewModelProvider(requireActivity()).get(BingFragmentViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -103,14 +111,19 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         View view = inflater.inflate(R.layout.fragment_bing, container, false);
 
         bingNotificationTextView = view.findViewById(R.id.bingNotificationTextView);
-        bingNotificationTextView.setTextSize(MainActivity.fontSizeTitles);
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
 
+        //Setting the font sizes
+        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> {
+            bingNotificationTextView.setTextSize(integer);
+        });
+
+        //Setting up the recycler view
         RecyclerView bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
         bingRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedRecipesCustomRecyclerAdapter adapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this);
+        SavedRecipesCustomRecyclerAdapter adapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this, mainActivityViewModel.getFontSizeTitle().getValue(), mainActivityViewModel.getFontSizeText().getValue());
         bingRecyclerView.setAdapter(adapter);
         bingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

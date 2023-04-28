@@ -2,9 +2,11 @@ package com.nrojt.dishdex.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -12,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +23,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
+import com.nrojt.dishdex.backend.viewmodels.SavedCategoriesFragmentViewModel;
+import com.nrojt.dishdex.backend.viewmodels.SavedRecipesFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
@@ -42,12 +48,14 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
 
     private Category deletedCategory;
 
-    FragmentManager fragmentManager;
+    private FragmentManager fragmentManager;
+
+    private SavedCategoriesFragmentViewModel viewModel;
+    private MainActivityViewModel mainActivityViewModel;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -72,6 +80,8 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        viewModel = new ViewModelProvider(requireActivity()).get(SavedCategoriesFragmentViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -84,13 +94,19 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
         ImageButton addCategoryButton = view.findViewById(R.id.addCategoryButton);
 
         savedCategoriesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), categories, this);
+        SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), categories, this, mainActivityViewModel.getFontSizeTitle().getValue());
         savedCategoriesRecyclerView.setAdapter(savedCategoriesCustomRecyclerAdapter);
         savedCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         db = MyDatabaseHelper.getInstance(getContext());
 
+        //Setting font Size
+        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), fontSize -> {
+            EditText editText = savedCategoriesSearchView.findViewById(androidx.appcompat.R.id.search_src_text);
+            editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
+        });
 
+        //Setting up the search view
         savedCategoriesSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -172,7 +188,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
             }
         }
 
-        SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), filteredCategories, this);
+        SavedCategoriesCustomRecyclerAdapter savedCategoriesCustomRecyclerAdapter = new SavedCategoriesCustomRecyclerAdapter(getContext(), filteredCategories, this, mainActivityViewModel.getFontSizeTitle().getValue());
         savedCategoriesRecyclerView.setAdapter(savedCategoriesCustomRecyclerAdapter);
         savedCategoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }

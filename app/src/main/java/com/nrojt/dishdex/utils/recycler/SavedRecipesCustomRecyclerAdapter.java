@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Recipe;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 
 import java.util.ArrayList;
@@ -21,14 +22,17 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
     //Interface (polymorphism)
     private final RecyclerViewInterface listener;
     private final Context context;
-
     private final ArrayList<Recipe> recipes;
+    private int fontSizeTitle;
+    private int fontSizeText;
 
     //Constructor
-    public SavedRecipesCustomRecyclerAdapter(Context context, ArrayList<Recipe> recipes, RecyclerViewInterface listener) {
+    public SavedRecipesCustomRecyclerAdapter(Context context, ArrayList<Recipe> recipes, RecyclerViewInterface listener, int fontSizeTitle, int fontSizeText) {
         this.listener = listener;
         this.context = context;
         this.recipes = recipes;
+        this.fontSizeTitle = fontSizeTitle;
+        this.fontSizeText = fontSizeText;
     }
 
     //Inflate the view
@@ -47,9 +51,9 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
         holder.recipeCookingTimeText.setText(recipes.get(position).getRecipeCookingTime() + " minutes");
         holder.recipeServingsText.setText(recipes.get(position).getRecipeServings() + " servings");
 
-        holder.recipeTitleText.setTextSize(MainActivity.fontSizeTitles);
-        holder.recipeCookingTimeText.setTextSize(MainActivity.fontSizeText);
-        holder.recipeServingsText.setTextSize(MainActivity.fontSizeText);
+        holder.recipeTitleText.setTextSize(fontSizeTitle);
+        holder.recipeCookingTimeText.setTextSize(fontSizeText);
+        holder.recipeServingsText.setTextSize(fontSizeText);
     }
 
     @Override

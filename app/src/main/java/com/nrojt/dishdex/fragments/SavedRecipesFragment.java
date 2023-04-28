@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,7 +26,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.Recipe;
+import com.nrojt.dishdex.backend.viewmodels.SavedRecipesFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
@@ -35,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SavedRecipesFragment extends Fragment implements RecyclerViewInterface, FragmentReplacer, FragmentManager.OnBackStackChangedListener {
@@ -62,6 +65,9 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     private FragmentManager fragmentManager;
 
     public static boolean noSavedRecipes = false;
+
+    private SavedRecipesFragmentViewModel viewModel;
+    private MainActivityViewModel mainActivityViewModel;
 
 
     public SavedRecipesFragment() {
@@ -90,6 +96,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         if (getArguments() != null) {
             hideFab = getArguments().getBoolean(ARG_PARAM1, false);
         }
+        viewModel = new ViewModelProvider(requireActivity()).get(SavedRecipesFragmentViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -110,10 +118,17 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         //Adding padding to the recyclerView and setting the adapter and layout manager
         savedRecipesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this);
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this, mainActivityViewModel.getFontSizeTitle().getValue(), mainActivityViewModel.getFontSizeText().getValue() );
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        //Setting font size
+        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), fontSizeTitle -> {
+            EditText searchEditText = savedRecipesSearchView.findViewById(androidx.appcompat.R.id.search_src_text);
+            searchEditText.setTextSize(fontSizeTitle);
+        });
+
+        //Hiding elements for the HomePageFragment
         if(hideFab){
             savedRecipesFab.setVisibility(View.GONE);
             savedRecipesSearchRelativeLayout.setVisibility(View.GONE);
@@ -252,7 +267,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
             }
         }
 
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this);
+        //Updating the recyclerView
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this, mainActivityViewModel.getFontSizeTitle().getValue(), mainActivityViewModel.getFontSizeText().getValue());
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
@@ -325,11 +341,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         // Create a HashMap mapping menu item IDs to Runnables
         Map<Integer, Runnable> actionMap = new HashMap<>();
         actionMap.put(R.id.savedRecipesFabAddCategory, () -> {
-            if (!MainActivity.isProUser && db.getCategoryCount() >= MainActivity.MAX_CATEGORIES_FREE) {
-                Toast.makeText(getContext(), "You have reached the maximum amount of categories for the free version of the app. Please upgrade to the pro version to create more categories.", Toast.LENGTH_LONG).show();
-            } else {
-                replaceFragment(new AddCategoryFragment());
-            }
+            replaceFragment(new AddCategoryFragment());
         });
         actionMap.put(R.id.savedRecipesFabBrowser, () -> replaceFragment(new WebBrowserFragment()));
         actionMap.put(R.id.savedRecipesFabAddEmptyRecipe, () -> replaceFragment(ShowAndEditRecipeFragment.newInstance(2, new Recipe(), null, null)));

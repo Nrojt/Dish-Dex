@@ -12,10 +12,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
+import com.nrojt.dishdex.backend.viewmodels.HomePageFragmentViewModel;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
@@ -44,13 +47,13 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     private TextView greetingsTextView;
     private TextView recipeForTimeTextView;
 
+    private HomePageFragmentViewModel viewModel;
+    private MainActivityViewModel mainActivityViewModel;
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -84,6 +87,8 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        viewModel = new ViewModelProvider(requireActivity()).get(HomePageFragmentViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -113,13 +118,20 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
 
         //Setting the text sizes
-        greetingsTextView.setTextSize(MainActivity.fontSizeTitles);
-        recipeForTimeTextView.setTextSize(MainActivity.fontSizeText);
-        dateTextView.setTextSize(MainActivity.fontSizeText);
-        timeTextView.setTextSize(MainActivity.fontSizeText);
-        recipeTimeCookingTimeTextView.setTextSize(MainActivity.fontSizeText);
-        recipeTimeServingsTextView.setTextSize(MainActivity.fontSizeText);
-        homePageFragmentContainerTextView.setTextSize(MainActivity.fontSizeTitles);
+        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), fontSize -> {
+            recipeTimeTitleTextView.setTextSize(fontSize);
+            homePageFragmentContainerTextView.setTextSize(fontSize);
+            greetingsTextView.setTextSize(fontSize);
+        });
+
+        mainActivityViewModel.getFontSizeText().observe(getViewLifecycleOwner(), fontSize -> {
+            recipeForTimeTextView.setTextSize(fontSize);
+            dateTextView.setTextSize(fontSize);
+            timeTextView.setTextSize(fontSize);
+            recipeTimeCookingTimeTextView.setTextSize(fontSize);
+            recipeTimeServingsTextView.setTextSize(fontSize);
+        });
+
 
         //Getting a random recipeID based on the time of day
         getRandomRecipeIDBasedOnTime();
@@ -145,11 +157,8 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
         if(recipe != null) {
             recipeTimeTitleTextView.setText(recipe.getRecipeTitle());
-            recipeTimeTitleTextView.setTextSize(MainActivity.fontSizeTitles);
-
             recipeTimeCookingTimeTextView.setText(recipe.getRecipeCookingTime() + " minutes");
             recipeTimeServingsTextView.setText("Servings: " + recipe.getRecipeServings());
-
         }
 
 

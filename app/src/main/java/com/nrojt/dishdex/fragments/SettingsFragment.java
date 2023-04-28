@@ -11,10 +11,14 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
+import com.nrojt.dishdex.backend.viewmodels.SettingsFragmentViewModel;
 
 
 public class SettingsFragment extends Fragment {
@@ -36,6 +40,8 @@ public class SettingsFragment extends Fragment {
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_SIZE_TITLES = "fontSizeTitles";
 
+    private SettingsFragmentViewModel viewModel;
+    private MainActivityViewModel mainActivityViewModel;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -62,6 +68,8 @@ public class SettingsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        viewModel = new ViewModelProvider(requireActivity()).get(SettingsFragmentViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -77,6 +85,15 @@ public class SettingsFragment extends Fragment {
         fontSizeTextInput = view.findViewById(R.id.fontSizeTextInput);
         fontSizeTitleTextInput = view.findViewById(R.id.fontSizeTitleTextInput);
 
+        //Setting the font sizes
+        mainActivityViewModel.getFontSizeText().observe(getViewLifecycleOwner(), integer -> {
+            bingApiKeyTextInput.getEditText().setTextSize(integer);
+            proUserToggleButton.setTextSize(integer);
+            fontSizeTextInput.getEditText().setTextSize(integer);
+            saveSettingsButton.setTextSize(integer);
+        });
+
+        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> fontSizeTitleTextInput.getEditText().setTextSize(integer));
 
         //Saving the settings to shared preferences (local storage) when the save button is clicked
         saveSettingsButton.setOnClickListener(v -> {
@@ -139,8 +156,8 @@ public class SettingsFragment extends Fragment {
         editor.apply();
 
         //Setting the static variables in MainActivity to the new values so the user doesn't have to restart the app to apply a different font size
-        MainActivity.fontSizeText = fontSize;
-        MainActivity.fontSizeTitles = fontSizeTitles;
+        mainActivityViewModel.setFontSizeText(fontSize);
+        mainActivityViewModel.setFontSizeTitle(fontSizeTitles);
     }
 
     //Loading the data from shared preferences

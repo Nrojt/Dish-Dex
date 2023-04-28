@@ -8,11 +8,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 
 import java.util.ArrayList;
@@ -21,11 +23,13 @@ public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<S
     private final RecyclerViewInterface listener;
     private final Context context;
     private final ArrayList<Category> categories;
+    private int fontSizeTitle;
 
-    public SavedCategoriesCustomRecyclerAdapter(Context context, ArrayList<Category> categories, RecyclerViewInterface listener) {
+    public SavedCategoriesCustomRecyclerAdapter(Context context, ArrayList<Category> categories, RecyclerViewInterface listener, int fontSizeTitle) {
         this.listener = listener;
         this.context = context;
         this.categories = categories;
+        this.fontSizeTitle = fontSizeTitle;
     }
 
     @NonNull
@@ -39,7 +43,7 @@ public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<S
     @Override
     public void onBindViewHolder(@NonNull SavedCategoriesCustomRecyclerAdapter.MyViewHolder holder, int position) {
         holder.categoryTitleText.setText(categories.get(position).getCategoryName());
-        holder.categoryTitleText.setTextSize(MainActivity.fontSizeTitles);
+        holder.categoryTitleText.setTextSize(fontSizeTitle);
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
