@@ -17,11 +17,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
-import com.nrojt.dishdex.backend.viewmodels.HomePageFragmentViewModel;
-import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.Recipe;
+import com.nrojt.dishdex.backend.viewmodels.HomePageFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
+import com.nrojt.dishdex.utils.viewmodels.FontUtils;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -48,7 +48,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
     private TextView recipeForTimeTextView;
 
     private HomePageFragmentViewModel viewModel;
-    private MainActivityViewModel mainActivityViewModel;
+
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -88,7 +88,6 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         viewModel = new ViewModelProvider(requireActivity()).get(HomePageFragmentViewModel.class);
-        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -118,19 +117,17 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
 
         //Setting the text sizes
-        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), fontSize -> {
-            recipeTimeTitleTextView.setTextSize(fontSize);
-            homePageFragmentContainerTextView.setTextSize(fontSize);
-            greetingsTextView.setTextSize(fontSize);
-        });
+        recipeTimeTitleTextView.setTextSize(FontUtils.getTitleFontSize());
+        homePageFragmentContainerTextView.setTextSize(FontUtils.getTitleFontSize());
+        greetingsTextView.setTextSize(FontUtils.getTitleFontSize());
 
-        mainActivityViewModel.getFontSizeText().observe(getViewLifecycleOwner(), fontSize -> {
-            recipeForTimeTextView.setTextSize(fontSize);
-            dateTextView.setTextSize(fontSize);
-            timeTextView.setTextSize(fontSize);
-            recipeTimeCookingTimeTextView.setTextSize(fontSize);
-            recipeTimeServingsTextView.setTextSize(fontSize);
-        });
+
+        recipeForTimeTextView.setTextSize(FontUtils.getTextFontSize());
+        dateTextView.setTextSize(FontUtils.getTextFontSize());
+        timeTextView.setTextSize(FontUtils.getTextFontSize());
+        recipeTimeCookingTimeTextView.setTextSize(FontUtils.getTextFontSize());
+        recipeTimeServingsTextView.setTextSize(FontUtils.getTextFontSize());
+
 
 
         //Getting a random recipeID based on the time of day

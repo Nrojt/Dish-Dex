@@ -22,12 +22,12 @@ import androidx.lifecycle.ViewModelProvider;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
-import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.backend.viewmodels.ShowAndEditRecipeFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.WebScraper;
+import com.nrojt.dishdex.utils.viewmodels.FontUtils;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -67,7 +67,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
     private Recipe recipe;
 
     private ShowAndEditRecipeFragmentViewModel viewModel;
-    private MainActivityViewModel mainActivityViewModel;
 
     public ShowAndEditRecipeFragment() {
         // Required empty public constructor
@@ -102,7 +101,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             }
         }
         viewModel = new ViewModelProvider(requireActivity()).get(ShowAndEditRecipeFragmentViewModel.class);
-        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
 
@@ -126,20 +124,16 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         TextView isUrlSupportedTextView = view.findViewById(R.id.isUrlSupportedTextView);
 
         //setting the text size of the on screen elements
-        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> {
-            recipeTitleTextOnScreen.setTextSize(integer);
-        });
+        recipeTitleTextOnScreen.setTextSize(FontUtils.getTitleFontSize());
 
-        mainActivityViewModel.getFontSizeText().observe(getViewLifecycleOwner(), integer -> {
-            instructionTextOnScreen.setTextSize(integer);
-            ingredientTextOnScreen.setTextSize(integer);
-            cookingTimeTextOnScreen.setTextSize(integer);
-            servingsTextOnScreen.setTextSize(integer);
-            noteTextOnScreen.setTextSize(integer);
-            urlTextOnScreen.setTextSize(integer);
-            chooseCategoriesTextView.setTextSize(integer);
-            isUrlSupportedTextView.setTextSize(integer);
-        });
+        instructionTextOnScreen.setTextSize(FontUtils.getTextFontSize());
+        ingredientTextOnScreen.setTextSize(FontUtils.getTextFontSize());
+        cookingTimeTextOnScreen.setTextSize(FontUtils.getTextFontSize());
+        servingsTextOnScreen.setTextSize(FontUtils.getTextFontSize());
+        noteTextOnScreen.setTextSize(FontUtils.getTextFontSize());
+        urlTextOnScreen.setTextSize(FontUtils.getTextFontSize());
+        chooseCategoriesTextView.setTextSize(FontUtils.getTextFontSize());
+        isUrlSupportedTextView.setTextSize(FontUtils.getTextFontSize());
 
 
         getCategoriesFromDatabase();

@@ -23,11 +23,11 @@ public class SavedRecipesCustomRecyclerAdapter extends RecyclerView.Adapter<Save
     private final RecyclerViewInterface listener;
     private final Context context;
     private final ArrayList<Recipe> recipes;
-    private int fontSizeTitle;
-    private int fontSizeText;
+    private float fontSizeTitle;
+    private float fontSizeText;
 
     //Constructor
-    public SavedRecipesCustomRecyclerAdapter(Context context, ArrayList<Recipe> recipes, RecyclerViewInterface listener, int fontSizeTitle, int fontSizeText) {
+    public SavedRecipesCustomRecyclerAdapter(Context context, ArrayList<Recipe> recipes, RecyclerViewInterface listener, float fontSizeTitle, float fontSizeText) {
         this.listener = listener;
         this.context = context;
         this.recipes = recipes;

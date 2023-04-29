@@ -11,14 +11,14 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 public class MyDatabaseHelper extends SQLiteOpenHelper {
-    private Context context;
-
 
     private static final String DATABASE_NAME = "dishdex.db";
     private static final int DATABASE_VERSION = 1;
 
     // Declare a private static field of type MyDatabaseHelper and initialize it to null
     private static MyDatabaseHelper instance = null;
+    private Context context;
+
 
 
     // Declare a private constructor that takes a Context parameter and calls the super constructor with the database name and version

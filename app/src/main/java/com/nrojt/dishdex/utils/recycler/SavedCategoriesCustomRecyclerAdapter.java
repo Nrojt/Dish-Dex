@@ -23,9 +23,9 @@ public class SavedCategoriesCustomRecyclerAdapter extends RecyclerView.Adapter<S
     private final RecyclerViewInterface listener;
     private final Context context;
     private final ArrayList<Category> categories;
-    private int fontSizeTitle;
+    private float fontSizeTitle;
 
-    public SavedCategoriesCustomRecyclerAdapter(Context context, ArrayList<Category> categories, RecyclerViewInterface listener, int fontSizeTitle) {
+    public SavedCategoriesCustomRecyclerAdapter(Context context, ArrayList<Category> categories, RecyclerViewInterface listener, float fontSizeTitle) {
         this.listener = listener;
         this.context = context;
         this.categories = categories;

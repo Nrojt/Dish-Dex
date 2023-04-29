@@ -24,15 +24,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
-import com.nrojt.dishdex.backend.viewmodels.BingFragmentViewModel;
-import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.Recipe;
+import com.nrojt.dishdex.backend.viewmodels.BingFragmentViewModel;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 import com.nrojt.dishdex.utils.internet.SearchResults;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
 import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
+import com.nrojt.dishdex.utils.viewmodels.FontUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,7 +68,6 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
     private TextView bingNotificationTextView;
 
     private BingFragmentViewModel viewModel;
-    private MainActivityViewModel mainActivityViewModel;
 
 
     /*
@@ -102,7 +101,6 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
             searchTerm = getArguments().getString(SEARCH_QUERY);
         }
         viewModel = new ViewModelProvider(requireActivity()).get(BingFragmentViewModel.class);
-        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -116,14 +114,12 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         subscriptionKey = sharedPreferences.getString(BING_API_KEY, "");
 
         //Setting the font sizes
-        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> {
-            bingNotificationTextView.setTextSize(integer);
-        });
+        bingNotificationTextView.setTextSize(FontUtils.getTitleFontSize());
 
         //Setting up the recycler view
         RecyclerView bingRecyclerView = view.findViewById(R.id.bingRecyclerView);
         bingRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedRecipesCustomRecyclerAdapter adapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this, mainActivityViewModel.getFontSizeTitle().getValue(), mainActivityViewModel.getFontSizeText().getValue());
+        SavedRecipesCustomRecyclerAdapter adapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this, FontUtils.getTitleFontSize(), FontUtils.getTextFontSize());
         bingRecyclerView.setAdapter(adapter);
         bingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

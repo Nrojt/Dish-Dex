@@ -27,15 +27,18 @@ public class MainActivityViewModel extends ViewModel {
     public void setFontSizeText(int size) {
         if (mFontSizeText != null) {
             mFontSizeText.setValue(size);
+        } else {
+            mFontSizeText = new MutableLiveData<>();
+            mFontSizeText.setValue(size);
         }
     }
 
     public void setFontSizeTitle(int size) {
         if (mFontSizeTitle != null) {
             mFontSizeTitle.setValue(size);
+        } else {
+            mFontSizeTitle = new MutableLiveData<>();
+            mFontSizeTitle.setValue(size);
         }
-    }
-
-    public MainActivityViewModel() {
     }
 }

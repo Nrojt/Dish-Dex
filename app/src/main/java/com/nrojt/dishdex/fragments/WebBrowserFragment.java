@@ -22,18 +22,17 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Recipe;
-import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.viewmodels.WebBrowserFragmentViewModel;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
 import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
 import com.nrojt.dishdex.utils.internet.WebScraper;
+import com.nrojt.dishdex.utils.viewmodels.FontUtils;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -52,8 +51,6 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
     private FragmentManager fragmentManager;
 
     private WebBrowserFragmentViewModel viewModel;
-    private MainActivityViewModel mainActivityViewModel;
-
 
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -82,7 +79,6 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
             openUrl = getArguments().getString(URL);
         }
         viewModel = new ViewModelProvider(requireActivity()).get(WebBrowserFragmentViewModel.class);
-        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -95,7 +91,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         currentBrowserUrl = view.findViewById(R.id.currentBrowserUrl);
         Button scrapeThisUrlButton = view.findViewById(R.id.scrapeThisUrlButton);
 
-        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> currentBrowserUrl.setTextSize(integer));
+        currentBrowserUrl.setTextSize(FontUtils.getTitleFontSize());
 
 
         LoadWebsiteBlockList loadWebsiteBlockList = new LoadWebsiteBlockList(getContext());

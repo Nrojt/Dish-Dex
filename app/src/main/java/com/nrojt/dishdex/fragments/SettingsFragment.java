@@ -11,11 +11,9 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.viewmodels.SettingsFragmentViewModel;
@@ -93,6 +91,7 @@ public class SettingsFragment extends Fragment {
             saveSettingsButton.setTextSize(integer);
         });
 
+        //We need observe here so it updates the on screen text size when the user changes it in the settings
         mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> fontSizeTitleTextInput.getEditText().setTextSize(integer));
 
         //Saving the settings to shared preferences (local storage) when the save button is clicked

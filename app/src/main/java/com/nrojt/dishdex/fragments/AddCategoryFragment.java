@@ -14,9 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.viewmodels.AddCategoryFragmentViewModel;
-import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
+import com.nrojt.dishdex.utils.viewmodels.FontUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,7 +28,6 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
     private FragmentManager fragmentManager;
 
     private AddCategoryFragmentViewModel viewModel;
-    private MainActivityViewModel mainActivityViewModel;
 
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,7 +59,6 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         viewModel = new ViewModelProvider(requireActivity()).get(AddCategoryFragmentViewModel.class);
-        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -70,9 +68,8 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
         Button saveCategoryButton = view.findViewById(R.id.saveCategoryButton);
         categoryNameEditText = view.findViewById(R.id.categoryNameEditText);
 
-        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), fontSizeTitle -> {
-            categoryNameEditText.setTextSize(fontSizeTitle);
-        });
+        categoryNameEditText.setTextSize(FontUtils.getTitleFontSize());
+
 
         fragmentManager = getChildFragmentManager();
 

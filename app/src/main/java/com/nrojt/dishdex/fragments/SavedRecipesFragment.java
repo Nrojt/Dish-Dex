@@ -26,7 +26,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.Category;
-import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.backend.viewmodels.SavedRecipesFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
@@ -34,6 +33,7 @@ import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
 import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
+import com.nrojt.dishdex.utils.viewmodels.FontUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,10 +53,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     private MyDatabaseHelper db;
 
     private final ArrayList<Recipe> recipes = new ArrayList<>();
-    private ArrayList<Category> allCategories = new ArrayList<>();
+    private final ArrayList<Category> allCategories = new ArrayList<>();
     private boolean[] selectedCategories;
-
-    private TextView chooseCategoriesSavedRecipeTextView;
 
     private RecyclerView savedRecipesRecyclerView;
 
@@ -67,7 +65,6 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     public static boolean noSavedRecipes = false;
 
     private SavedRecipesFragmentViewModel viewModel;
-    private MainActivityViewModel mainActivityViewModel;
 
 
     public SavedRecipesFragment() {
@@ -97,7 +94,6 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
             hideFab = getArguments().getBoolean(ARG_PARAM1, false);
         }
         viewModel = new ViewModelProvider(requireActivity()).get(SavedRecipesFragmentViewModel.class);
-        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -111,22 +107,21 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
         SearchView savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);
         savedRecipesFab = view.findViewById(R.id.savedRecipesFab);
-        chooseCategoriesSavedRecipeTextView = view.findViewById(R.id.chooseCategoriesSavedRecipeTextView);
+        TextView chooseCategoriesSavedRecipeTextView = view.findViewById(R.id.chooseCategoriesSavedRecipeTextView);
         RelativeLayout savedRecipesSearchRelativeLayout = view.findViewById(R.id.savedRecipesSearchRelativeLayout);
 
         savedRecipesFab.setOnClickListener(v -> showFabMenu());
 
         //Adding padding to the recyclerView and setting the adapter and layout manager
         savedRecipesRecyclerView.addItemDecoration(new CustomItemPaddingDecoration(20));
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this, mainActivityViewModel.getFontSizeTitle().getValue(), mainActivityViewModel.getFontSizeText().getValue() );
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), recipes, this, FontUtils.getTitleFontSize(), FontUtils.getTextFontSize());
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         //Setting font size
-        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), fontSizeTitle -> {
-            EditText searchEditText = savedRecipesSearchView.findViewById(androidx.appcompat.R.id.search_src_text);
-            searchEditText.setTextSize(fontSizeTitle);
-        });
+        EditText searchEditText = savedRecipesSearchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchEditText.setTextSize(FontUtils.getTitleFontSize());
+
 
         //Hiding elements for the HomePageFragment
         if(hideFab){
@@ -268,7 +263,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         }
 
         //Updating the recyclerView
-        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this, mainActivityViewModel.getFontSizeTitle().getValue(), mainActivityViewModel.getFontSizeText().getValue());
+        SavedRecipesCustomRecyclerAdapter savedRecipesCustomRecyclerAdapter = new SavedRecipesCustomRecyclerAdapter(getContext(), filteredRecipes, this, FontUtils.getTitleFontSize(), FontUtils.getTextFontSize());
         savedRecipesRecyclerView.setAdapter(savedRecipesCustomRecyclerAdapter);
         savedRecipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
