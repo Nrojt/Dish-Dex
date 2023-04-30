@@ -172,7 +172,6 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             case 2 -> {
                 isUrlSupportedTextView.setVisibility(View.GONE);
                 saveOrEditRecipeButton.setText("Save Recipe");
-                getSavedCategoryForRecipe();
             }
             case 3 -> {
                 isUrlSupportedTextView.setVisibility(View.VISIBLE);

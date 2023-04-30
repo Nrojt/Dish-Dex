@@ -337,7 +337,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         Map<Integer, Runnable> actionMap = new HashMap<>();
         actionMap.put(R.id.savedRecipesFabAddCategory, () -> replaceFragment(new AddCategoryFragment()));
         actionMap.put(R.id.savedRecipesFabBrowser, () -> replaceFragment(new WebBrowserFragment()));
-        actionMap.put(R.id.savedRecipesFabAddEmptyRecipe, () -> replaceFragment(ShowAndEditRecipeFragment.newInstance(2, new Recipe(), null, null)));
+        actionMap.put(R.id.savedRecipesFabAddEmptyRecipe, () -> replaceFragment(ShowAndEditRecipeFragment.newInstance(2, null, null, null)));
         actionMap.put(R.id.savedRecipesFabAllCategories, () -> replaceFragment(new SavedCategoriesFragment()));
 
         // Set the click listener for menu items
