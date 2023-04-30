@@ -32,7 +32,7 @@ import com.nrojt.dishdex.utils.internet.SearchResults;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
 import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
-import com.nrojt.dishdex.utils.viewmodels.FontUtils;
+import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -21,7 +21,7 @@ import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.backend.viewmodels.HomePageFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
-import com.nrojt.dishdex.utils.viewmodels.FontUtils;
+import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

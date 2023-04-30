@@ -15,8 +15,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.nrojt.dishdex.R;
-import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.viewmodels.SettingsFragmentViewModel;
+import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
 
 public class SettingsFragment extends Fragment {
@@ -24,8 +24,8 @@ public class SettingsFragment extends Fragment {
     private TextInputLayout bingApiKeyTextInput;
     private TextInputLayout fontSizeTextInput;
     private TextInputLayout fontSizeTitleTextInput;
-
     private ToggleButton proUserToggleButton;
+    private Button saveSettingsButton;
 
     private String bingApiKey;
     private boolean isProUser;
@@ -39,7 +39,7 @@ public class SettingsFragment extends Fragment {
     public static final String FONT_SIZE_TITLES = "fontSizeTitles";
 
     private SettingsFragmentViewModel viewModel;
-    private MainActivityViewModel mainActivityViewModel;
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -67,7 +67,6 @@ public class SettingsFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         viewModel = new ViewModelProvider(requireActivity()).get(SettingsFragmentViewModel.class);
-        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -78,21 +77,11 @@ public class SettingsFragment extends Fragment {
 
         //Getting the views
         bingApiKeyTextInput = view.findViewById(R.id.bingKeyTextInput);
-        Button saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
+        saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
         proUserToggleButton = view.findViewById(R.id.proUserToggleButton);
         fontSizeTextInput = view.findViewById(R.id.fontSizeTextInput);
         fontSizeTitleTextInput = view.findViewById(R.id.fontSizeTitleTextInput);
 
-        //Setting the font sizes
-        mainActivityViewModel.getFontSizeText().observe(getViewLifecycleOwner(), integer -> {
-            bingApiKeyTextInput.getEditText().setTextSize(integer);
-            proUserToggleButton.setTextSize(integer);
-            fontSizeTextInput.getEditText().setTextSize(integer);
-            saveSettingsButton.setTextSize(integer);
-        });
-
-        //We need observe here so it updates the on screen text size when the user changes it in the settings
-        mainActivityViewModel.getFontSizeTitle().observe(getViewLifecycleOwner(), integer -> fontSizeTitleTextInput.getEditText().setTextSize(integer));
 
         //Saving the settings to shared preferences (local storage) when the save button is clicked
         saveSettingsButton.setOnClickListener(v -> {
@@ -138,6 +127,9 @@ public class SettingsFragment extends Fragment {
         //Loading the settings from shared preferences (local storage) when the fragment is created
         loadData();
 
+        //Setting the font sizes
+        setFontSizes();
+
         return view;
     }
 
@@ -154,9 +146,12 @@ public class SettingsFragment extends Fragment {
         editor.putInt(FONT_SIZE_TITLES, fontSizeTitles);
         editor.apply();
 
-        //Setting the static variables in MainActivity to the new values so the user doesn't have to restart the app to apply a different font size
-        mainActivityViewModel.setFontSizeText(fontSize);
-        mainActivityViewModel.setFontSizeTitle(fontSizeTitles);
+        //Setting the static variables in FontUtils to the new values
+        FontUtils.setTextFontSize(fontSize);
+        FontUtils.setTitleFontSize(fontSizeTitles);
+
+        //Updating the font sizes
+        setFontSizes();
     }
 
     //Loading the data from shared preferences
@@ -173,11 +168,14 @@ public class SettingsFragment extends Fragment {
         proUserToggleButton.setChecked(loadedIsProUser);
         fontSizeTextInput.getEditText().setText(String.valueOf(loadedFontSize));
         fontSizeTitleTextInput.getEditText().setText(String.valueOf(loadedFontSizeTitles));
+    }
 
-        //setting the text sizes
-        bingApiKeyTextInput.getEditText().setTextSize(loadedFontSize);
-        fontSizeTextInput.getEditText().setTextSize(loadedFontSize);
-        fontSizeTitleTextInput.getEditText().setTextSize(loadedFontSize);
-        fontSizeTitleTextInput.getEditText().setTextSize(loadedFontSize);
+    private void setFontSizes() {
+        bingApiKeyTextInput.getEditText().setTextSize(FontUtils.getTextFontSize());
+        proUserToggleButton.setTextSize(FontUtils.getTextFontSize());
+        fontSizeTextInput.getEditText().setTextSize(FontUtils.getTextFontSize());
+        saveSettingsButton.setTextSize(FontUtils.getTextFontSize());
+
+        fontSizeTitleTextInput.getEditText().setTextSize(FontUtils.getTitleFontSize());
     }
 }

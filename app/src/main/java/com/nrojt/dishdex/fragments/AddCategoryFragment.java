@@ -16,7 +16,7 @@ import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.viewmodels.AddCategoryFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
-import com.nrojt.dishdex.utils.viewmodels.FontUtils;
+import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
 /**
  * A simple {@link Fragment} subclass.

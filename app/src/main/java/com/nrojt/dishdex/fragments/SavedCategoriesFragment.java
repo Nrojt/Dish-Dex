@@ -29,7 +29,7 @@ import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
 import com.nrojt.dishdex.utils.recycler.SavedCategoriesCustomRecyclerAdapter;
-import com.nrojt.dishdex.utils.viewmodels.FontUtils;
+import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
 import java.util.ArrayList;
 

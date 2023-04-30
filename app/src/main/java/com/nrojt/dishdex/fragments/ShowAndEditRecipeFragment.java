@@ -2,7 +2,6 @@ package com.nrojt.dishdex.fragments;
 
 import android.database.Cursor;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,7 +26,7 @@ import com.nrojt.dishdex.backend.viewmodels.ShowAndEditRecipeFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.internet.WebScraper;
-import com.nrojt.dishdex.utils.viewmodels.FontUtils;
+import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -92,13 +91,9 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             mode = getArguments().getInt(MODE);
             url = getArguments().getString(URL);
 
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                recipe = getActivity().getIntent().getParcelableExtra(RECIPE, Recipe.class);
-                wb = getActivity().getIntent().getParcelableExtra(WEB_SCRAPER, WebScraper.class);
-            } else {
-                recipe = getArguments().getParcelable(RECIPE);
-                wb = getArguments().getParcelable(WEB_SCRAPER);
-            }
+            recipe = getArguments().getParcelable(RECIPE);
+            wb = getArguments().getParcelable(WEB_SCRAPER);
+
         }
         viewModel = new ViewModelProvider(requireActivity()).get(ShowAndEditRecipeFragmentViewModel.class);
     }
@@ -323,9 +318,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
 
 
             //setting the positive button to save the categories
-            builder.setPositiveButton("Save", (dialog, which) -> {
-                updateSelectedCategories();
-            });
+            builder.setPositiveButton("Save", (dialog, which) -> updateSelectedCategories());
 
             //setting the negative button to cancel the dialog
             builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());

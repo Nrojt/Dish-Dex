@@ -18,7 +18,7 @@ import com.nrojt.dishdex.fragments.HomePageFragment;
 import com.nrojt.dishdex.fragments.SavedRecipesFragment;
 import com.nrojt.dishdex.fragments.SettingsFragment;
 import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
-import com.nrojt.dishdex.utils.viewmodels.FontUtils;
+import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,12 +39,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         MainActivityViewModel mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
         SharedPreferences sharedPreferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
-        mainActivityViewModel.setFontSizeText(sharedPreferences.getInt(SettingsFragment.FONT_SIZE, 14));
-        mainActivityViewModel.setFontSizeTitle(sharedPreferences.getInt(SettingsFragment.FONT_SIZE_TITLES, 20));
 
-        //Creating the font utils object and passing the view model to it
-        FontUtils fontUtils = FontUtils.getInstance(mainActivityViewModel);
-
+        //Setting the font size
+        FontUtils.setTextFontSize(sharedPreferences.getInt(SettingsFragment.FONT_SIZE, 14));
+        FontUtils.setTitleFontSize(sharedPreferences.getInt(SettingsFragment.FONT_SIZE_TITLES, 20));
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 

@@ -33,7 +33,7 @@ import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 import com.nrojt.dishdex.utils.recycler.CustomItemPaddingDecoration;
 import com.nrojt.dishdex.utils.recycler.SavedRecipesCustomRecyclerAdapter;
-import com.nrojt.dishdex.utils.viewmodels.FontUtils;
+import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -335,9 +335,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         // Create a HashMap mapping menu item IDs to Runnables
         Map<Integer, Runnable> actionMap = new HashMap<>();
-        actionMap.put(R.id.savedRecipesFabAddCategory, () -> {
-            replaceFragment(new AddCategoryFragment());
-        });
+        actionMap.put(R.id.savedRecipesFabAddCategory, () -> replaceFragment(new AddCategoryFragment()));
         actionMap.put(R.id.savedRecipesFabBrowser, () -> replaceFragment(new WebBrowserFragment()));
         actionMap.put(R.id.savedRecipesFabAddEmptyRecipe, () -> replaceFragment(ShowAndEditRecipeFragment.newInstance(2, new Recipe(), null, null)));
         actionMap.put(R.id.savedRecipesFabAllCategories, () -> replaceFragment(new SavedCategoriesFragment()));
@@ -359,6 +357,8 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
     //This code runs when a recipe is clicked
     @Override
     public void onItemClick(int position) {
+        System.out.println(recipes.get(position).getRecipeTitle());
+
         Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipes.get(position), null, null);
         replaceFragment(showAndEditRecipeFragment);
     }
