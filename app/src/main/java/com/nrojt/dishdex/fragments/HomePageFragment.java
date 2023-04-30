@@ -22,6 +22,7 @@ import com.nrojt.dishdex.backend.viewmodels.HomePageFragmentViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.viewmodel.FontUtils;
+import com.nrojt.dishdex.utils.viewmodel.HomePageFragmentViewModelFactory;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -38,11 +39,6 @@ import java.util.Locale;
  */
 public class HomePageFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private FragmentManager fragmentManager;
-
-    private int timeCategoryID;
-    private int timeRecipeID;
-
-    private Recipe recipe;
 
     private TextView greetingsTextView;
     private TextView recipeForTimeTextView;
@@ -61,16 +57,6 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomePageFragment.
-     */
-
-
     public static HomePageFragment newInstance(String param1, String param2) {
         HomePageFragment fragment = new HomePageFragment();
         Bundle args = new Bundle();
@@ -87,7 +73,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        viewModel = new ViewModelProvider(requireActivity()).get(HomePageFragmentViewModel.class);
+        viewModel = new ViewModelProvider(this, new HomePageFragmentViewModelFactory(requireActivity().getApplication())).get(HomePageFragmentViewModel.class);
     }
 
     @Override
@@ -95,6 +81,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
+
 
         //inflating the views
         CardView recipeTimeCardView = view.findViewById(R.id.recipeTimeCardView);
@@ -114,27 +101,16 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         transaction.replace(R.id.savedRecipesFragmentContainerView, savedRecipesFragment);
         transaction.commit();
 
-
-
         //Setting the text sizes
         recipeTimeTitleTextView.setTextSize(FontUtils.getTitleFontSize());
         homePageFragmentContainerTextView.setTextSize(FontUtils.getTitleFontSize());
         greetingsTextView.setTextSize(FontUtils.getTitleFontSize());
-
 
         recipeForTimeTextView.setTextSize(FontUtils.getTextFontSize());
         dateTextView.setTextSize(FontUtils.getTextFontSize());
         timeTextView.setTextSize(FontUtils.getTextFontSize());
         recipeTimeCookingTimeTextView.setTextSize(FontUtils.getTextFontSize());
         recipeTimeServingsTextView.setTextSize(FontUtils.getTextFontSize());
-
-
-
-        //Getting a random recipeID based on the time of day
-        getRandomRecipeIDBasedOnTime();
-
-        //Getting the recipe information from the database
-        getInformationFromRecipe();
 
 
         fragmentManager = getChildFragmentManager();
@@ -152,27 +128,6 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         timeTextView.setText("It is currently: " + currentTime);
 
 
-        if(recipe != null) {
-            recipeTimeTitleTextView.setText(recipe.getRecipeTitle());
-            recipeTimeCookingTimeTextView.setText(recipe.getRecipeCookingTime() + " minutes");
-            recipeTimeServingsTextView.setText("Servings: " + recipe.getRecipeServings());
-        }
-
-
-
-        //Setting the visibility and onclick listener for the recipe card
-        if (timeRecipeID == -1) {
-            recipeForTimeTextView.setText("You do not have any saved recipes for this time of the day.");
-            homePageFragmentContainerTextView.setText("Maybe try one of your saved recipes:");
-            recipeTimeCardView.setVisibility(View.GONE);
-        } else {
-            recipeTimeCardView.setVisibility(View.VISIBLE);
-            homePageFragmentContainerTextView.setText("Don't like this one? Try one of your saved recipes:");
-            recipeTimeCardView.setOnClickListener(v -> {
-                Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipe , null, null);
-                replaceFragment(showAndEditRecipeFragment);
-            });
-        }
 
         //TODO hide containertextview when there are no saved recipes
         if (savedRecipesFragment.noSavedRecipes) {
@@ -180,74 +135,58 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
             homePageFragmentContainerTextView.setVisibility(View.GONE);
         }
 
-        return view;
-    }
-
-    //getting a random recipeID based on the time of day
-    private void getRandomRecipeIDBasedOnTime() {
-        LocalTime currentTime = LocalTime.now();
-        LocalTime breakfastTime = LocalTime.of(9, 0);
-        LocalTime lunchTime = LocalTime.of(12, 0);
-        LocalTime dinnerTime = LocalTime.of(18, 0);
-        LocalTime lateNightTime = LocalTime.of(22, 0);
-        LocalTime earlyMorningTime = LocalTime.of(5, 0); //We dont want to suggest breakfast recipes after 0:00 and before 5:00
-
-        if (currentTime.isBefore(breakfastTime) && currentTime.isAfter(earlyMorningTime)) {
-            timeCategoryID = 1;
-            greetingsTextView.setText("Good morning!");
-            recipeForTimeTextView.setText("Let's try this breakfast recipe:");
-        } else if (currentTime.isBefore(lunchTime)) {
-            timeCategoryID = 2;
-            greetingsTextView.setText("Good morning!");
-            recipeForTimeTextView.setText("How about this for lunch:");
-        } else if (currentTime.isBefore(dinnerTime)) {
-            timeCategoryID = 3;
-            greetingsTextView.setText("Good afternoon!");
-            recipeForTimeTextView.setText("Your new favourite dinner:");
-        } else if (currentTime.isBefore(lateNightTime)) {
-            timeCategoryID = 5;
-            greetingsTextView.setText("Good evening!");
-            recipeForTimeTextView.setText("This is a great time for a snack:");
-        } else {
-            //if the time is after 22:00
-            timeCategoryID = 5;
-            greetingsTextView.setText("Good night!");
-            recipeForTimeTextView.setText("Time for a little midnight snack:");
-        }
-
-        MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext());
-        timeRecipeID = db.getRandomRecipeIDWhereCategoryID(timeCategoryID);
-        db.close();
-    }
-
-    //Getting the recipe information from the database
-    private void getInformationFromRecipe() {
-        MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext());
-
-        if (timeRecipeID != -1) {
-            Cursor cursor = db.readAllDataFromSavedRecipesWhereRecipeID(timeRecipeID);
-            cursor.moveToFirst();
-            ArrayList<Category> categories = getSavedCategoryForRecipeFromDatabase(timeRecipeID);
-            recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true, categories);
-            cursor.close();
-        }
-        db.close();
-    }
-
-    //Getting the saved categoryIDs from the database to show the user which categories are applied to the recipe
-    private ArrayList<Category> getSavedCategoryForRecipeFromDatabase(int recipeID) {
-        ArrayList<Category> savedCategories = new ArrayList<>();
-        try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
-            Cursor cursor = db.getAllCategoriesWhereRecipeID(recipeID);
-            while (cursor.moveToNext()) {
-                Category category = new Category( cursor.getInt(0), cursor.getString(1));
-                savedCategories.add(category);
+        //Setting the greetings
+        viewModel.getTimeCategoryIDLiveData().observe(getViewLifecycleOwner(), timeCategoryID -> {
+            if (timeCategoryID != null) {
+                //Setting the greeting text
+                switch (timeCategoryID) {
+                    case 1 -> {
+                        greetingsTextView.setText("Good morning!");
+                        recipeForTimeTextView.setText("Let's try this breakfast recipe:");
+                    }
+                    case 2 -> {
+                        greetingsTextView.setText("Good morning!");
+                        recipeForTimeTextView.setText("How about this for lunch:");
+                    }
+                    case 3 -> {
+                        greetingsTextView.setText("Good afternoon!");
+                        recipeForTimeTextView.setText("Your new favourite dinner:");
+                    }
+                    case 4 -> {
+                        greetingsTextView.setText("Good evening!");
+                        recipeForTimeTextView.setText("Want a desert:");
+                    }
+                    case 5 -> {
+                        greetingsTextView.setText("Good night!");
+                        recipeForTimeTextView.setText("Time for a little midnight snack:");
+                    }
+                }
             }
-            cursor.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return savedCategories;
+        });
+
+        // Observe changes in the ViewModel data for the Recipe
+        viewModel.getRecipeLiveData().observe(getViewLifecycleOwner(), recipe -> {
+            if (recipe != null) {
+                //setting the text for the recipe card
+                recipeTimeTitleTextView.setText(recipe.getRecipeTitle());
+                recipeTimeCookingTimeTextView.setText(recipe.getRecipeCookingTime() + " minutes");
+                recipeTimeServingsTextView.setText("Servings: " + recipe.getRecipeServings());
+
+                //Setting the visibility and onclick listener for the recipe card
+                recipeTimeCardView.setVisibility(View.VISIBLE);
+                homePageFragmentContainerTextView.setText("Don't like this one? Try one of your saved recipes:");
+                recipeTimeCardView.setOnClickListener(v -> {
+                    Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(1, recipe , null, null);
+                    replaceFragment(showAndEditRecipeFragment);
+                });
+            } else {
+                recipeForTimeTextView.setText("You do not have any saved recipes for this time of the day.");
+                homePageFragmentContainerTextView.setText("Maybe try one of your saved recipes:");
+                recipeTimeCardView.setVisibility(View.GONE);
+            }
+        });
+
+        return view;
     }
 
     @Override
