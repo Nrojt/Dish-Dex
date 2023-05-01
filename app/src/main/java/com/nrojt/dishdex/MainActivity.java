@@ -1,11 +1,13 @@
 package com.nrojt.dishdex;
 
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -43,6 +45,25 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         //Setting the font size
         FontUtils.setTextFontSize(sharedPreferences.getInt(SettingsFragment.FONT_SIZE, 14));
         FontUtils.setTitleFontSize(sharedPreferences.getInt(SettingsFragment.FONT_SIZE_TITLES, 20));
+
+        //Setting the dark mode
+        // Get the current system theme
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        // Check if the system is in night mode
+        boolean defaultDarkMode = nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
+
+        mainActivityViewModel.setDarkModeLiveData(sharedPreferences.getBoolean(SettingsFragment.DARK_MODE, defaultDarkMode));
+
+        //setting an observer for the dark mode
+        mainActivityViewModel.getDarkModeLiveData().observe(this, darkMode -> {
+            if (darkMode) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+            //recreate();
+        });
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 

@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Add a category"
-        android:textSize="32sp"
-        android:textColor="@color/black" />
+        android:textSize="32sp" />
 
     <EditText
         android:id="@+id/categoryNameEditText"

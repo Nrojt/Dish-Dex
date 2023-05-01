@@ -2,6 +2,7 @@ package com.nrojt.dishdex.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +10,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.viewmodels.MainActivityViewModel;
 import com.nrojt.dishdex.backend.viewmodels.SettingsFragmentViewModel;
 import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
@@ -24,17 +27,21 @@ public class SettingsFragment extends Fragment {
     private TextInputLayout fontSizeTextInput;
     private TextInputLayout fontSizeTitleTextInput;
     private Button saveSettingsButton;
+    private SwitchCompat darkModeSwitch;
 
     private String bingApiKey;
     private int fontSize;
     private int fontSizeTitles;
+    private boolean darkMode;
 
     public static final String SHARED_PREFS = "SharedPrefs";
     public static final String BING_API_KEY = "bingApiKey";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_SIZE_TITLES = "fontSizeTitles";
+    public static final String DARK_MODE = "darkMode";
 
     private SettingsFragmentViewModel viewModel;
+    private MainActivityViewModel mainActivityViewModel;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -63,6 +70,7 @@ public class SettingsFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         viewModel = new ViewModelProvider(requireActivity()).get(SettingsFragmentViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -76,6 +84,7 @@ public class SettingsFragment extends Fragment {
         saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
         fontSizeTextInput = view.findViewById(R.id.fontSizeTextInput);
         fontSizeTitleTextInput = view.findViewById(R.id.fontSizeTitleTextInput);
+        darkModeSwitch = view.findViewById(R.id.darkModeSwitch);
 
 
         //Saving the settings to shared preferences (local storage) when the save button is clicked
@@ -83,6 +92,7 @@ public class SettingsFragment extends Fragment {
             bingApiKey = bingApiKeyTextInput.getEditText().getText().toString();
             fontSize = Integer.parseInt(fontSizeTextInput.getEditText().getText().toString());
             fontSizeTitles = Integer.parseInt(fontSizeTitleTextInput.getEditText().getText().toString());
+            darkMode = darkModeSwitch.isChecked();
 
             if(fontSize > 32){
                 Toast.makeText(getActivity().getApplicationContext(), "Font size too large", Toast.LENGTH_SHORT).show();
@@ -137,11 +147,13 @@ public class SettingsFragment extends Fragment {
         editor.putString(BING_API_KEY, bingApiKey);
         editor.putInt(FONT_SIZE, fontSize);
         editor.putInt(FONT_SIZE_TITLES, fontSizeTitles);
+        editor.putBoolean(DARK_MODE, darkMode);
         editor.apply();
 
         //Setting the static variables in FontUtils to the new values
         FontUtils.setTextFontSize(fontSize);
         FontUtils.setTitleFontSize(fontSizeTitles);
+        mainActivityViewModel.setDarkModeLiveData(darkMode);
 
         //Updating the font sizes
         setFontSizes();
@@ -155,10 +167,19 @@ public class SettingsFragment extends Fragment {
         int loadedFontSize = sharedPreferences.getInt(FONT_SIZE, 14);
         int loadedFontSizeTitles = sharedPreferences.getInt(FONT_SIZE_TITLES, 20);
 
+        // Get the current system theme
+        int nightModeFlags = getContext().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        // Check if the system is in night mode
+        boolean defaultDarkMode = nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
+
+        boolean loadedDarkMode = sharedPreferences.getBoolean(DARK_MODE, defaultDarkMode);
+
         //Setting the text in the text input to the api key that was loaded in
         bingApiKeyTextInput.getEditText().setText(loadedApiKey);
         fontSizeTextInput.getEditText().setText(String.valueOf(loadedFontSize));
         fontSizeTitleTextInput.getEditText().setText(String.valueOf(loadedFontSizeTitles));
+        darkModeSwitch.setChecked(loadedDarkMode);
     }
 
     private void setFontSizes() {

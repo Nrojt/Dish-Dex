@@ -1,7 +1,5 @@
 <resources>
-    <string name="app_name">Dish Dex</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name" translatable="false">Dish Dex</string>
     <string name="add_category">add category</string>
     <string name="home_title">Home</string>
     <string name="add_recipe_title">Add recipe</string>
