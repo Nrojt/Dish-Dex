@@ -2,7 +2,9 @@ package com.nrojt.dishdex.backend.viewmodels;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -11,6 +13,7 @@ import com.nrojt.dishdex.backend.Category;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 
+import java.time.Clock;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -18,12 +21,15 @@ public class HomePageFragmentViewModel extends ViewModel {
     private final MutableLiveData<Recipe> recipeLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> timeCategoryIDLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> timeRecipeIDLiveData = new MutableLiveData<>();
-    private Context context;
 
     public HomePageFragmentViewModel(Context context) {
-        this.context = context;
-        loadRecipe();
-        System.out.println("HomePageFragmentViewModel created");
+        loadRecipe(context);
+        Log.i("HomePageFragmentViewModel", "HomePageFragmentViewModel created");
+    }
+
+    @VisibleForTesting
+    public HomePageFragmentViewModel(){
+        //This is just for testing purposes, we do not want to load a recipe when we are testing
     }
 
     public void setRecipe(Recipe recipe){
@@ -33,16 +39,16 @@ public class HomePageFragmentViewModel extends ViewModel {
         recipeLiveData.setValue(recipe);
     }
 
-    public void loadRecipe() {
-        Recipe recipe = getRandomRecipeBasedOnTime();
+    public void loadRecipe(Context context) {
+        Recipe recipe = getRandomRecipeBasedOnTime(context);
         recipeLiveData.setValue(recipe);
     }
 
-    public void setTimeCategoryID(){
-        LocalTime currentTime = LocalTime.now();
-        LocalTime breakfastTime = LocalTime.of(9, 0);
-        LocalTime lunchTime = LocalTime.of(12, 0);
-        LocalTime dinnerTime = LocalTime.of(18, 0);
+    public void setTimeCategoryID(Clock clock){
+        LocalTime currentTime = LocalTime.now(clock);
+        LocalTime breakfastTime = LocalTime.of(10, 0);
+        LocalTime lunchTime = LocalTime.of(14, 0);
+        LocalTime dinnerTime = LocalTime.of(20, 0);
         LocalTime lateNightTime = LocalTime.of(22, 0);
         LocalTime earlyMorningTime = LocalTime.of(5, 0); //We dont want to suggest breakfast recipes after 0:00 and before 5:00
 
@@ -80,8 +86,8 @@ public class HomePageFragmentViewModel extends ViewModel {
     }
 
     //getting a random recipeID based on the time of day
-    private Recipe getRandomRecipeBasedOnTime() {
-        setTimeCategoryID();
+    private Recipe getRandomRecipeBasedOnTime(Context context) {
+        setTimeCategoryID(Clock.systemDefaultZone());
         MyDatabaseHelper db = MyDatabaseHelper.getInstance(context);
 
         int timeRecipeID = db.getRandomRecipeIDWhereCategoryID(getTimeCategoryIDLiveData().getValue());
@@ -91,7 +97,7 @@ public class HomePageFragmentViewModel extends ViewModel {
         if (timeRecipeID != -1) {
             Cursor cursor = db.readAllDataFromSavedRecipesWhereRecipeID(timeRecipeID);
             cursor.moveToFirst();
-            ArrayList<Category> categories = getSavedCategoryForRecipeFromDatabase(timeRecipeID);
+            ArrayList<Category> categories = getSavedCategoryForRecipeFromDatabase(timeRecipeID, context);
             recipe = new Recipe(cursor.getString(1), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getInt(0), cursor.getInt(2), cursor.getInt(3), true, categories);
             cursor.close();
         }
@@ -102,7 +108,7 @@ public class HomePageFragmentViewModel extends ViewModel {
     }
 
     //Getting the saved categoryIDs from the database to show the user which categories are applied to the recipe
-    private ArrayList<Category> getSavedCategoryForRecipeFromDatabase(int recipeID) {
+    private ArrayList<Category> getSavedCategoryForRecipeFromDatabase(int recipeID, Context context) {
         ArrayList<Category> savedCategories = new ArrayList<>();
         try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(context)) {
             Cursor cursor = db.getAllCategoriesWhereRecipeID(recipeID);

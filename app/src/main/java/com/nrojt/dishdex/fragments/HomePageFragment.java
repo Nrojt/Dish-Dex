@@ -1,6 +1,5 @@
 package com.nrojt.dishdex.fragments;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
-import com.nrojt.dishdex.backend.Category;
-import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.backend.viewmodels.HomePageFragmentViewModel;
-import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 import com.nrojt.dishdex.utils.viewmodel.HomePageFragmentViewModelFactory;
@@ -29,7 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
