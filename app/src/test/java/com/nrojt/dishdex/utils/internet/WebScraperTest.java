@@ -7,6 +7,14 @@ import org.junit.jupiter.api.Test;
 
 class WebScraperTest {
 
+    // https://www.simplyrecipes.com/recipes/chicken_cordon_bleu/
+    // https://bellyfull.net/chicken-cordon-bleu/
+    // https://www.allrecipes.com/recipe/8495/chicken-cordon-bleu-i/
+
+    // https://www.allrecipes.com/recipe/10264/oatmeal-raisin-cookies-i/
+    // https://bellyfull.net/oatmeal-raisin-cookies/
+    // https://www.simplyrecipes.com/recipes/oatmeal_raisin_cookies/
+
     @Test
     void isNotSupported() {
         String url = "https://www.tasteofhome.com/recipes/fontina-asparagus-tart/";
