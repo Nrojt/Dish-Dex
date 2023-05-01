@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,17 +23,14 @@ public class SettingsFragment extends Fragment {
     private TextInputLayout bingApiKeyTextInput;
     private TextInputLayout fontSizeTextInput;
     private TextInputLayout fontSizeTitleTextInput;
-    private ToggleButton proUserToggleButton;
     private Button saveSettingsButton;
 
     private String bingApiKey;
-    private boolean isProUser;
     private int fontSize;
     private int fontSizeTitles;
 
     public static final String SHARED_PREFS = "SharedPrefs";
     public static final String BING_API_KEY = "bingApiKey";
-    public static final String IS_PRO_USER = "isProUser";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_SIZE_TITLES = "fontSizeTitles";
 
@@ -78,14 +74,12 @@ public class SettingsFragment extends Fragment {
         //Getting the views
         bingApiKeyTextInput = view.findViewById(R.id.bingKeyTextInput);
         saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
-        proUserToggleButton = view.findViewById(R.id.proUserToggleButton);
         fontSizeTextInput = view.findViewById(R.id.fontSizeTextInput);
         fontSizeTitleTextInput = view.findViewById(R.id.fontSizeTitleTextInput);
 
 
         //Saving the settings to shared preferences (local storage) when the save button is clicked
         saveSettingsButton.setOnClickListener(v -> {
-            isProUser = proUserToggleButton.isChecked();
             bingApiKey = bingApiKeyTextInput.getEditText().getText().toString();
             fontSize = Integer.parseInt(fontSizeTextInput.getEditText().getText().toString());
             fontSizeTitles = Integer.parseInt(fontSizeTitleTextInput.getEditText().getText().toString());
@@ -141,7 +135,6 @@ public class SettingsFragment extends Fragment {
 
         //Saving the data, the first parameter is the key(name) and the second is the value(api key)
         editor.putString(BING_API_KEY, bingApiKey);
-        editor.putBoolean(IS_PRO_USER, isProUser);
         editor.putInt(FONT_SIZE, fontSize);
         editor.putInt(FONT_SIZE_TITLES, fontSizeTitles);
         editor.apply();
@@ -159,20 +152,17 @@ public class SettingsFragment extends Fragment {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         //If the key doesn't exist, the default value is an empty string
         String loadedApiKey = sharedPreferences.getString(BING_API_KEY, "");
-        boolean loadedIsProUser = sharedPreferences.getBoolean(IS_PRO_USER, false);
         int loadedFontSize = sharedPreferences.getInt(FONT_SIZE, 14);
         int loadedFontSizeTitles = sharedPreferences.getInt(FONT_SIZE_TITLES, 20);
 
         //Setting the text in the text input to the api key that was loaded in
         bingApiKeyTextInput.getEditText().setText(loadedApiKey);
-        proUserToggleButton.setChecked(loadedIsProUser);
         fontSizeTextInput.getEditText().setText(String.valueOf(loadedFontSize));
         fontSizeTitleTextInput.getEditText().setText(String.valueOf(loadedFontSizeTitles));
     }
 
     private void setFontSizes() {
         bingApiKeyTextInput.getEditText().setTextSize(FontUtils.getTextFontSize());
-        proUserToggleButton.setTextSize(FontUtils.getTextFontSize());
         fontSizeTextInput.getEditText().setTextSize(FontUtils.getTextFontSize());
         saveSettingsButton.setTextSize(FontUtils.getTextFontSize());
 

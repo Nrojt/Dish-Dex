@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     public void replaceFragment(Fragment fragment, Class<?> callingClass) {
         Log.d("MainActivity", "replaceFragment called from " + callingClass.getName() + " with fragment: " + fragment.getClass().getName());
 
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.addToBackStack(fragment.getClass().getName());
