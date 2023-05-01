@@ -5,103 +5,68 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Collection;
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
+@RunWith(Parameterized.class)
 public class HomePageFragmentViewModelTest {
     // This rule is needed to test LiveData
     @Rule
     public InstantTaskExecutorRule rule = new InstantTaskExecutorRule();
 
     private HomePageFragmentViewModel viewModel;
+    private LocalDateTime fixedDateTime;
+    private int expectedTimeCategoryId;
 
     @Before
     public void setUp() {
         viewModel = new HomePageFragmentViewModel();
     }
 
-    @Test
-    public void testSetTimeCategoryIDBreakfast() {
-        // Set a fixed date and time to use during testing
-        LocalDateTime fixedDateTime = LocalDateTime.of(2023, 5, 1, 5, 1);
-        ZoneId zoneId = ZoneId.systemDefault();
-        Instant fixedInstant = fixedDateTime.atZone(zoneId).toInstant();
-        Clock fixedClock = Clock.fixed(fixedInstant, zoneId);
+    // Constructor for the test, we pass in the fixed time and the expected time category id
+    // A constructor is needed because you cannot pass parameters into a test method
+    // This constructor is called for each test by the Parameterized runner
+    public HomePageFragmentViewModelTest(LocalTime fixedTime, int expectedTimeCategoryId) {
+        this.fixedDateTime = LocalDateTime.of(2023, 5, 1, fixedTime.getHour(), fixedTime.getMinute());
+        this.expectedTimeCategoryId = expectedTimeCategoryId;
+    }
 
-        // Use the fixed clock to spoof the time in the ViewModel
-        viewModel.setTimeCategoryID(fixedClock); // pass the fixed clock as a parameter
-
-        // Assert that the correct time category ID is set for the fixed time
-        assertEquals(1, viewModel.getTimeCategoryIDLiveData().getValue().intValue());
-
-        // Set a fixed date and time to use during testing
-        fixedDateTime = LocalDateTime.of(2023, 5, 1, 9, 59);
-        zoneId = ZoneId.systemDefault();
-        fixedInstant = fixedDateTime.atZone(zoneId).toInstant();
-        fixedClock = Clock.fixed(fixedInstant, zoneId);
-
-        // Use the fixed clock to spoof the time in the ViewModel
-        viewModel.setTimeCategoryID(fixedClock); // pass the fixed clock as a parameter
-
-        // Assert that the correct time category ID is set for the fixed time
-        assertEquals(1, viewModel.getTimeCategoryIDLiveData().getValue().intValue());
+    //Using parameters to test multiple values and so I can easily add more values to test
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] {
+                { LocalTime.parse("05:01"), 1 },
+                { LocalTime.parse("08:00"), 1 },
+                { LocalTime.parse("09:59"), 1 },
+                { LocalTime.parse("10:00"), 2 },
+                { LocalTime.parse("12:00"), 2 },
+                { LocalTime.parse("13:59"), 2 },
+                { LocalTime.parse("14:00"), 3 },
+                { LocalTime.parse("18:00"), 3 },
+                { LocalTime.parse("19:59"), 3 }
+        });
     }
 
     @Test
-    public void testSetTimeCategoryIDLunch() {
-        // Set a fixed date and time to use during testing
-        LocalDateTime fixedDateTime = LocalDateTime.of(2023, 5, 1, 10, 0);
+    public void testSetTimeCategory() {
+        // Making a fixed clock so we can test the time category
         ZoneId zoneId = ZoneId.systemDefault();
         Instant fixedInstant = fixedDateTime.atZone(zoneId).toInstant();
         Clock fixedClock = Clock.fixed(fixedInstant, zoneId);
 
-        // Use the fixed clock to spoof the time in the ViewModel
-        viewModel.setTimeCategoryID(fixedClock); // pass the fixed clock as a parameter
+        // Passing the clock into the viewmodel
+        viewModel.setTimeCategoryID(fixedClock);
 
-        // Assert that the correct time category ID is set for the fixed time
-        assertEquals(2, viewModel.getTimeCategoryIDLiveData().getValue().intValue());
-
-        // Set a fixed date and time to use during testing
-        fixedDateTime = LocalDateTime.of(2023, 5, 1, 13, 59);
-        zoneId = ZoneId.systemDefault();
-        fixedInstant = fixedDateTime.atZone(zoneId).toInstant();
-        fixedClock = Clock.fixed(fixedInstant, zoneId);
-
-        // Use the fixed clock to spoof the time in the ViewModel
-        viewModel.setTimeCategoryID(fixedClock); // pass the fixed clock as a parameter
-
-        // Assert that the correct time category ID is set for the fixed time
-        assertEquals(2, viewModel.getTimeCategoryIDLiveData().getValue().intValue());
-    }
-
-    @Test
-    public void testSetTimeCategoryIDDinner() {
-        // Set a fixed date and time to use during testing
-        LocalDateTime fixedDateTime = LocalDateTime.of(2023, 5, 1, 14, 0);
-        ZoneId zoneId = ZoneId.systemDefault();
-        Instant fixedInstant = fixedDateTime.atZone(zoneId).toInstant();
-        Clock fixedClock = Clock.fixed(fixedInstant, zoneId);
-
-        // Use the fixed clock to spoof the time in the ViewModel
-        viewModel.setTimeCategoryID(fixedClock); // pass the fixed clock as a parameter
-
-        // Assert that the correct time category ID is set for the fixed time
-        assertEquals(3, viewModel.getTimeCategoryIDLiveData().getValue().intValue());
-
-        // Set a fixed date and time to use during testing
-        fixedDateTime = LocalDateTime.of(2023, 5, 1, 19, 59);
-        zoneId = ZoneId.systemDefault();
-        fixedInstant = fixedDateTime.atZone(zoneId).toInstant();
-        fixedClock = Clock.fixed(fixedInstant, zoneId);
-
-        // Use the fixed clock to spoof the time in the ViewModel
-        viewModel.setTimeCategoryID(fixedClock); // pass the fixed clock as a parameter
-
-        // Assert that the correct time category ID is set for the fixed time
-        assertEquals(3, viewModel.getTimeCategoryIDLiveData().getValue().intValue());
+        assertEquals(expectedTimeCategoryId, viewModel.getTimeCategoryIDLiveData().getValue().intValue());
     }
 }
