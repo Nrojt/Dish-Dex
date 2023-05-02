@@ -46,7 +46,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,7 +177,9 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
 
     //getting the titles, cooking times and servings from the links
     private void scrapeLink(String url){
-        WebScraper wb = new WebScraper(url);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        String openaiApiKey = sharedPreferences.getString(SettingsFragment.OPENAI_API_KEY, "");
+        WebScraper wb = new WebScraper(url, openaiApiKey);
         wb.scrapeWebsite();
         //checking to see if the site is supported and if the site is reachable
         if (wb.isNotConnected() || wb.isNotReachable()) {

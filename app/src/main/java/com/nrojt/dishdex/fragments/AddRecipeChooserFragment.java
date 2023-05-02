@@ -1,5 +1,9 @@
 package com.nrojt.dishdex.fragments;
 
+import static com.nrojt.dishdex.fragments.SettingsFragment.SHARED_PREFS;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -92,7 +96,9 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
         getRecipeFromUrlButton.setOnClickListener(v -> {
             String url = urlInput.getText().toString();
             if (!url.isBlank()) {
-                WebScraper wb = new WebScraper(url);
+                SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+                String openaiApiKey = sharedPreferences.getString(SettingsFragment.OPENAI_API_KEY, "");
+                WebScraper wb = new WebScraper(url, openaiApiKey);
                 //creating a new thread for the WebScraper
                 ExecutorService service = Executors.newSingleThreadExecutor();
                 Handler handler = new Handler(Looper.getMainLooper());

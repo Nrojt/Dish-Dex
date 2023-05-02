@@ -18,7 +18,9 @@ class WebScraperTest {
     @Test
     void isNotSupported() {
         String url = "https://www.tasteofhome.com/recipes/fontina-asparagus-tart/";
-        WebScraper webScraper = new WebScraper(url);
+        String openaiApiKey = "";
+
+        WebScraper webScraper = new WebScraper(url, openaiApiKey);
         webScraper.scrapeWebsite();
         assertTrue(webScraper.isNotSupported());
     }
@@ -26,7 +28,9 @@ class WebScraperTest {
     @Test
     void isNotReachable() {
         String url = "AAAA";
-        WebScraper webScraper = new WebScraper(url);
+        String openaiApiKey = "";
+
+        WebScraper webScraper = new WebScraper(url, openaiApiKey);
         webScraper.scrapeWebsite();
         assertTrue(webScraper.isNotReachable());
     }
@@ -34,15 +38,19 @@ class WebScraperTest {
     @Test
     void getUrl() {
         String url = "https://www.google.com";
-        WebScraper webScraper = new WebScraper(url);
+        String openaiApiKey = "";
+
+        WebScraper webScraper = new WebScraper(url, openaiApiKey);
         assertEquals(url, webScraper.getUrl());
     }
 
     @Test
     void getServings() {
         String url = "https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren";
+        String openaiApiKey = "";
         int expectedServings = 8;
-        WebScraper webScraper = new WebScraper(url);
+
+        WebScraper webScraper = new WebScraper(url, openaiApiKey);
         webScraper.scrapeWebsite();
         assertEquals(expectedServings, webScraper.getServings());
     }
@@ -50,8 +58,10 @@ class WebScraperTest {
     @Test
     void getCookingTime() {
         String url = "https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren";
+        String openaiApiKey = "";
         int expectedCookingTime = 75;
-        WebScraper webScraper = new WebScraper(url);
+
+        WebScraper webScraper = new WebScraper(url, openaiApiKey);
         webScraper.scrapeWebsite();
         assertEquals(expectedCookingTime, webScraper.getCookingTime());
     }
@@ -59,8 +69,10 @@ class WebScraperTest {
     @Test
     void getRecipeTitle() {
         String url = "https://www.ah.nl/allerhande/recept/R-R1198109/kleurig-gevulde-eieren";
+        String openaiApiKey = "";
         String expectedTitle = "Kleurig gevulde eieren";
-        WebScraper webScraper = new WebScraper(url);
+
+        WebScraper webScraper = new WebScraper(url, openaiApiKey);
         webScraper.scrapeWebsite();
         assertEquals(expectedTitle, webScraper.getRecipeTitle());
     }

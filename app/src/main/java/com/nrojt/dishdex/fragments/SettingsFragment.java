@@ -24,18 +24,21 @@ import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 public class SettingsFragment extends Fragment {
 
     private TextInputLayout bingApiKeyTextInput;
+    private TextInputLayout openaiKeyTextInput;
     private TextInputLayout fontSizeTextInput;
     private TextInputLayout fontSizeTitleTextInput;
     private Button saveSettingsButton;
     private SwitchCompat darkModeSwitch;
 
     private String bingApiKey;
+    private String openaiKey;
     private int fontSize;
     private int fontSizeTitles;
     private boolean darkMode;
 
     public static final String SHARED_PREFS = "SharedPrefs";
     public static final String BING_API_KEY = "bingApiKey";
+    public static final String OPENAI_API_KEY = "openaiKey";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_SIZE_TITLES = "fontSizeTitles";
     public static final String DARK_MODE = "darkMode";
@@ -85,11 +88,13 @@ public class SettingsFragment extends Fragment {
         fontSizeTextInput = view.findViewById(R.id.fontSizeTextInput);
         fontSizeTitleTextInput = view.findViewById(R.id.fontSizeTitleTextInput);
         darkModeSwitch = view.findViewById(R.id.darkModeSwitch);
+        openaiKeyTextInput = view.findViewById(R.id.openaiKeyTextInput);
 
 
         //Saving the settings to shared preferences (local storage) when the save button is clicked
         saveSettingsButton.setOnClickListener(v -> {
             bingApiKey = bingApiKeyTextInput.getEditText().getText().toString();
+            openaiKey = openaiKeyTextInput.getEditText().getText().toString();
             fontSize = Integer.parseInt(fontSizeTextInput.getEditText().getText().toString());
             fontSizeTitles = Integer.parseInt(fontSizeTitleTextInput.getEditText().getText().toString());
             darkMode = darkModeSwitch.isChecked();
@@ -145,6 +150,7 @@ public class SettingsFragment extends Fragment {
 
         //Saving the data, the first parameter is the key(name) and the second is the value(api key)
         editor.putString(BING_API_KEY, bingApiKey);
+        editor.putString(OPENAI_API_KEY, openaiKey);
         editor.putInt(FONT_SIZE, fontSize);
         editor.putInt(FONT_SIZE_TITLES, fontSizeTitles);
         editor.putBoolean(DARK_MODE, darkMode);
@@ -163,7 +169,8 @@ public class SettingsFragment extends Fragment {
     public void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         //If the key doesn't exist, the default value is an empty string
-        String loadedApiKey = sharedPreferences.getString(BING_API_KEY, "");
+        String loadedBingApiKey = sharedPreferences.getString(BING_API_KEY, "");
+        String loadedOpenaiKey = sharedPreferences.getString(OPENAI_API_KEY, "");
         int loadedFontSize = sharedPreferences.getInt(FONT_SIZE, 14);
         int loadedFontSizeTitles = sharedPreferences.getInt(FONT_SIZE_TITLES, 20);
 
@@ -176,7 +183,8 @@ public class SettingsFragment extends Fragment {
         boolean loadedDarkMode = sharedPreferences.getBoolean(DARK_MODE, defaultDarkMode);
 
         //Setting the text in the text input to the api key that was loaded in
-        bingApiKeyTextInput.getEditText().setText(loadedApiKey);
+        bingApiKeyTextInput.getEditText().setText(loadedBingApiKey);
+        openaiKeyTextInput.getEditText().setText(loadedOpenaiKey);
         fontSizeTextInput.getEditText().setText(String.valueOf(loadedFontSize));
         fontSizeTitleTextInput.getEditText().setText(String.valueOf(loadedFontSizeTitles));
         darkModeSwitch.setChecked(loadedDarkMode);
@@ -184,6 +192,7 @@ public class SettingsFragment extends Fragment {
 
     private void setFontSizes() {
         bingApiKeyTextInput.getEditText().setTextSize(FontUtils.getTextFontSize());
+        openaiKeyTextInput.getEditText().setTextSize(FontUtils.getTextFontSize());
         fontSizeTextInput.getEditText().setTextSize(FontUtils.getTextFontSize());
         saveSettingsButton.setTextSize(FontUtils.getTextFontSize());
 

@@ -1,5 +1,9 @@
 package com.nrojt.dishdex.fragments;
 
+import static com.nrojt.dishdex.fragments.SettingsFragment.SHARED_PREFS;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -173,7 +177,9 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
             String url = currentBrowserUrl.getText().toString();
             if (!url.isBlank()) {
                 if (URLUtil.isValidUrl(url)) {
-                    WebScraper wb = new WebScraper(url);
+                    SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+                    String openaiApiKey = sharedPreferences.getString(SettingsFragment.OPENAI_API_KEY, "");
+                    WebScraper wb = new WebScraper(url, openaiApiKey);
                     ExecutorService webScraperService = Executors.newSingleThreadExecutor();
                     Handler handler1 = new Handler(Looper.getMainLooper());
                     //running the WebScraper on a separate thread, so the ui thread doesn't lock

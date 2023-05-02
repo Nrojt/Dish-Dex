@@ -2,10 +2,15 @@ package com.nrojt.dishdex.utils.internet;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.nrojt.dishdex.backend.Category;
+import com.theokanning.openai.OpenAiHttpException;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.ChatMessageRole;
+import com.theokanning.openai.service.OpenAiService;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -16,9 +21,14 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.reactivex.schedulers.Schedulers;
 
 //Serializable allows the object to be passed between fragments
 public class WebScraper implements Parcelable {
@@ -26,6 +36,7 @@ public class WebScraper implements Parcelable {
     private boolean notSupported = false;
     private boolean notReachable = false;
     private final String url;
+    private final String openaiApiKey;
     private int servings = 0;
     private int cookingTime = 0;
     private String recipeTitle;
@@ -37,15 +48,17 @@ public class WebScraper implements Parcelable {
     private final StringBuilder ingredientText = new StringBuilder();
 
     //constructor
-    public WebScraper(String url) {
+    public WebScraper(String url, String openaiApiKey) {
         //if the url doesn't contain http or https, add https. This is to prevent the app from crashing.
         if (!(url.contains("http://") || url.contains("https://"))) {
             this.url = "https://" + url;
         } else {
             this.url = url;
         }
+        this.openaiApiKey = openaiApiKey;
     }
 
+    //Random stuff needed for parcelables
     protected WebScraper(Parcel in) {
         notConnected = in.readByte() != 0;
         notSupported = in.readByte() != 0;
@@ -56,8 +69,10 @@ public class WebScraper implements Parcelable {
         recipeTitle = in.readString();
         recipeTextList = in.createStringArrayList();
         ingredientTextList = in.createStringArrayList();
+        openaiApiKey = in.readString();
     }
 
+    //Random stuff needed for parcelables
     public static final Creator<WebScraper> CREATOR = new Creator<>() {
         @Override
         public WebScraper createFromParcel(Parcel in) {
@@ -70,6 +85,7 @@ public class WebScraper implements Parcelable {
         }
     };
 
+    // getters
     public boolean isNotConnected() {
         return notConnected;
     }
@@ -275,14 +291,12 @@ public class WebScraper implements Parcelable {
                 // Define keywords that indicate the type of recipe
                 //TODO make a hashmap with the keywords and the category, this allows for multiple keywords per category
                 //TODO add support for custom categories
-                String[] keywords = {"breakfast", "Lunch", "Dinner", "Dessert", "Snack", "Side Dish"};
+                String[] keywords = {"Breakfast", "Lunch", "Dinner", "Dessert", "Snack", "Side Dish"};
 
                 String categoryText = "";
                 if (categoryElements != null) {
                     categoryText = categoryElements.text();
                 }
-
-
 
                 // Loop through each keyword
                 for (String keyword : keywords) {
@@ -292,10 +306,94 @@ public class WebScraper implements Parcelable {
                         break;
                     }
                 }
+
+                //If the recipe category is still 0, use GPT to guess the category
+                if(recipeCategory == 0 && !notSupported && openaiApiKey != null && !openaiApiKey.isEmpty()){
+                    getRecipeCategoryFromGPT(keywords);
+                }
+
+                Log.i("WebScraper", "Recipe Category: " + recipeCategory);
             }
 
         } else {
             notConnected = true;
+        }
+    }
+
+    //Using GPT 3.5 to get the category of the recipe
+    private void getRecipeCategoryFromGPT(String[] keywords){
+        try {
+            OpenAiService SERVICE = new OpenAiService(openaiApiKey);
+
+            String userMessageString = "What recipe type of recipe is this? Give one of the following answers in 1 word without punctuation: " + Arrays.toString(keywords) + url;
+            List<ChatMessage> messages = new ArrayList<>();
+            ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), userMessageString);
+            messages.add(userMessage);
+
+            StringBuilder responseBuilder = new StringBuilder();
+
+            ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
+                    .builder()
+                    .model("gpt-3.5-turbo")
+                    .messages(messages)
+                    .n(1) // number of choices to return
+                    .logitBias(new HashMap<>()) // bias towards certain tokens, idk how to implement this yet
+                    .build();
+
+
+            // Because we cannot run network requests on the main thread, we need to use a Scheduler and a completable future to wait for the response
+            CompletableFuture<String> future = new CompletableFuture<>();
+
+            SERVICE.streamChatCompletion(chatCompletionRequest) // get a stream of chat completions, the gpt api returns tokens one by one.
+                    .observeOn(Schedulers.io()) // run on a background thread
+                    .doOnError(e -> {
+                        //TODO find out why this still crashes the app when an incorrect api key is used
+                        if (e instanceof OpenAiHttpException) {
+                            // Handle OpenAiHttpExceptions here
+                            Log.e("GPTResponse", "OpenAI HTTP Error: " + e.getMessage());
+                            // Provide a user-friendly error message to the user
+                            future.completeExceptionally(new RuntimeException("Unable to complete request. Please check your API key and try again."));
+                        } else {
+                            Log.e("GPTResponse", "Error: " + e.getMessage());
+                            future.completeExceptionally(e);
+                        }
+                    }) // print errors
+                    .doOnComplete(() -> {
+                        String gptResponse = responseBuilder.toString();
+                        future.complete(gptResponse);
+                    })
+                    .subscribe(chatCompletionResponse -> {
+                        String response = chatCompletionResponse.getChoices().get(0).getMessage().getContent();
+                        if (response != null) { //The beginning and the end of the response are null
+                            responseBuilder.append(response);
+                        }
+                    });
+
+            String gptResponseString;
+            try {
+                gptResponseString = future.get();
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (gptResponseString == null || gptResponseString.isEmpty()) {
+                Log.e("GPTResponse", "GPT response was null");
+                return;
+            }
+
+            Log.i("GPTResponse", "GPT response: " + gptResponseString);
+            // Loop through each keyword
+            for (String keyword : keywords) {
+                // Check if the keyword is present in the URL
+                if (keyword.equalsIgnoreCase(gptResponseString)) {
+                    recipeCategory = Arrays.asList(keywords).indexOf(keyword) + 1;
+                    break;
+                }
+            }
+
+            SERVICE.shutdownExecutor(); // shutdown the executor to prevent memory leaks
+        } catch (OpenAiHttpException e) {
+            throw new RuntimeException(e);
         }
     }
 
