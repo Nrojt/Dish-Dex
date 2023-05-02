@@ -118,6 +118,7 @@
                 android:background="@android:drawable/editbox_background"
                 android:drawableEnd="@android:drawable/arrow_down_float"
                 android:minHeight="48dp"
+                android:textColor="@color/black"
                 android:text="Choose categories" />
 
             <TextView

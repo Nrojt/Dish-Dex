@@ -34,6 +34,7 @@
             android:layout_alignParentEnd="true"
             android:background="@android:drawable/editbox_background"
             android:minHeight="48dp"
+            android:textColor="@color/black"
             android:text="Choose categories"
             app:drawableEndCompat="@android:drawable/arrow_down_float" />
 

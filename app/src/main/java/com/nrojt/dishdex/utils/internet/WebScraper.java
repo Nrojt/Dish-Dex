@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.nrojt.dishdex.backend.Category;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,8 +14,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +31,7 @@ public class WebScraper implements Parcelable {
     private String recipeTitle;
     private List<String> recipeTextList = new ArrayList<>();
     private List<String> ingredientTextList = new ArrayList<>();
+    private int recipeCategory;
 
     private final StringBuilder recipeText = new StringBuilder();
     private final StringBuilder ingredientText = new StringBuilder();
@@ -55,7 +58,7 @@ public class WebScraper implements Parcelable {
         ingredientTextList = in.createStringArrayList();
     }
 
-    public static final Creator<WebScraper> CREATOR = new Creator<WebScraper>() {
+    public static final Creator<WebScraper> CREATOR = new Creator<>() {
         @Override
         public WebScraper createFromParcel(Parcel in) {
             return new WebScraper(in);
@@ -103,6 +106,10 @@ public class WebScraper implements Parcelable {
         return ingredientText;
     }
 
+    public int getRecipeCategory() {
+        return recipeCategory;
+    }
+
     //method to scrape the website
     public void scrapeWebsite() {
         //Checking if the user is connected to the internet
@@ -116,6 +123,7 @@ public class WebScraper implements Parcelable {
                 Element servingsElement;
                 Element cookingTimeElement;
                 Element recipeTitleElement;
+                Elements categoryElements = null;
 
                 //checking the url to see what classes need to be scraped, don't think this can be done in a switch
                 if (url.contains("ah.nl/allerhande/recept")) {
@@ -171,6 +179,7 @@ public class WebScraper implements Parcelable {
                     servingsElement = document.getElementsByClass("wprm-recipe-servings-with-unit").first();
                     cookingTimeElement = document.getElementsByClass("wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes").get(0);
                     recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").first();
+                    categoryElements = document.getElementsByClass("breadcrumbs");
                 } else {
                     //General recipe scraper
                     //Selectors are used to find the elements on the page
@@ -261,7 +270,30 @@ public class WebScraper implements Parcelable {
                 for (int i = 0; i < ingredientTextList.size(); i++) {
                     ingredientText.append(ingredientTextList.get(i));
                 }
+
+                // guessing the category of the recipe based on the url
+                // Define keywords that indicate the type of recipe
+                //TODO make a hashmap with the keywords and the category, this allows for multiple keywords per category
+                //TODO add support for custom categories
+                String[] keywords = {"breakfast", "Lunch", "Dinner", "Dessert", "Snack", "Side Dish"};
+
+                String categoryText = "";
+                if (categoryElements != null) {
+                    categoryText = categoryElements.text();
+                }
+
+
+
+                // Loop through each keyword
+                for (String keyword : keywords) {
+                    // Check if the keyword is present in the URL
+                    if (url.toLowerCase().contains(keyword.toLowerCase()) || categoryText.toLowerCase().contains(keyword.toLowerCase())) {
+                        recipeCategory = Arrays.asList(keywords).indexOf(keyword) + 1;
+                        break;
+                    }
+                }
             }
+
         } else {
             notConnected = true;
         }

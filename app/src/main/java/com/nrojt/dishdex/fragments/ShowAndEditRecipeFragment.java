@@ -146,6 +146,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                     servingsTextOnScreen.setText(String.valueOf(wb.getServings()));
                     recipeTitleTextOnScreen.setText(wb.getRecipeTitle());
                     urlTextOnScreen.setText(url);
+                    setCategoryFromScraper();
                     if(wb.isNotSupported()){
                         isUrlSupportedTextView.setText("This website is not supported");
                     } else {
@@ -188,6 +189,9 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
                 } else {
                     isUrlSupportedTextView.setText("This website is not supported");
                 }
+
+                //getting the categories from the database and setting the selectedCategories array to the correct values;
+                getSavedCategoryForRecipe();
             }
             default -> {
                 isUrlSupportedTextView.setVisibility(View.GONE);
@@ -385,6 +389,19 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
         }
         else {
             chooseCategoriesTextView.setText(selectedCategoryNames);
+        }
+    }
+
+    //setting the category that got scraped by web scraper
+    private void setCategoryFromScraper(){
+        int categoryIDFromScraper = wb.getRecipeCategory();
+        if(categoryIDFromScraper > 0){
+            for (int i = 0; i < categories.size(); i++) {
+                if (categories.get(i).getCategoryID() == categoryIDFromScraper){
+                    selectedCategories[i] = true;
+                }
+            }
+            updateSelectedCategories();
         }
     }
 

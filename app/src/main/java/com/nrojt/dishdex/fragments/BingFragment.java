@@ -5,6 +5,8 @@ import static com.nrojt.dishdex.fragments.SettingsFragment.SHARED_PREFS;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -24,8 +26,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
+import com.nrojt.dishdex.backend.Category;
 import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.backend.viewmodels.BingFragmentViewModel;
+import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.RecyclerViewInterface;
 import com.nrojt.dishdex.utils.internet.SearchResults;
@@ -42,6 +46,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,7 +184,8 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         if (wb.isNotConnected() || wb.isNotReachable()) {
             Log.e("BingFragment", "Not connected to the internet or cannot reach this site: " + url);
         } else {
-            Recipe recipe = new Recipe(wb.getRecipeTitle(), wb.getIngredientText().toString(), wb.getRecipeText().toString(), "", wb.getUrl(), -1, wb.getCookingTime(), wb.getServings(), !wb.isNotSupported(), new ArrayList<>()); //if the site is supported, isNotSupported will return false. Here we need to know if the site is supported, so we invert the boolean
+            ArrayList<Category> scrapedCategory = setCategoryFromScraper(wb);
+            Recipe recipe = new Recipe(wb.getRecipeTitle(), wb.getIngredientText().toString(), wb.getRecipeText().toString(), "", wb.getUrl(), -1, wb.getCookingTime(), wb.getServings(), !wb.isNotSupported(), scrapedCategory); //if the site is supported, isNotSupported will return false. Here we need to know if the site is supported, so we invert the boolean
             recipes.add(recipe);
         }
     }
@@ -242,6 +248,40 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         }
         stream.close();
         return results;
+    }
+
+    //setting the category that got scraped by web scraper
+    private ArrayList<Category> setCategoryFromScraper(WebScraper wb){
+        ArrayList<Category> scrapedCategory = new ArrayList<>();
+        ArrayList<Category> allCategories = new ArrayList<>();
+
+        try (MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext())) {
+            Cursor cursor = db.readAllDataFromCategories();
+            if (cursor.getCount() == 0) {
+                //This should never happen, since the database is created with default categories
+                Toast.makeText(getContext(), "No Categories", Toast.LENGTH_SHORT).show();
+            } else {
+                while (cursor.moveToNext()) {
+                    Category category = new Category(cursor.getInt(1), cursor.getString(0));
+                    allCategories.add(category);
+                }
+            }
+
+            cursor.close();
+        } catch (SQLException e) {
+            Log.e("BingFragment Database", e.getMessage());
+        }
+
+
+        int categoryIDFromScraper = wb.getRecipeCategory();
+        if(categoryIDFromScraper > 0){
+            for (int i = 0; i < allCategories.size(); i++) {
+                if (allCategories.get(i).getCategoryID() == categoryIDFromScraper){
+                    scrapedCategory.add(allCategories.get(i));
+                }
+            }
+        }
+        return scrapedCategory;
     }
 
     // Method for replacing the fragment (redirecting to main activity)
