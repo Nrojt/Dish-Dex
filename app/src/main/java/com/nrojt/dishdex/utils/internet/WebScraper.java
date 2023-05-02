@@ -308,11 +308,10 @@ public class WebScraper implements Parcelable {
                 }
 
                 //If the recipe category is still 0, use GPT to guess the category
-                if(recipeCategory == 0 && !notSupported && openaiApiKey != null && !openaiApiKey.isEmpty()){
+                if(recipeCategory == 0 && !notSupported && openaiApiKey != null && !openaiApiKey.isBlank()){
                     getRecipeCategoryFromGPT(keywords);
                 }
 
-                Log.i("WebScraper", "Recipe Category: " + recipeCategory);
             }
 
         } else {
