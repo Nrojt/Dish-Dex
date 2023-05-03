@@ -394,7 +394,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
 
     //setting the category that got scraped by web scraper
     private void setCategoryFromScraper(){
-        int categoryIDFromScraper = wb.getRecipeCategory();
+        int categoryIDFromScraper = wb.getRecipeCategoryID();
         if(categoryIDFromScraper > 0){
             for (int i = 0; i < categories.size(); i++) {
                 if (categories.get(i).getCategoryID() == categoryIDFromScraper){
