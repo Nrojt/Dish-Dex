@@ -42,11 +42,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link WebBrowserFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+//TODO fix the networkonmainthreadexception when opening and trying to save a recipe from a saved recipe
+
 public class WebBrowserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
     private ArrayList<String> blockedUrls = new ArrayList<>();
     private WebView urlBrowser;

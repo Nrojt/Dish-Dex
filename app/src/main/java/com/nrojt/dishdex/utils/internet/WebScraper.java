@@ -203,6 +203,15 @@ public class WebScraper implements Parcelable {
                     cookingTimeElement = document.getElementsByClass("wprm-recipe-details wprm-recipe-details-minutes wprm-recipe-total_time wprm-recipe-total_time-minutes").get(0);
                     recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").first();
                     categoryElements = document.getElementsByClass("breadcrumbs");
+                } else if (url.contains("ohmyfoodness.nl")){
+                    instructionElements = document.getElementsByClass("wprm-recipe-instruction-text");
+                    ingredientElements = document.getElementsByClass("wprm-recipe-ingredient");
+
+                    servingsElement = document.getElementsByClass("wprm-recipe-servings-with-unit").first();
+                    cookingTimeElement = null;
+                    recipeTitleElement = document.getElementsByClass("wprm-recipe-name wprm-block-text-bold").first();
+                    categoryElements = document.getElementsByClass("cat-links");
+
                 } else {
                     //General recipe scraper
                     //Selectors are used to find the elements on the page
@@ -296,9 +305,21 @@ public class WebScraper implements Parcelable {
 
                 // guessing the category of the recipe based on the url
                 // Define keywords that indicate the type of recipe
-                //TODO make a hashmap with the keywords and the category, this allows for multiple keywords per category
+                //TODO maybe put the hashmap in a separate class or in its own method.
                 //TODO add support for custom categories
-                String[] keywords = {"Breakfast", "Lunch", "Dinner", "Dessert", "Snack", "Side Dish"};
+
+                HashMap<String, Integer> categoryKeywords = new HashMap<>();
+                categoryKeywords.put("breakfast", 1);
+                categoryKeywords.put("lunch", 2);
+                categoryKeywords.put("dinner", 3);
+                categoryKeywords.put("main", 3);
+                categoryKeywords.put("diner", 3);
+                categoryKeywords.put("avond eten", 3);
+                categoryKeywords.put("dessert", 4);
+                categoryKeywords.put("toetje", 4);
+                categoryKeywords.put("snack", 5);
+                categoryKeywords.put("side dish", 6);
+
 
                 String categoryText = "";
                 if (categoryElements != null) {
@@ -306,17 +327,17 @@ public class WebScraper implements Parcelable {
                 }
 
                 // Loop through each keyword
-                for (String keyword : keywords) {
+                for (String keyword : categoryKeywords.keySet()){
                     // Check if the keyword is present in the URL
                     if (url.toLowerCase().contains(keyword.toLowerCase()) || categoryText.toLowerCase().contains(keyword.toLowerCase())) {
-                        recipeCategoryID = Arrays.asList(keywords).indexOf(keyword) + 1;
+                        recipeCategoryID = categoryKeywords.get(keyword);
                         break;
                     }
                 }
 
                 //If the recipe category is still 0, use GPT to guess the category
                 if (recipeCategoryID == 0 && !notSupported && openaiApiKey != null && !openaiApiKey.isBlank()) {
-                    getRecipeCategoryFromGPT(keywords);
+                    getRecipeCategoryFromGPT(categoryKeywords);
                 }
 
             }
@@ -324,9 +345,11 @@ public class WebScraper implements Parcelable {
     }
 
     //Using GPT 3.5 to get the category of the recipe
-    private void getRecipeCategoryFromGPT(String[] keywords){
+    private void getRecipeCategoryFromGPT(HashMap<String, Integer> categoryKeywords){
         try {
             OpenAiService SERVICE = new OpenAiService(openaiApiKey);
+
+            String[] keywords = categoryKeywords.keySet().toArray(new String[0]);
 
             String userMessageString = "What recipe type of recipe is this? Give one of the following answers in 1 word without punctuation: " + Arrays.toString(keywords) + url;
             List<ChatMessage> messages = new ArrayList<>();
@@ -386,10 +409,10 @@ public class WebScraper implements Parcelable {
 
             //Log.i("GPTResponse", "GPT response: " + gptResponseString);
             // Loop through each keyword
-            for (String keyword : keywords) {
+            for (String keyword : categoryKeywords.keySet()) {
                 // Check if the keyword is present in the URL
                 if (keyword.equalsIgnoreCase(gptResponseString)) {
-                    recipeCategoryID = Arrays.asList(keywords).indexOf(keyword) + 1;
+                    recipeCategoryID = categoryKeywords.get(keyword);
                     break;
                 }
             }
