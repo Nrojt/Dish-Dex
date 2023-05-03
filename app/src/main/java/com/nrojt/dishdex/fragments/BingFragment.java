@@ -274,7 +274,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         }
 
 
-        int categoryIDFromScraper = wb.getRecipeCategory();
+        int categoryIDFromScraper = wb.getRecipeCategoryID();
         if(categoryIDFromScraper > 0){
             for (int i = 0; i < allCategories.size(); i++) {
                 if (allCategories.get(i).getCategoryID() == categoryIDFromScraper){

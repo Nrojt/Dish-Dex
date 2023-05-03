@@ -42,7 +42,7 @@ public class WebScraper implements Parcelable {
     private String recipeTitle;
     private List<String> recipeTextList = new ArrayList<>();
     private List<String> ingredientTextList = new ArrayList<>();
-    private int recipeCategory;
+    private int recipeCategoryID;
 
     private final StringBuilder recipeText = new StringBuilder();
     private final StringBuilder ingredientText = new StringBuilder();
@@ -122,14 +122,21 @@ public class WebScraper implements Parcelable {
         return ingredientText;
     }
 
-    public int getRecipeCategory() {
-        return recipeCategory;
+    public int getRecipeCategoryID() {
+        return recipeCategoryID;
+    }
+
+    //method to check if the device is connected to the internet
+    public boolean checkIfNotConnected() {
+        boolean connected = InternetConnection.isNetworkAvailable();
+        return !connected;
     }
 
     //method to scrape the website
     public void scrapeWebsite() {
-        //Checking if the user is connected to the internet
-        if (InternetConnection.isNetworkAvailable()) {
+        //check if the device is connected to the internet
+        notConnected = checkIfNotConnected();
+        if (!notConnected) {
             Document document = getDocument(url);
             if (document == null) {
                 notReachable = true;
@@ -302,20 +309,17 @@ public class WebScraper implements Parcelable {
                 for (String keyword : keywords) {
                     // Check if the keyword is present in the URL
                     if (url.toLowerCase().contains(keyword.toLowerCase()) || categoryText.toLowerCase().contains(keyword.toLowerCase())) {
-                        recipeCategory = Arrays.asList(keywords).indexOf(keyword) + 1;
+                        recipeCategoryID = Arrays.asList(keywords).indexOf(keyword) + 1;
                         break;
                     }
                 }
 
                 //If the recipe category is still 0, use GPT to guess the category
-                if(recipeCategory == 0 && !notSupported && openaiApiKey != null && !openaiApiKey.isBlank()){
+                if (recipeCategoryID == 0 && !notSupported && openaiApiKey != null && !openaiApiKey.isBlank()) {
                     getRecipeCategoryFromGPT(keywords);
                 }
 
             }
-
-        } else {
-            notConnected = true;
         }
     }
 
@@ -349,11 +353,11 @@ public class WebScraper implements Parcelable {
                         //TODO find out why this still crashes the app when an incorrect api key is used
                         if (e instanceof OpenAiHttpException) {
                             // Handle OpenAiHttpExceptions here
-                            Log.e("GPTResponse", "OpenAI HTTP Error: " + e.getMessage());
+                            //Log.e("GPTResponse", "OpenAI HTTP Error: " + e.getMessage());
                             // Provide a user-friendly error message to the user
                             future.completeExceptionally(new RuntimeException("Unable to complete request. Please check your API key and try again."));
                         } else {
-                            Log.e("GPTResponse", "Error: " + e.getMessage());
+                            //Log.e("GPTResponse", "Error: " + e.getMessage());
                             future.completeExceptionally(e);
                         }
                     }) // print errors
@@ -376,16 +380,16 @@ public class WebScraper implements Parcelable {
             }
 
             if (gptResponseString == null || gptResponseString.isEmpty()) {
-                Log.e("GPTResponse", "GPT response was null");
+                //Log.e("GPTResponse", "GPT response was null");
                 return;
             }
 
-            Log.i("GPTResponse", "GPT response: " + gptResponseString);
+            //Log.i("GPTResponse", "GPT response: " + gptResponseString);
             // Loop through each keyword
             for (String keyword : keywords) {
                 // Check if the keyword is present in the URL
                 if (keyword.equalsIgnoreCase(gptResponseString)) {
-                    recipeCategory = Arrays.asList(keywords).indexOf(keyword) + 1;
+                    recipeCategoryID = Arrays.asList(keywords).indexOf(keyword) + 1;
                     break;
                 }
             }
