@@ -8,8 +8,9 @@ import androidx.lifecycle.ViewModel;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 
 public class AddCategoryFragmentViewModel extends ViewModel {
-    MutableLiveData<String> categoryName = new MutableLiveData<>();
+    MutableLiveData<String> categoryName;
     public AddCategoryFragmentViewModel() {
+        categoryName = new MutableLiveData<>();
     }
 
     public void setCategoryName(String categoryName) {

@@ -91,7 +91,9 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         if (getArguments() != null) {
             hideFab = getArguments().getBoolean(ARG_PARAM1, false);
         }
+
         viewModel = new ViewModelProvider(requireActivity()).get(SavedRecipesFragmentViewModel.class);
+
     }
 
     @Override

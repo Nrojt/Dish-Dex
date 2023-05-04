@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,11 +30,6 @@ import com.nrojt.dishdex.utils.internet.WebScraper;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddRecipeChooserFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class AddRecipeChooserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private TextInputEditText urlInput;
     private TextInputEditText bingSearchInput;
@@ -91,11 +88,50 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
         Button browseWebButton = view.findViewById(R.id.browseWebButton);
         Button emptyRecipeButton = view.findViewById(R.id.emptyRecipeButton);
 
+        //setting the text of the urlInput to the value of the urlInput in the viewModel, same for bingSearchInput
+        urlInput.setText(viewModel.getUrlInput().getValue());
+        bingSearchInput.setText(viewModel.getBingSearchInput().getValue());
+
+        // TextChangedListeners for the urlInput and bingSearchInput, which update the values in the viewModel
+        urlInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //not needed
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                viewModel.setUrlInput(s.toString());
+            }
+        });
+
+        bingSearchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //not needed
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                viewModel.setBingSearchInput(s.toString());
+            }
+        });
+
 
         //When the user clicks the button, the url is passed to the WebScraper class which checks if the site is supported and if the site is reachable
         getRecipeFromUrlButton.setOnClickListener(v -> {
-            String url = urlInput.getText().toString();
-            if (!url.isBlank()) {
+            String url = viewModel.getUrlInput().getValue();
+            if (url != null && !url.isBlank()) {
                 SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
                 String openaiApiKey = sharedPreferences.getString(SettingsFragment.OPENAI_API_KEY, "");
                 WebScraper wb = new WebScraper(url, openaiApiKey);
@@ -105,7 +141,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
                 service.execute(() -> {
                     wb.scrapeWebsite();
                     handler.post(() -> {
-                        Log.d("Scraping","Scraping done");
+                        Log.i("Scraping","Scraping done");
                         //checking to see if the site is supported and if the site is reachable
                         if (wb.isNotConnected()) {
                             Toast.makeText(getActivity().getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
@@ -132,8 +168,8 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
 
         //When the user clicks this button, the search query is passed to the BingSearch class
         bingSearchButton.setOnClickListener(v -> {
-            String bingSearchQuery = bingSearchInput.getText().toString();
-            if (!bingSearchQuery.isBlank()) {
+            String bingSearchQuery = viewModel.getBingSearchInput().getValue();
+            if (bingSearchQuery != null && !bingSearchQuery.isBlank()) {
                 Fragment bingFragment = BingFragment.newInstance(bingSearchQuery);
                 replaceFragment(bingFragment);
             } else {
@@ -141,6 +177,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
             }
         });
 
+        //When the user clicks this button, the ShowAndEditRecipeFragment is opened with a new empty recipe
         emptyRecipeButton.setOnClickListener(v -> {
             Fragment showAndEditRecipeFragment = ShowAndEditRecipeFragment.newInstance(2, null, null, null);
             replaceFragment(showAndEditRecipeFragment);
@@ -167,5 +204,11 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
         if (getActivity() != null) {
             fragmentManager.removeOnBackStackChangedListener(this);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        viewModel.clear();
     }
 }

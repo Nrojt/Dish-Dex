@@ -87,18 +87,17 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
         categoryNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                //not used
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // This method is called when the text is changed.
-                viewModel.setCategoryName(s.toString());
+                //not used
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-
+                viewModel.setCategoryName(editable.toString());
             }
         });
 

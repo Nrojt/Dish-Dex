@@ -70,6 +70,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         viewModel = new ViewModelProvider(this, new HomePageFragmentViewModelFactory(requireActivity().getApplication())).get(HomePageFragmentViewModel.class);
+
     }
 
     @Override
