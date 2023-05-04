@@ -165,7 +165,7 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                replaceFragment(WebBrowserFragment.newInstance(recipes.get(position).getRecipeUrl()));
+                replaceFragment(WebBrowserFragment.newInstance(recipes.get(position).getRecipeUrl(), true));
             }
         };
 

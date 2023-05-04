@@ -50,6 +50,7 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
     private FragmentManager fragmentManager;
 
     private SavedCategoriesFragmentViewModel viewModel;
+    private Snackbar currentSnackbar = null;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -115,6 +116,8 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
             }
         });
 
+
+
         //Adding swipe to delete functionality
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             @Override
@@ -124,9 +127,15 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
                 //Remove swiped item from list and notify the RecyclerView
                 int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.RIGHT) {
+                    // Check if there's a current Snackbar instance and dismiss it
+                    if (currentSnackbar != null) {
+                        currentSnackbar.dismiss();
+                    }
+
                     if (categories.get(position).getCategoryID() > 6) {
                         deletedCategory = categories.get(position);
                         categories.remove(deletedCategory);
@@ -150,6 +159,8 @@ public class SavedCategoriesFragment extends Fragment implements RecyclerViewInt
                                 }
                             }
                         });
+
+                        currentSnackbar = snackbar;
                         snackbar.show();
                     } else {
                         Toast.makeText(getContext(), "You can't delete this category", Toast.LENGTH_SHORT).show();

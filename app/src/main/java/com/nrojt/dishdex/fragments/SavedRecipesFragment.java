@@ -62,22 +62,20 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
     private FragmentManager fragmentManager;
 
-    public static boolean noSavedRecipes = false;
+    private static boolean noSavedRecipes = false;
+
+    private Snackbar currentSnackbar = null;
 
     private SavedRecipesFragmentViewModel viewModel;
+
+    public boolean getNoSavedRecipes() {
+        return noSavedRecipes;
+    }
 
 
     public SavedRecipesFragment() {
         // Required empty public constructor
     }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param hideFab Parameter 1.
-     * @return A new instance of fragment SavedRecipesFragment.
-     */
 
     public static SavedRecipesFragment newInstance(boolean hideFab) {
         SavedRecipesFragment fragment = new SavedRecipesFragment();
@@ -103,6 +101,12 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         View view = inflater.inflate(R.layout.fragment_saved_recipes, container, false);
 
         db = MyDatabaseHelper.getInstance(getContext());
+
+        //This method gets the recipes in the database
+        getRecipesFromDatabase();
+
+        //getting all the categories from the database
+        getCategoriesFromDatabase();
 
         savedRecipesRecyclerView = view.findViewById(R.id.savedRecipesRecyclerView);
         SearchView savedRecipesSearchView = view.findViewById(R.id.savedRecipesSearchView);
@@ -156,6 +160,11 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
                 //Remove swiped item from list and notify the RecyclerView
                 int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.RIGHT) {
+                    // Check if there's a current Snackbar instance and dismiss it
+                    if (currentSnackbar != null) {
+                        currentSnackbar.dismiss();
+                    }
+
                     deletedRecipe = recipes.get(position);
                     recipes.remove(position);
 
@@ -187,12 +196,6 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(savedRecipesRecyclerView);
-
-        //This method gets the recipes in the database
-        getRecipesFromDatabase();
-
-        //getting all the categories from the database
-        getCategoriesFromDatabase();
 
         //setting the onClickListener for the chooseCategoriesTextView
         chooseCategoriesSavedRecipeTextView.setOnClickListener(v -> {

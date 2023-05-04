@@ -2,7 +2,6 @@ package com.nrojt.dishdex.utils.internet;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -340,6 +339,7 @@ public class WebScraper implements Parcelable {
                     getRecipeCategoryFromGPT(categoryKeywords);
                 }
 
+                System.out.println("Recipe CategoryID: " + recipeCategoryID);
             }
         }
     }
@@ -376,11 +376,11 @@ public class WebScraper implements Parcelable {
                         //TODO find out why this still crashes the app when an incorrect api key is used
                         if (e instanceof OpenAiHttpException) {
                             // Handle OpenAiHttpExceptions here
-                            //Log.e("GPTResponse", "OpenAI HTTP Error: " + e.getMessage());
+                            System.out.println("OpenAI HTTP Error: " + e.getMessage());
                             // Provide a user-friendly error message to the user
                             future.completeExceptionally(new RuntimeException("Unable to complete request. Please check your API key and try again."));
                         } else {
-                            //Log.e("GPTResponse", "Error: " + e.getMessage());
+                            System.out.println("Error: " + e.getMessage());
                             future.completeExceptionally(e);
                         }
                     }) // print errors
@@ -403,11 +403,12 @@ public class WebScraper implements Parcelable {
             }
 
             if (gptResponseString == null || gptResponseString.isEmpty()) {
-                //Log.e("GPTResponse", "GPT response was null");
+                System.out.println("GPT response was null");
                 return;
             }
 
-            //Log.i("GPTResponse", "GPT response: " + gptResponseString);
+            System.out.println("GPT response: " + gptResponseString);
+
             // Loop through each keyword
             for (String keyword : categoryKeywords.keySet()) {
                 // Check if the keyword is present in the URL

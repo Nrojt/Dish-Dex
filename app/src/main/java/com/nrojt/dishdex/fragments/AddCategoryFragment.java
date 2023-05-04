@@ -1,6 +1,8 @@
 package com.nrojt.dishdex.fragments;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +16,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.backend.viewmodels.AddCategoryFragmentViewModel;
-import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddCategoryFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class AddCategoryFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener {
     private EditText categoryNameEditText;
     private FragmentManager fragmentManager;
@@ -69,6 +66,7 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
         categoryNameEditText = view.findViewById(R.id.categoryNameEditText);
 
         categoryNameEditText.setTextSize(FontUtils.getTitleFontSize());
+        categoryNameEditText.setText(viewModel.getCategoryName().getValue());
 
 
         fragmentManager = getChildFragmentManager();
@@ -80,12 +78,30 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
                 return;
             }
 
-            MyDatabaseHelper db = MyDatabaseHelper.getInstance(getContext());
-            if (db.addCategory(categoryName)) {
+            if (viewModel.addCategory(requireContext())){
                 fragmentManager.popBackStack();
             }
 
         });
+
+        categoryNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // This method is called when the text is changed.
+                viewModel.setCategoryName(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
         return view;
     }
 
@@ -107,6 +123,5 @@ public class AddCategoryFragment extends Fragment implements FragmentReplacer, F
     @Override
     public void onBackStackChanged() {
             ((MainActivity) getActivity()).onBackStackChanged();
-
     }
 }

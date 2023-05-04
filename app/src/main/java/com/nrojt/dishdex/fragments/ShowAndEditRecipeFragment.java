@@ -335,7 +335,7 @@ public class ShowAndEditRecipeFragment extends Fragment implements FragmentManag
             if (urlTextOnScreen.getText().toString().isBlank()) {
                 Toast.makeText(getContext(), "No URL to open", Toast.LENGTH_SHORT).show();
             } else {
-                replaceFragment(WebBrowserFragment.newInstance(urlTextOnScreen.getText().toString()));
+                replaceFragment(WebBrowserFragment.newInstance(urlTextOnScreen.getText().toString(), false));
             }
             return true; // indicate that the event is consumed
         });

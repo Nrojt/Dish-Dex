@@ -1,6 +1,7 @@
 package com.nrojt.dishdex.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,10 +124,11 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
         timeTextView.setText("It is currently: " + currentTime);
 
 
-
-        //TODO hide containertextview when there are no saved recipes
-        if (savedRecipesFragment.noSavedRecipes) {
+        Log.i("HomePageFragment", "noSavedRecipes " + savedRecipesFragment.getNoSavedRecipes());
+        //TODO fix this
+        if (savedRecipesFragment.getNoSavedRecipes()) {
             fragmentContainerView.setVisibility(View.GONE);
+            homePageFragmentContainerTextView.setVisibility(View.GONE);
             homePageFragmentContainerTextView.setVisibility(View.GONE);
         }
 

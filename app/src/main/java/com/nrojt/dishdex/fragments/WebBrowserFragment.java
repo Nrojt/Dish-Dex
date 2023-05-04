@@ -42,8 +42,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//TODO fix the networkonmainthreadexception when opening and trying to save a recipe from a saved recipe
-
+//TODO when opening a link from a saved recipe, allow that recipe to be updated/saved when pressing the saveThisRecipe button, instead of creating a new one
 public class WebBrowserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
     private ArrayList<String> blockedUrls = new ArrayList<>();
     private WebView urlBrowser;
@@ -56,19 +55,22 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String URL = "url";
+    private static final String SHOW_SAVE_BUTTON = "showSaveButton";
 
 
-    private String openUrl = "https://www.google.com";
+    private String openUrl;
+    private Boolean showSaveButton;
 
     public WebBrowserFragment() {
         // Required empty public constructor
     }
 
 
-    public static WebBrowserFragment newInstance(String url) {
+    public static WebBrowserFragment newInstance(String url, boolean showSaveButton) {
         WebBrowserFragment fragment = new WebBrowserFragment();
         Bundle args = new Bundle();
         args.putString(URL, url);
+        args.putBoolean(SHOW_SAVE_BUTTON, showSaveButton);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,7 +80,12 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             openUrl = getArguments().getString(URL);
+            showSaveButton = getArguments().getBoolean(SHOW_SAVE_BUTTON);
+        } else {
+            openUrl = "https://www.google.com";
+            showSaveButton = true;
         }
+
         viewModel = new ViewModelProvider(requireActivity()).get(WebBrowserFragmentViewModel.class);
     }
 
@@ -168,6 +175,13 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
             }
             return false;
         });
+
+        //hiding or showing the save this button
+        if(showSaveButton){
+            scrapeThisUrlButton.setVisibility(View.VISIBLE);
+        } else {
+            scrapeThisUrlButton.setVisibility(View.GONE);
+        }
 
         //the button that will get the url and send it to the ScrapeFromUrlFragment
         scrapeThisUrlButton.setOnClickListener(view1 -> {
