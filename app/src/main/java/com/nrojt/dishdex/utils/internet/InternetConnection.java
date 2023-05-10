@@ -10,7 +10,7 @@ public class InternetConnection {
     //This is better than checking if the device is connected to a WiFi network, because the device might be connected to a WiFi network but not have internet access.
     public static boolean isNetworkAvailable() {
         try {
-            int timeout = 2000; //setting a timeout of 2 seconds
+            int timeout = 10000; //setting a timeout of 10 seconds
             Socket sock = new Socket();
             SocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 53);
 
