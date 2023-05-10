@@ -5,11 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import com.theokanning.openai.OpenAiHttpException;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
-import com.theokanning.openai.service.OpenAiService;
+import com.nrojt.dishdex.utils.hashmap.CategoryKeywordsHashmap;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -19,15 +15,9 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import io.reactivex.schedulers.Schedulers;
 
 //Serializable allows the object to be passed between fragments
 public class WebScraper implements Parcelable {
@@ -164,6 +154,7 @@ public class WebScraper implements Parcelable {
                     servingsElement = document.getElementsByClass("recipe-ingredients_servings__f8HXF").first();
                     cookingTimeElement = document.getElementsByClass("recipe-header-time_timeLine__nn84w").first();
                     recipeTitleElement = document.getElementsByClass("typography_root__Om3Wh typography_variant-superhero__239x3 typography_hasMargin__4EaQi recipe-header_title__tG0JE").first();
+                    categoryElements = document.getElementsByClass("typography_root__Om3Wh typography_variant-paragraph__T5ZAU typography_weight-strong__uEXiN recipe-tag_text__aKcWG");
                 } else if (url.contains("allrecipes.com/recipe")) {
                     instructionElements = document.getElementsByClass("comp mntl-sc-block-group--LI mntl-sc-block mntl-sc-block-startgroup");
                     ingredientElements = document.getElementsByClass("mntl-structured-ingredients__list-item ");
@@ -307,17 +298,7 @@ public class WebScraper implements Parcelable {
                 //TODO maybe put the hashmap in a separate class or in its own method.
                 //TODO add support for custom categories
 
-                HashMap<String, Integer> categoryKeywords = new HashMap<>();
-                categoryKeywords.put("breakfast", 1);
-                categoryKeywords.put("lunch", 2);
-                categoryKeywords.put("dinner", 3);
-                categoryKeywords.put("main", 3);
-                categoryKeywords.put("diner", 3);
-                categoryKeywords.put("avond eten", 3);
-                categoryKeywords.put("dessert", 4);
-                categoryKeywords.put("toetje", 4);
-                categoryKeywords.put("snack", 5);
-                categoryKeywords.put("side dish", 6);
+
 
 
                 String categoryText = "";
@@ -326,17 +307,18 @@ public class WebScraper implements Parcelable {
                 }
 
                 // Loop through each keyword
-                for (String keyword : categoryKeywords.keySet()){
+                for (String keyword : CategoryKeywordsHashmap.getCategoryKeywords().keySet()){
                     // Check if the keyword is present in the URL
                     if (url.toLowerCase().contains(keyword.toLowerCase()) || categoryText.toLowerCase().contains(keyword.toLowerCase())) {
-                        recipeCategoryID = categoryKeywords.get(keyword);
+                        recipeCategoryID = CategoryKeywordsHashmap.getCategoryID(keyword);
                         break;
                     }
                 }
 
                 //If the recipe category is still 0, use GPT to guess the category
                 if (recipeCategoryID == 0 && !notSupported && openaiApiKey != null && !openaiApiKey.isBlank()) {
-                    getRecipeCategoryFromGPT(categoryKeywords);
+                    OpenAIGPT openAIGPT = OpenAIGPT.getInstance(openaiApiKey);
+                    recipeCategoryID = openAIGPT.getRecipeCategoryFromGPT(url);
                 }
 
                 System.out.println("Recipe CategoryID: " + recipeCategoryID);
@@ -344,85 +326,7 @@ public class WebScraper implements Parcelable {
         }
     }
 
-    //Using GPT 3.5 to get the category of the recipe
-    private void getRecipeCategoryFromGPT(HashMap<String, Integer> categoryKeywords){
-        try {
-            OpenAiService SERVICE = new OpenAiService(openaiApiKey);
 
-            String[] keywords = categoryKeywords.keySet().toArray(new String[0]);
-
-            String userMessageString = "What recipe type of recipe is this? Give one of the following answers in 1 word without punctuation: " + Arrays.toString(keywords) + url;
-            List<ChatMessage> messages = new ArrayList<>();
-            ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), userMessageString);
-            messages.add(userMessage);
-
-            StringBuilder responseBuilder = new StringBuilder();
-
-            ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
-                    .builder()
-                    .model("gpt-3.5-turbo")
-                    .messages(messages)
-                    .n(1) // number of choices to return
-                    .logitBias(new HashMap<>()) // bias towards certain tokens, idk how to implement this yet
-                    .build();
-
-
-            // Because we cannot run network requests on the main thread, we need to use a Scheduler and a completable future to wait for the response
-            CompletableFuture<String> future = new CompletableFuture<>();
-
-            SERVICE.streamChatCompletion(chatCompletionRequest) // get a stream of chat completions, the gpt api returns tokens one by one.
-                    .observeOn(Schedulers.io()) // run on a background thread
-                    .doOnError(e -> {
-                        //TODO find out why this still crashes the app when an incorrect api key is used
-                        if (e instanceof OpenAiHttpException) {
-                            // Handle OpenAiHttpExceptions here
-                            System.out.println("OpenAI HTTP Error: " + e.getMessage());
-                            // Provide a user-friendly error message to the user
-                            future.completeExceptionally(new RuntimeException("Unable to complete request. Please check your API key and try again."));
-                        } else {
-                            System.out.println("Error: " + e.getMessage());
-                            future.completeExceptionally(e);
-                        }
-                    }) // print errors
-                    .doOnComplete(() -> {
-                        String gptResponse = responseBuilder.toString();
-                        future.complete(gptResponse);
-                    })
-                    .subscribe(chatCompletionResponse -> {
-                        String response = chatCompletionResponse.getChoices().get(0).getMessage().getContent();
-                        if (response != null) { //The beginning and the end of the response are null
-                            responseBuilder.append(response);
-                        }
-                    });
-
-            String gptResponseString;
-            try {
-                gptResponseString = future.get();
-            } catch (ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
-            if (gptResponseString == null || gptResponseString.isEmpty()) {
-                System.out.println("GPT response was null");
-                return;
-            }
-
-            System.out.println("GPT response: " + gptResponseString);
-
-            // Loop through each keyword
-            for (String keyword : categoryKeywords.keySet()) {
-                // Check if the keyword is present in the URL
-                if (keyword.equalsIgnoreCase(gptResponseString)) {
-                    recipeCategoryID = categoryKeywords.get(keyword);
-                    break;
-                }
-            }
-
-            SERVICE.shutdownExecutor(); // shutdown the executor to prevent memory leaks
-        } catch (OpenAiHttpException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     //Method to get a Document from the website, this is part of Jsoup
     public static Document getDocument(String url) {
