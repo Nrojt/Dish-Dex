@@ -341,7 +341,7 @@ public class SavedRecipesFragment extends Fragment implements RecyclerViewInterf
         // Create a HashMap mapping menu item IDs to Runnables
         Map<Integer, Runnable> actionMap = new HashMap<>();
         actionMap.put(R.id.savedRecipesFabAddCategory, () -> replaceFragment(new AddCategoryFragment()));
-        actionMap.put(R.id.savedRecipesFabBrowser, () -> replaceFragment(new WebBrowserFragment()));
+        actionMap.put(R.id.savedRecipesFabBrowser, () -> replaceFragment(WebBrowserFragment.newInstance("https://www.google.com", true)));
         actionMap.put(R.id.savedRecipesFabAddEmptyRecipe, () -> replaceFragment(ShowAndEditRecipeFragment.newInstance(2, null, null, null)));
         actionMap.put(R.id.savedRecipesFabAllCategories, () -> replaceFragment(new SavedCategoriesFragment()));
 

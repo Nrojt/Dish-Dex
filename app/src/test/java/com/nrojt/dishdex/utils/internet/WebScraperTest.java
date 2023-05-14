@@ -79,20 +79,14 @@ class WebScraperTest {
     @CsvSource({
             "https://bellyfull.net/chicken-cordon-bleu/, Chicken Cordon Bleu, true, 3",
             "https://www.allrecipes.com/recipe/8495/chicken-cordon-bleu-i/, Chicken Cordon Bleu, true, 3",
-            "https://www.simplyrecipes.com/recipes/chicken_cordon_bleu/, Chicken Cordon Bleu, false, 0",
+            "https://www.simplyrecipes.com/recipes/chicken_cordon_bleu/, Chicken Cordon Bleu, false, 3",
             "https://bellyfull.net/oatmeal-raisin-cookies/, Oatmeal Raisin Cookies, true, 4",
             "https://www.allrecipes.com/recipe/10264/oatmeal-raisin-cookies-i/, Oatmeal Raisin Cookies, true, 4",
-            "https://www.simplyrecipes.com/recipes/oatmeal_raisin_cookies/, Oatmeal Raisin Cookies, false, 0"
+            "https://www.simplyrecipes.com/recipes/oatmeal_raisin_cookies/, Oatmeal Raisin Cookies, false, 4"
     })
     void testPairwise(String url, String expectedTitle, boolean expectedSupported, int expectedCategoryID) {
 
-        String openaiApiKey = "OPENAI_API_KEY"; //This needs to be filled in for the test to work
-
-        // If the API key is not filled in, the test will fail because the category will be 0, so we set it to 0
-        if(openaiApiKey.equals("OPENAI_API_KEY") && !url.contains("bellyfull.net")){
-            expectedCategoryID = 0;
-            openaiApiKey = "";
-        }
+        String openaiApiKey = "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"; //This needs to be filled in with a valid API key
 
 
         WebScraper webScraper = new WebScraper(url, openaiApiKey);
@@ -101,12 +95,21 @@ class WebScraperTest {
         assertEquals(expectedTitle, webScraper.getRecipeTitle());
         assertEquals(expectedSupported, !webScraper.isNotSupported()); // !isNotSupported() == isSupported()
         assertEquals(expectedCategoryID, webScraper.getRecipeCategoryID()); // 0 means no category
+
+        if(expectedSupported){
+            assertFalse(webScraper.getIngredientText().toString().isEmpty());
+            assertFalse(webScraper.getRecipeText().toString().isEmpty());
+        }
+        else{
+            assertTrue(webScraper.getIngredientText().toString().isEmpty());
+            assertTrue(webScraper.getRecipeText().toString().isEmpty());
+        }
     }
 
 
-    private String supportedWebsite = "https://bellyfull.net/chicken-cordon-bleu/";
-    private String supportedWebsiteUnreachable = "https://bellyfull.net/chicken-aqwerdrsdfgsdefrzg/";
-    private String unsupportedWebsite = "https://www.simplyrecipes.com/recipes/chicken_cordon_bleu/";
+    private final String supportedWebsite = "https://bellyfull.net/chicken-cordon-bleu/";
+    private final String supportedWebsiteUnreachable = "https://bellyfull.net/chicken-aqwerdrsdfgsdefrzg/";
+    private final String unsupportedWebsite = "https://www.simplyrecipes.com/recipes/chicken_cordon_bleu/";
 
     @Test
     public void testMCDCNoInternet(){

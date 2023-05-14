@@ -126,7 +126,7 @@ public class HomePageFragment extends Fragment implements FragmentReplacer, Frag
 
 
         Log.i("HomePageFragment", "noSavedRecipes " + savedRecipesFragment.getNoSavedRecipes());
-        //TODO fix this
+        //TODO fix this, needs restart to apply correctly
         if (savedRecipesFragment.getNoSavedRecipes()) {
             fragmentContainerView.setVisibility(View.GONE);
             homePageFragmentContainerTextView.setVisibility(View.GONE);

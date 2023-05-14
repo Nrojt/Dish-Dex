@@ -295,11 +295,7 @@ public class WebScraper implements Parcelable {
 
                 // guessing the category of the recipe based on the url
                 // Define keywords that indicate the type of recipe
-                //TODO maybe put the hashmap in a separate class or in its own method.
                 //TODO add support for custom categories
-
-
-
 
                 String categoryText = "";
                 if (categoryElements != null) {
@@ -316,7 +312,7 @@ public class WebScraper implements Parcelable {
                 }
 
                 //If the recipe category is still 0, use GPT to guess the category
-                if (recipeCategoryID == 0 && !notSupported && openaiApiKey != null && !openaiApiKey.isBlank()) {
+                if (recipeCategoryID == 0 && openaiApiKey != null && !openaiApiKey.isBlank()) {
                     OpenAIGPT openAIGPT = OpenAIGPT.getInstance(openaiApiKey);
                     recipeCategoryID = openAIGPT.getRecipeCategoryFromGPT(url);
                 }

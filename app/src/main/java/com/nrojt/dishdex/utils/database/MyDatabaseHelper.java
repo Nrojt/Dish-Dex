@@ -167,6 +167,19 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public boolean deleteCategory(String categoryName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.delete("category", "categoryName = ?", new String[]{categoryName});
+        db.close();
+        if (result == -1) {
+            Toast.makeText(context, "Failed to delete category", Toast.LENGTH_SHORT).show();
+            Log.e("Database", "Failed to delete category");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     //Adding a category to the database
     public boolean addCategory(String categoryName) {
         SQLiteDatabase db = this.getWritableDatabase();

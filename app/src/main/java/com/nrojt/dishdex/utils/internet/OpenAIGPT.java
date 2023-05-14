@@ -105,8 +105,13 @@ public class OpenAIGPT {
 
             System.out.println("GPT response: " + gptResponseString);
 
-            if(keywords.contains(gptResponseString)){
-                recipeCategoryID = CategoryKeywordsHashmap.getCategoryID(gptResponseString);
+            String gptResponseStringLowercase = gptResponseString.toLowerCase().trim();
+            gptResponseStringLowercase = gptResponseStringLowercase.replaceAll("\\p{Punct}", "");
+
+            if(keywords.contains(gptResponseStringLowercase)){
+                recipeCategoryID = CategoryKeywordsHashmap.getCategoryID(gptResponseStringLowercase); //replacing all potential punctuation
+            } else {
+                System.out.println("GPT response was not in keywords");
             }
 
             SERVICE.shutdownExecutor(); // shutdown the executor to prevent memory leaks

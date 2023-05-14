@@ -16,12 +16,32 @@ import com.nrojt.dishdex.MainActivity;
 import com.nrojt.dishdex.R;
 import com.nrojt.dishdex.utils.database.MyDatabaseHelper;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Random;
+
 public class AddCategoryFragmentTest {
+    private String randomCategoryName;
+
+    @Before
+    public void setUp() {
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder();
+
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            int index = random.nextInt(alphabet.length());
+            char randomChar = alphabet.charAt(index);
+            sb.append(randomChar);
+        }
+
+        randomCategoryName = sb.toString();
+    }
 
     @Test
     public void testAddCategoryToDatabase() {
+
         // Start an activity scenario for MainActivity
         ActivityScenario<MainActivity> activityScenario = ActivityScenario.launch(MainActivity.class);
 
@@ -39,13 +59,16 @@ public class AddCategoryFragmentTest {
         });
 
 
+
+
         // Enter a category name and click the saveCategoryButton
-        onView(withId(R.id.categoryNameEditText)).perform(typeText("Test Category"));
+        onView(withId(R.id.categoryNameEditText)).perform(typeText(randomCategoryName));
         onView(withId(R.id.saveCategoryButton)).perform(click());
 
         // Check that the category was added to the database
         MyDatabaseHelper db = MyDatabaseHelper.getInstance(context);
-        assertTrue(db.checkIfCategoryExists("Test Category"));
+        assertTrue(db.checkIfCategoryExists(randomCategoryName));
+        assertTrue(db.deleteCategory(randomCategoryName));
 
         // Close the activity scenario
         activityScenario.close();

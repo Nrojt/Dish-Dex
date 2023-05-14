@@ -34,17 +34,14 @@ import com.nrojt.dishdex.backend.Recipe;
 import com.nrojt.dishdex.backend.viewmodels.WebBrowserFragmentViewModel;
 import com.nrojt.dishdex.utils.interfaces.FragmentReplacer;
 import com.nrojt.dishdex.utils.interfaces.OnBackPressedListener;
-import com.nrojt.dishdex.utils.internet.LoadWebsiteBlockList;
 import com.nrojt.dishdex.utils.internet.WebScraper;
 import com.nrojt.dishdex.utils.viewmodel.FontUtils;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 //TODO when opening a link from a saved recipe, allow that recipe to be updated/saved when pressing the saveThisRecipe button, instead of creating a new one
 public class WebBrowserFragment extends Fragment implements FragmentReplacer, FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
-    private ArrayList<String> blockedUrls = new ArrayList<>();
     private WebView urlBrowser;
     private EditText currentBrowserUrl;
 
@@ -57,8 +54,6 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
     private static final String URL = "url";
     private static final String SHOW_SAVE_BUTTON = "showSaveButton";
 
-
-    private String openUrl;
     private Boolean showSaveButton;
 
     public WebBrowserFragment() {
@@ -78,15 +73,21 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(WebBrowserFragmentViewModel.class);
+
         if (getArguments() != null) {
-            openUrl = getArguments().getString(URL);
+            viewModel.setOpenUrl(getArguments().getString(URL));
             showSaveButton = getArguments().getBoolean(SHOW_SAVE_BUTTON);
         } else {
-            openUrl = "https://www.google.com";
+            if (viewModel.getOpenUrl() == null) {
+                viewModel.setOpenUrl("https://www.google.com");
+            }
             showSaveButton = true;
         }
 
-        viewModel = new ViewModelProvider(requireActivity()).get(WebBrowserFragmentViewModel.class);
+        if(viewModel.getBlockedUrls().getValue().isEmpty()){
+            viewModel.loadBlockedUrls(getContext());
+        }
     }
 
     @Override
@@ -102,17 +103,6 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         currentBrowserUrl.setTextSize(FontUtils.getTitleFontSize());
 
 
-        LoadWebsiteBlockList loadWebsiteBlockList = new LoadWebsiteBlockList(getContext());
-        //creating a new thread for getting the blocked urls
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-
-        //running the LoadBlockList in another thread
-        service.execute(() -> {
-            loadWebsiteBlockList.loadBlockList();
-            handler.post(() -> blockedUrls = loadWebsiteBlockList.getAdUrls());
-        });
-        service.shutdown();
 
 
         //Overriding the standard ChromeClient to update the currentBrowserUrl
@@ -131,6 +121,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 currentBrowserUrl.setText(request.getUrl().toString());
+                viewModel.setOpenUrl(request.getUrl().toString());
                 return false;
             }
 
@@ -139,7 +130,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 // check if request is coming from an ad URL and return a fake resource if it is
-                if (isBlocked(request.getUrl().toString())) {
+                if (viewModel.isBlockedUrl(request.getUrl().toString())) {
                     Log.i("WebView", "blocked url: " + request.getUrl().toString());
                     return new WebResourceResponse("text/plain", "utf-8", null);
                 } else {
@@ -156,7 +147,7 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
 
         //enabling javascript, since without it many websites won't work
         urlBrowser.getSettings().setJavaScriptEnabled(true);
-        urlBrowser.loadUrl(openUrl);
+        urlBrowser.loadUrl(viewModel.getOpenUrl());
 
 
         //searching the web if the user presses the enter key in the edittext
@@ -234,18 +225,6 @@ public class WebBrowserFragment extends Fragment implements FragmentReplacer, Fr
         }
         return false;
     }
-
-
-    //trying to see if it is possible to block ads
-    private boolean isBlocked(String url) {
-        for (int i = 0; i < blockedUrls.size(); i++) {
-            if (url.contains(blockedUrls.get(i))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     //replacing the fragment
     @Override

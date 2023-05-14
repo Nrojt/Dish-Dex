@@ -164,7 +164,7 @@ public class AddRecipeChooserFragment extends Fragment implements FragmentReplac
         });
 
         //When the user clicks this button, an in app browser is going to open in the WebBrowserFragment
-        browseWebButton.setOnClickListener(view1 -> replaceFragment(new WebBrowserFragment()));
+        browseWebButton.setOnClickListener(view1 -> replaceFragment(WebBrowserFragment.newInstance("https://www.google.com",true)));
 
         //When the user clicks this button, the search query is passed to the BingSearch class
         bingSearchButton.setOnClickListener(v -> {
