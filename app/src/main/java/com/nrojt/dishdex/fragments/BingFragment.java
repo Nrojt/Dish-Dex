@@ -41,12 +41,6 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
 
     private BingFragmentViewModel viewModel;
 
-    /*
-     * If you encounter unexpected authorization errors, double-check these values
-     * against the endpoint for your Bing Web search instance in your Azure
-     * dashboard.
-     */
-
 
     // the fragment initialization parameters
     private static final String SEARCH_QUERY = "searchQuery";

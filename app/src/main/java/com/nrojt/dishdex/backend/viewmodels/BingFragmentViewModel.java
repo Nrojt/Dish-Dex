@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 import javax.net.ssl.HttpsURLConnection;
 
 //TODO savedinstance so it doesn't have to search again when opening a recipe and going back
+//TODO fix network on main thread exception
 public class BingFragmentViewModel extends ViewModel {
     private MutableLiveData<String> bingApiKey;
     private MutableLiveData<ArrayList<String>> bingReturnUrls;
@@ -39,6 +40,7 @@ public class BingFragmentViewModel extends ViewModel {
     private MutableLiveData<String> searchTerm;
     private MutableLiveData<String> openaiApiKey;
     private MutableLiveData<Integer> recipeChangeCounter;
+     private boolean searchTermChanged = false;
 
     private static final String host = "https://api.bing.microsoft.com";
     private static final String path = "/v7.0/search";
@@ -65,6 +67,7 @@ public class BingFragmentViewModel extends ViewModel {
 
     public void setSearchTerm(String searchTerm) {
         this.searchTerm.setValue(searchTerm);
+        searchTermChanged = true;
     }
 
     public MutableLiveData<String> getSearchTermMutable() {
@@ -88,26 +91,34 @@ public class BingFragmentViewModel extends ViewModel {
     }
 
     public void searchForRecipes(Context context) {
-        bingReturnUrls.getValue().clear();
-        recipes.getValue().clear();
+        if(searchTerm.getValue() == null || searchTerm.getValue().equals("")) {
+            Toast.makeText(context, "Please enter a search term", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(() -> {
-            try {
-                runTheSearch();
-                for (String url : bingReturnUrls.getValue()) {
-                    System.out.println(url);
-                    try {
-                        recipes.getValue().add(scrapeLink(url, context));
-                        recipeChangeCounter.postValue(recipes.getValue().size());
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        if(searchTermChanged) {
+            bingReturnUrls.getValue().clear();
+            recipes.getValue().clear();
+
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            service.execute(() -> {
+                try {
+                    runTheSearch();
+                    for (String url : bingReturnUrls.getValue()) {
+                        System.out.println(url);
+                        try {
+                            recipes.getValue().add(scrapeLink(url, context));
+                            recipeChangeCounter.postValue(recipes.getValue().size());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+            });
+            searchTermChanged = false;
+        }
     }
 
     private void runTheSearch() {
@@ -208,5 +219,4 @@ public class BingFragmentViewModel extends ViewModel {
         }
         return scrapedCategory;
     }
-
 }

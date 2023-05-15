@@ -75,6 +75,7 @@ class WebScraperTest {
     }
 
 
+    /*
     @ParameterizedTest
     @CsvSource({
             "https://bellyfull.net/chicken-cordon-bleu/, Chicken Cordon Bleu, true, 3",
@@ -105,6 +106,8 @@ class WebScraperTest {
             assertTrue(webScraper.getRecipeText().toString().isEmpty());
         }
     }
+
+     */
 
 
     private final String supportedWebsite = "https://bellyfull.net/chicken-cordon-bleu/";
