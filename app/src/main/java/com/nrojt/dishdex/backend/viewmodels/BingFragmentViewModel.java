@@ -31,8 +31,7 @@ import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-//TODO savedinstance so it doesn't have to search again when opening a recipe and going back
-//TODO fix network on main thread exception
+//TODO fix network on main thread exception, this might actually be caused by openai api
 public class BingFragmentViewModel extends ViewModel {
     private MutableLiveData<String> bingApiKey;
     private MutableLiveData<ArrayList<String>> bingReturnUrls;
@@ -90,6 +89,10 @@ public class BingFragmentViewModel extends ViewModel {
         return recipeChangeCounter;
     }
 
+    public boolean isSearchTermChanged() {
+        return searchTermChanged;
+    }
+
     public void searchForRecipes(Context context) {
         if(searchTerm.getValue() == null || searchTerm.getValue().equals("")) {
             Toast.makeText(context, "Please enter a search term", Toast.LENGTH_SHORT).show();
@@ -118,6 +121,7 @@ public class BingFragmentViewModel extends ViewModel {
                 }
             });
             searchTermChanged = false;
+            service.shutdown();
         }
     }
 

@@ -103,8 +103,10 @@ public class BingFragment extends Fragment implements RecyclerViewInterface, Fra
         viewModel.getSearchTermMutable().observe(getViewLifecycleOwner(), s -> {
             if(s != null) {
                 if(!s.isBlank()) {
-                    bingNotificationTextView.setText("Searching for " + s + "...");
-                    viewModel.searchForRecipes(getContext());
+                    if( viewModel.isSearchTermChanged()) {
+                        bingNotificationTextView.setText("Searching for " + s + "...");
+                        viewModel.searchForRecipes(getContext());
+                    }
                 } else {
                     bingNotificationTextView.setText("No search term provided");
                 }
